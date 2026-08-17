@@ -21,10 +21,17 @@ jobs:
             export PATH=$PATH:/usr/local/bin:/opt/alt/alt-nodejs22/root/usr/bin:/opt/alt/alt-nodejs20/root/usr/bin
             if [ -s "$HOME/.nvm/nvm.sh" ]; then source "$HOME/.nvm/nvm.sh"; fi
 
-            cd /home/${{ secrets.HOSTINGER_USERNAME }}/domains/mediumblue-wildcat-188317.hostingersite.com/nodejs
+            # Determine directory
+            DEPLOY_DIR="/home/${{ secrets.HOSTINGER_USERNAME }}/domains/mediumblue-wildcat-188317.hostingersite.com/nodejs"
+            if [ -d "/home/${{ secrets.HOSTINGER_USERNAME }}/domains/aelbd.net/nodejs" ]; then
+              DEPLOY_DIR="/home/${{ secrets.HOSTINGER_USERNAME }}/domains/aelbd.net/nodejs"
+            fi
+            
+            echo "Deploying to $DEPLOY_DIR"
+            cd "$DEPLOY_DIR"
             
             # Prevent Hostinger VPS thread & memory crashing
-            export NODE_OPTIONS="--max-old-space-size=512"
+            export NODE_OPTIONS="--max-old-space-size=1024"
             git config --global pack.threads 1
             git config --global pack.windowMemory 50m
             
@@ -49,20 +56,20 @@ jobs:
             
             URL_VAL="${{ secrets.NEXTAUTH_URL }}"
             if [ -z "$URL_VAL" ]; then
-              URL_VAL="https://mediumblue-wildcat-188317.hostingersite.com"
+              URL_VAL="https://aelbd.net"
             fi
             echo "NEXTAUTH_URL=\"$URL_VAL\"" >> .env
             
             # System variables
             echo "PRISMA_CLIENT_ENGINE_TYPE=\"binary\"" >> .env
-            echo "NEXT_PUBLIC_APP_URL=\"https://mediumblue-wildcat-188317.hostingersite.com\"" >> .env
+            echo "NEXT_PUBLIC_APP_URL=\"https://aelbd.net\"" >> .env
             
-            # Install packages without choking the memory
-            npm install --production --no-audit --no-fund
+            # Install packages (including devDependencies required by Next.js & Prisma build)
+            npm install --no-audit --no-fund
             npx prisma generate
-            npx prisma migrate deploy || npx prisma db push --accept-data-loss
+            npx prisma db push --accept-data-loss
             npm run seed || true
             npm run build
-            # Gracefully restart application utilizing dynamic npx executable to avoid memory crashes
+            # Gracefully restart application utilizing pm2
             npx -y pm2 restart garments-website --update-env || npx -y pm2 start ecosystem.config.js
             echo "✅ Deployment complete!"
