@@ -88,47 +88,50 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
                     </p>
                 </div>
 
-                {product.priceDisplay && product.priceRange && (
-                    <div className="mb-4">
-                        <span className="text-xl font-black text-primary dark:text-blue-400">
-                            {product.priceRange}
-                        </span>
-                        <div className="flex items-center gap-1 mt-1 text-[10px] text-gray-400 font-bold uppercase tracking-wider">
-                            Min. order: {product.minOrder || '500 pieces'}
-                        </div>
-                    </div>
-                )}
+                {/* B2B Sourcing Tag (NO PUBLIC PRICES) */}
+                <div className="mb-3 flex items-center justify-between">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-md">
+                        B2B Sourcing & Export
+                    </span>
+                    <span className="text-[11px] font-medium text-gray-500">
+                        Custom Tech-Pack
+                    </span>
+                </div>
 
-                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-6 flex-grow leading-relaxed">
-                    {product.shortDescription}
+                <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2 mb-4 flex-grow leading-relaxed">
+                    {product.shortDescription || product.description}
                 </p>
 
                 {/* Specs highlight grid */}
-                <div className="grid grid-cols-2 gap-3 mb-6">
-                    <div className="bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-3 border border-gray-100 dark:border-gray-800">
-                        <span className="block text-[9px] text-gray-400 uppercase font-black tracking-widest mb-0.5">MOQ</span>
-                        <span className="block text-xs font-bold text-gray-900 dark:text-white truncate" title={specs['MOQ'] || '500 Pcs'}>
-                            {specs['MOQ'] || '500 Pcs'}
+                <div className="grid grid-cols-2 gap-2 mb-4">
+                    <div className="bg-gray-50 dark:bg-gray-800 rounded-xl px-3 py-2 border border-gray-100 dark:border-gray-800">
+                        <span className="block text-[9px] text-gray-400 uppercase font-black tracking-widest mb-0.5">Min. Order</span>
+                        <span className="block text-xs font-bold text-gray-900 dark:text-white truncate" title={specs['MOQ'] || product.minOrder || '500 Pcs'}>
+                            {specs['MOQ'] || product.minOrder || '500 Pcs'}
                         </span>
                     </div>
-                    <div className="bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-3 border border-gray-100 dark:border-gray-800">
+                    <div className="bg-gray-50 dark:bg-gray-800 rounded-xl px-3 py-2 border border-gray-100 dark:border-gray-800">
                         <span className="block text-[9px] text-gray-400 uppercase font-black tracking-widest mb-0.5">Fabric</span>
-                        <span className="block text-xs font-bold text-gray-900 dark:text-white truncate" title={specs['Fabric'] || 'Cotton Mix'}>
-                            {specs['Fabric'] || 'Cotton Mix'}
+                        <span className="block text-xs font-bold text-gray-900 dark:text-white truncate" title={specs['Fabric'] || 'Custom Combed Cotton'}>
+                            {specs['Fabric'] || 'Custom Combed Cotton'}
                         </span>
                     </div>
                 </div>
 
-                {/* Main Action Component */}
-                <div className="mt-auto flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-800">
-                    <Link href={`/products/${product.slug}`} className="text-sm font-bold text-primary dark:text-gray-300 flex items-center group-hover:text-secondary transition-all">
-                        View Item <ArrowRight className="w-4 h-4 ml-1.5 group-hover:translate-x-1 transition-transform" />
+                {/* Main Action Component: Details & Request Quote */}
+                <div className="mt-auto flex items-center gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
+                    <Link
+                        href={`/products/${product.slug}`}
+                        className="flex-1 text-center py-2 px-3 text-xs font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 rounded-lg transition-colors"
+                    >
+                        Specs
                     </Link>
                     <Link
-                        href={`/contact?product=${encodeURIComponent(product.name)}`}
-                        className="p-2 bg-gray-50 hover:bg-primary hover:text-white text-gray-400 rounded-lg transition-all"
+                        href={`/request-quote?product=${encodeURIComponent(product.name)}`}
+                        className="flex-1 py-2 px-3 text-xs font-bold text-white bg-primary hover:bg-primary/90 rounded-lg shadow-sm transition-all text-center flex items-center justify-center gap-1"
                     >
-                        <ShoppingCart size={16} />
+                        <span>Quote</span>
+                        <ArrowRight size={13} />
                     </Link>
                 </div>
             </div>

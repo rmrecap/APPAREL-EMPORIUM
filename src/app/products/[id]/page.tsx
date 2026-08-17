@@ -90,39 +90,20 @@ export default async function ProductDetailPage({
                                 {product.shortDescription}
                             </p>
 
-                            {/* Pricing Display */}
-                            {product.priceDisplay && (
-                                <div className="mb-10 animate-in fade-in slide-in-from-top-4 duration-500">
-                                    <div className="flex items-baseline gap-4 mb-2">
-                                        <span className="text-4xl md:text-5xl font-black text-primary dark:text-blue-400 font-mono tracking-tighter">
-                                            {product.priceRange || '$7.15-$7.85'}
-                                        </span>
-                                        <span className="text-sm text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
-                                            USD / Piece
-                                        </span>
-                                    </div>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400 font-bold mb-6 flex items-center gap-2">
-                                        <CheckCircle className="w-4 h-4 text-green-500" />
-                                        Min. Order: <span className="text-gray-900 dark:text-white">{product.minOrder || '500 pieces'}</span>
-                                    </p>
-
-                                    {/* Tiered Pricing Table */}
-                                    {product.tieredPricing && (
-                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                            {JSON.parse(product.tieredPricing).map((tier: any, idx: number) => (
-                                                <div key={idx} className="bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 p-4 rounded-2xl shadow-sm hover:shadow-md transition-all group border-b-4 border-b-transparent hover:border-b-primary">
-                                                    <span className="block text-[10px] text-gray-400 uppercase font-black tracking-widest mb-1 group-hover:text-primary transition-colors">
-                                                        {tier.max ? `${tier.min}-${tier.max} pcs` : `>= ${tier.min} pcs`}
-                                                    </span>
-                                                    <span className="text-xl font-black text-gray-900 dark:text-white font-mono">
-                                                        ${tier.price}
-                                                    </span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
+                            {/* B2B Sourcing Callout (No Public Retail Pricing) */}
+                            <div className="mb-8 p-5 bg-blue-50/70 dark:bg-slate-800/60 border border-blue-100 dark:border-slate-700 rounded-2xl">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-xs font-bold uppercase tracking-wider text-primary">
+                                        B2B Factory Pricing & Sourcing
+                                    </span>
+                                    <span className="text-xs font-semibold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-950/60 px-2.5 py-0.5 rounded-full">
+                                        Custom Tech-Pack Ready
+                                    </span>
                                 </div>
-                            )}
+                                <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                                    FOB / CIF prices are calculated on a per-order basis depending on your target order quantity, fabric composition/GSM, wash effects, and destination country.
+                                </p>
+                            </div>
 
                             {/* Key Highlights (MOQ, Lead Time, Capacity) */}
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">

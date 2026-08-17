@@ -136,15 +136,16 @@ export default function FeaturedProducts({ headings }: { headings?: { featured_p
                                     <Link href={`/products/${product.slug}`}>{product.name}</Link>
                                 </h3>
 
-                                <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100 dark:border-gray-800">
-                                    <div className="font-bold text-xl text-primary">
-                                        {product.priceRange ? (product.priceRange.includes('$') ? product.priceRange : `$${product.priceRange}`) : '$0.00'}
+                                <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-100 dark:border-gray-800">
+                                    <div className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        B2B Sourcing
                                     </div>
-                                    <div className="flex items-center gap-1 text-sm text-yellow-500 font-bold">
-                                        <Star size={14} className="fill-yellow-500" />
-                                        <span>4.9</span>
-                                        <span className="text-gray-400 text-xs font-normal">({product._count?.reviews || 0})</span>
-                                    </div>
+                                    <Link
+                                        href={`/request-quote?product=${encodeURIComponent(product.name)}`}
+                                        className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
+                                    >
+                                        <span>Request Quote &rarr;</span>
+                                    </Link>
                                 </div>
                             </div>
                         </div>

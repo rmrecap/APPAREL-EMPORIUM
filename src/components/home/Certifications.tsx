@@ -39,10 +39,13 @@ export default function Certifications({ data, headings }: CertProps) {
         <section className="py-16 bg-white dark:bg-dark-bg border-y border-gray-100 dark:border-gray-800 transition-colors duration-300 overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
-                <div className="text-center mb-10">
-                    <span className="text-gray-400 dark:text-gray-500 font-bold tracking-widest uppercase text-xs">
-                        {headings?.certifications_label || 'Certified By Leading Global Standards'}
+                <div className="text-center mb-8 max-w-2xl mx-auto">
+                    <span className="text-primary font-bold tracking-widest uppercase text-xs block mb-1">
+                        {headings?.certifications_label || 'Compliance & Production Standards'}
                     </span>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Our partner manufacturing units across Bangladesh adhere to recognized international compliance and safety benchmarks:
+                    </p>
                 </div>
 
                 {/* Marquee Container */}

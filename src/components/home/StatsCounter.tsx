@@ -50,9 +50,7 @@ export default function StatsCounter({ data }: StatsCounterProps) {
     if (!stats || stats.length === 0) return null;
 
     return (
-        <section ref={sectionRef} className="py-20 bg-primary dark:bg-dark-surface relative overflow-hidden">
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '40px 40px' }}></div>
+        <section ref={sectionRef} className="py-16 bg-slate-900 text-white relative overflow-hidden border-y border-slate-800">
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
