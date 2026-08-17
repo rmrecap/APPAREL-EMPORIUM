@@ -8,6 +8,7 @@ import WhyChooseUs from '@/components/home/WhyChooseUs';
 import Certifications from '@/components/home/Certifications';
 import Testimonials from '@/components/home/Testimonials';
 import CTASection from '@/components/home/CTASection';
+import DeliveryFeed from '@/components/home/DeliveryFeed';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,7 +32,11 @@ export default async function HomePage() {
     let sectionOrder: string[] = [];
     try { sectionOrder = JSON.parse(settingsMap['homepage_sections_order'] || '[]'); } catch (e) { }
     if (sectionOrder.length === 0) {
-        sectionOrder = ['hero_slider', 'stats_counter', 'category_grid', 'featured_products', 'why_choose_us', 'certifications', 'testimonials', 'cta_section'];
+        sectionOrder = ['hero_slider', 'stats_counter', 'category_grid', 'featured_products', 'delivery_feed', 'why_choose_us', 'certifications', 'testimonials', 'cta_section'];
+    } else if (!sectionOrder.includes('delivery_feed')) {
+        const idx = sectionOrder.indexOf('featured_products');
+        if (idx !== -1) sectionOrder.splice(idx + 1, 0, 'delivery_feed');
+        else sectionOrder.push('delivery_feed');
     }
 
     // Section visibility
@@ -57,7 +62,8 @@ export default async function HomePage() {
         'featured_products': <FeaturedProducts headings={headings} key="featured_products" />,
         'why_choose_us': <WhyChooseUs data={settingsMap['homepage_why_choose_us'] || '[]'} headings={headings} key="why_choose_us" />,
         'certifications': <Certifications data={settingsMap['homepage_certifications'] || '[]'} headings={headings} key="certifications" />,
-        'testimonials': <Testimonials data={settingsMap['homepage_testimonials'] || '[]'} key="testimonials" />,
+        'testimonials': <Testimonials key="testimonials" />,
+        'delivery_feed': <DeliveryFeed key="delivery_feed" />,
         'cta_section': <CTASection data={settingsMap['homepage_cta_section'] || '{}'} key="cta_section" />,
     };
 

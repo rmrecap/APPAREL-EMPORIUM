@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
       : payload.specifications || '{}';
 
     // 3. Create or Match Category if available
-    let categoryId: string | null = null;
+    let categoryId: string;
     if (payload.category) {
       const catSlug = payload.category.toLowerCase().trim().replace(/[\s_]+/g, '-');
       const existingCat = await prisma.category.findFirst({
@@ -73,7 +73,19 @@ export async function POST(req: NextRequest) {
       });
       if (existingCat) {
         categoryId = existingCat.id;
+      } else {
+        const createdCat = await prisma.category.create({
+          data: { name: payload.category, slug: catSlug },
+        });
+        categoryId = createdCat.id;
       }
+    } else {
+      const fallbackCat = await prisma.category.upsert({
+        where: { slug: 'uncategorized' },
+        update: {},
+        create: { name: 'Uncategorized', slug: 'uncategorized' },
+      });
+      categoryId = fallbackCat.id;
     }
 
     // 4. Save into Database via Prisma
@@ -86,10 +98,9 @@ export async function POST(req: NextRequest) {
         sku: payload.sku || `AEL-${Date.now().toString().slice(-6)}`,
         categoryId: categoryId,
         images: imagesStr,
-        featuredImage: Array.isArray(payload.images) && payload.images.length > 0 ? payload.images[0] : null,
+        ogImage: Array.isArray(payload.images) && payload.images.length > 0 ? payload.images[0] : null,
         specifications: specsStr,
         priceDisplay: false, // Ensure public price is hidden
-        status: payload.status || 'ACTIVE',
       },
     });
 

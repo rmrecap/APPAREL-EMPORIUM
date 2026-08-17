@@ -247,3 +247,19 @@ model FormSubmission {
   createdAt DateTime   @default(now())
   form      CustomForm @relation(fields: [formId], references: [id], onDelete: Cascade)
 }
+
+model DeliveryUpdate {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  category    String
+  buyer       String
+  buyerCountry String
+  quantity    String
+  status      String   @default("COMPLETED")
+  imageUrl    String?
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
