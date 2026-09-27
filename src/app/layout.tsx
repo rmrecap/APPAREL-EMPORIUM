@@ -15,7 +15,9 @@ export const metadata = {
     title: 'Apparel Emporium | Trusted Garments Sourcing Partner in Bangladesh',
     description: '100% Export Oriented Readymade Garments, Home Textiles, Footwear and Accessories Buying House in Bangladesh. ISO 9001, BSCI, OEKO-TEX Certified.',
     icons: {
-        icon: '/favicon.png'
+        icon: '/favicon.png',
+        shortcut: '/favicon.png',
+        apple: '/apple-touch-icon.png',
     }
 };
 

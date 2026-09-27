@@ -10,6 +10,7 @@ import { Menu, X, ChevronDown, User, ShieldCheck } from 'lucide-react';
 import MegaMenu from './MegaMenu';
 import MobileNav from './MobileNav';
 import ThemeToggle from '../shared/ThemeToggle';
+import BrandLogo3D from './BrandLogo3D';
 
 type MenuItem = {
     id: string;
@@ -83,9 +84,9 @@ export default function Header() {
                     border border-[#E8E0D2] dark:border-white/10
                     shadow-[0_10px_35px_rgba(0,0,0,0.06)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.5)]`}
                 >
-                    {/* Brand / Monogram */}
+                    {/* Brand / Corporate Logo */}
                     <Link href="/" className="flex items-center gap-2 group h-9 sm:h-10 w-auto shrink-0">
-                        <div className="h-8 sm:h-9 max-w-[200px] flex items-center transition-all duration-300">
+                        <div className="h-8 sm:h-9 max-w-[220px] sm:max-w-[260px] flex items-center transition-all duration-300">
                             <img
                                 src={logoSrc}
                                 alt={settings.company_name || 'Apparel Emporium'}

@@ -4,6 +4,9 @@ import nextDynamic from 'next/dynamic';
 import { prisma } from '@/lib/prisma';
 import FeaturedProducts from '@/components/home/FeaturedProducts';
 import Category3DStage from '@/components/home/Category3DStage';
+import ProductionProcess3D from '@/components/home/ProductionProcess3D';
+import OurProducts3D from '@/components/home/OurProducts3D';
+import CoreValues3D from '@/components/home/CoreValues3D';
 
 const HeroSlider = nextDynamic(() => import('@/components/home/HeroSlider'), { ssr: false });
 const StatsCounter = nextDynamic(() => import('@/components/home/StatsCounter'), { ssr: false });
@@ -41,13 +44,28 @@ export default async function HomePage() {
     let sectionOrder: string[] = [];
     try { sectionOrder = JSON.parse(settingsMap['homepage_sections_order'] || '[]'); } catch (e) { }
     if (sectionOrder.length === 0) {
-        sectionOrder = ['category_3d_stage', 'featured_products', 'delivery_feed', 'why_choose_us', 'certifications', 'testimonials', 'cta_section'];
+        sectionOrder = ['category_3d_stage', 'featured_products', 'production_process', 'our_products_3d', 'core_values_3d', 'delivery_feed', 'why_choose_us', 'certifications', 'testimonials', 'cta_section'];
     } else {
         if (!sectionOrder.includes('category_3d_stage')) {
             sectionOrder.unshift('category_3d_stage');
         }
+        if (!sectionOrder.includes('production_process')) {
+            const featIdx = sectionOrder.indexOf('featured_products');
+            if (featIdx !== -1) sectionOrder.splice(featIdx + 1, 0, 'production_process');
+            else sectionOrder.push('production_process');
+        }
+        if (!sectionOrder.includes('our_products_3d')) {
+            const procIdx = sectionOrder.indexOf('production_process');
+            if (procIdx !== -1) sectionOrder.splice(procIdx + 1, 0, 'our_products_3d');
+            else sectionOrder.push('our_products_3d');
+        }
+        if (!sectionOrder.includes('core_values_3d')) {
+            const prodIdx = sectionOrder.indexOf('our_products_3d');
+            if (prodIdx !== -1) sectionOrder.splice(prodIdx + 1, 0, 'core_values_3d');
+            else sectionOrder.push('core_values_3d');
+        }
         if (!sectionOrder.includes('delivery_feed')) {
-            const idx = sectionOrder.indexOf('featured_products');
+            const idx = sectionOrder.indexOf('core_values_3d');
             if (idx !== -1) sectionOrder.splice(idx + 1, 0, 'delivery_feed');
             else sectionOrder.push('delivery_feed');
         }
@@ -56,9 +74,18 @@ export default async function HomePage() {
     // Section visibility
     let visibility: Record<string, boolean> = {};
     try { visibility = JSON.parse(settingsMap['homepage_sections_visibility'] || '{}'); } catch (e) { }
-    // Default 3D Stage to visible
+    // Default 3D Stages to visible
     if (visibility['category_3d_stage'] === undefined) {
         visibility['category_3d_stage'] = true;
+    }
+    if (visibility['production_process'] === undefined) {
+        visibility['production_process'] = true;
+    }
+    if (visibility['our_products_3d'] === undefined) {
+        visibility['our_products_3d'] = true;
+    }
+    if (visibility['core_values_3d'] === undefined) {
+        visibility['core_values_3d'] = true;
     }
 
     // Section headings — ALL editable labels from the admin dashboard
@@ -79,6 +106,9 @@ export default async function HomePage() {
         'stats_counter': <StatsCounter data={settingsMap['homepage_stats_counter'] || '[]'} key="stats_counter" />,
         'category_grid': <CategoryGrid headings={headings} key="category_grid" />,
         'featured_products': <FeaturedProducts headings={headings} key="featured_products" />,
+        'production_process': <ProductionProcess3D headings={headings} data={settingsMap['homepage_production_process']} key="production_process" />,
+        'our_products_3d': <OurProducts3D headings={headings} data={settingsMap['homepage_our_products_3d']} key="our_products_3d" />,
+        'core_values_3d': <CoreValues3D headings={headings} data={settingsMap['homepage_core_values_3d']} key="core_values_3d" />,
         'why_choose_us': <WhyChooseUs data={settingsMap['homepage_why_choose_us'] || '[]'} headings={headings} key="why_choose_us" />,
         'certifications': <Certifications data={settingsMap['homepage_certifications'] || '[]'} headings={headings} key="certifications" />,
         'testimonials': <Testimonials key="testimonials" />,

@@ -232,33 +232,33 @@ export default function ThemeManagerPage() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                             <div>
                                 <Label>
-                                    <span className="flex items-center gap-1.5"><Moon size={14} className="text-indigo-400" /> Dark Mode Header Logo</span>
+                                    <span className="flex items-center gap-1.5"><Monitor size={14} className="text-yellow-500" /> Light Mode Header Logo</span>
                                 </Label>
-                                <p className="text-xs text-gray-400 mb-2">Shown on dark/navy backgrounds. Use a light-coloured or white logo.</p>
+                                <p className="text-xs text-gray-400 mb-2">Shown on white/light backgrounds. Use a dark-coloured or transparent logo.</p>
                                 <ImagePicker
                                     value={formData.header_logo_light}
                                     onChange={(url: string) => handleChange('header_logo_light', url)}
                                     folder="logos"
                                 />
                                 {formData.header_logo_light && (
-                                    <div className="mt-3 p-3 bg-gray-900 rounded-lg flex items-center justify-center h-16">
-                                        <img src={formData.header_logo_light} alt="Header logo dark mode" className="max-h-12 max-w-full object-contain" />
+                                    <div className="mt-3 p-3 bg-white rounded-lg border flex items-center justify-center h-16">
+                                        <img src={formData.header_logo_light} alt="Header logo light mode" className="max-h-12 max-w-full object-contain" />
                                     </div>
                                 )}
                             </div>
                             <div>
                                 <Label>
-                                    <span className="flex items-center gap-1.5"><Monitor size={14} className="text-yellow-500" /> Light Mode Header Logo</span>
+                                    <span className="flex items-center gap-1.5"><Moon size={14} className="text-indigo-400" /> Dark Mode Header Logo</span>
                                 </Label>
-                                <p className="text-xs text-gray-400 mb-2">Shown on white/light backgrounds. Use a dark-coloured logo.</p>
+                                <p className="text-xs text-gray-400 mb-2">Shown on dark/navy backgrounds. Use a light-coloured or white logo.</p>
                                 <ImagePicker
                                     value={formData.header_logo_dark}
                                     onChange={(url: string) => handleChange('header_logo_dark', url)}
                                     folder="logos"
                                 />
                                 {formData.header_logo_dark && (
-                                    <div className="mt-3 p-3 bg-white rounded-lg border flex items-center justify-center h-16">
-                                        <img src={formData.header_logo_dark} alt="Header logo light mode" className="max-h-12 max-w-full object-contain" />
+                                    <div className="mt-3 p-3 bg-gray-900 rounded-lg flex items-center justify-center h-16">
+                                        <img src={formData.header_logo_dark} alt="Header logo dark mode" className="max-h-12 max-w-full object-contain" />
                                     </div>
                                 )}
                             </div>

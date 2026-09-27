@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import ProductGrid from '@/components/products/ProductGrid';
 import ProductFilter from '@/components/products/ProductFilter';
+import AtelierDecorations3D from '@/components/products/AtelierDecorations3D';
 import { X } from 'lucide-react';
 import Link from 'next/link';
 
@@ -9,9 +10,9 @@ export const dynamic = 'force-dynamic';
 export default async function ProductsPage({
     searchParams,
 }: {
-    searchParams: { category?: string; q?: string; page?: string; fabric?: string; moq?: string }
+    searchParams: { category?: string; q?: string; page?: string; fabric?: string; moq?: string; sort?: string }
 }) {
-    const { category, q, page, fabric, moq } = searchParams;
+    const { category, q, page, fabric, moq, sort } = searchParams;
 
     // Fetch categories for sidebar
     const categories = await prisma.category.findMany({
@@ -24,32 +25,36 @@ export default async function ProductsPage({
         orderBy: { order: 'asc' }
     });
 
-    // Popular root categories for top quick pills
+    // Top Category Pills from Screenshot: All Items, Knitwear, Woven, Sweater, Accessories
     const topPills = [
         { label: 'All Items', slug: '' },
-        ...categories
-            .filter(c => !c.parentId)
-            .slice(0, 7)
-            .map(c => ({ label: c.name, slug: c.slug }))
+        { label: 'Knitwear', slug: 'knitwear' },
+        { label: 'Woven', slug: 'woven' },
+        { label: 'Sweater', slug: 'sweater' },
+        { label: 'Accessories', slug: 'accessories' },
     ];
 
     // Build the query object
     const where: any = { isActive: true };
 
     if (category) {
-        // Match category directly or any of its descendant subcategories recursively
+        // Match category directly or descendant subcategories
         const collectDescendantSlugs = (slugToFind: string): string[] => {
-            const target = categories.find(c => c.slug === slugToFind);
+            const target = categories.find(c => c.slug === slugToFind || c.slug.includes(slugToFind));
             if (!target) return [slugToFind];
             const directChildSlugs = categories
                 .filter(c => c.parentId === target.id)
                 .map(c => c.slug);
             const nestedSlugs = directChildSlugs.flatMap(s => collectDescendantSlugs(s));
-            return [slugToFind, ...directChildSlugs, ...nestedSlugs];
+            return [slugToFind, target.slug, ...directChildSlugs, ...nestedSlugs];
         };
 
         const allMatchedSlugs = Array.from(new Set(collectDescendantSlugs(category)));
-        where.category = { slug: { in: allMatchedSlugs } };
+        where.OR = [
+            { category: { slug: { in: allMatchedSlugs } } },
+            { tags: { contains: category } },
+            { name: { contains: category } }
+        ];
     }
 
     if (q) {
@@ -61,8 +66,7 @@ export default async function ProductsPage({
         ];
     }
 
-    // Fabric and MOQ - these are stored in specifications JSON string
-    // In SQLite, we use contains on the string
+    // Fabric and MOQ filters
     const filters: any[] = [];
 
     if (fabric) {
@@ -83,6 +87,10 @@ export default async function ProductsPage({
         where.AND = filters;
     }
 
+    // Sorting order
+    let orderBy: any = { createdAt: 'desc' };
+    if (sort === 'name') orderBy = { name: 'asc' };
+
     // Pagination logic
     const limit = 12;
     const currentPage = parseInt(page || '1');
@@ -94,7 +102,7 @@ export default async function ProductsPage({
         include: { category: true },
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' }
+        orderBy
     });
 
     const totalProducts = await prisma.product.count({ where });
@@ -107,6 +115,7 @@ export default async function ProductsPage({
         if (q) params.set('q', q);
         if (fabric) params.set('fabric', fabric);
         if (moq) params.set('moq', moq);
+        if (sort) params.set('sort', sort);
         params.set('page', pageNum.toString());
         return `/products?${params.toString()}`;
     };
@@ -118,35 +127,43 @@ export default async function ProductsPage({
         if (q) params.set('q', q);
         if (fabric) params.set('fabric', fabric);
         if (moq) params.set('moq', moq);
+        if (sort) params.set('sort', sort);
         return `/products?${params.toString()}`;
     };
 
     return (
-        <div className="bg-light-bg dark:bg-dark-bg min-h-screen">
-            {/* Page Header — pt-20 or pt-24 offsets the fixed nav (h ~64-80px) */}
-            <div className="bg-primary text-white pt-28 pb-16 relative overflow-hidden">
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cross-stripes.png')] opacity-20"></div>
+        <div className="catalog-bg-canvas min-h-screen text-slate-800 dark:text-slate-100 transition-colors duration-500 relative">
+            {/* ── HERO BANNER: Deep Navy Blue Banner ── */}
+            <div className="bg-[#142338] dark:bg-[#0A1220] text-white pt-28 sm:pt-32 pb-14 sm:pb-16 relative overflow-hidden shadow-lg border-b border-white/10">
+                {/* Subtle garment weave texture */}
+                <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
+
+                {/* 3D Sewing Needle, Thread & Button Floating Art */}
+                <AtelierDecorations3D variant="top-right" />
+
                 <div className="container mx-auto px-4 text-center relative z-10">
-                    <h1 className="text-4xl md:text-5xl font-bold font-heading mb-4">Manufacturer Catalog</h1>
-                    <p className="text-blue-100 max-w-2xl mx-auto font-medium opacity-90">
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-black font-heading tracking-tight mb-3 text-white">
+                        Manufacturer Catalog
+                    </h1>
+                    <p className="text-blue-100/90 max-w-2xl mx-auto text-xs sm:text-sm md:text-base font-medium leading-relaxed">
                         Explore our world-class garment sourcing options. We bridge the gap between Bangladeshi excellence and global brands.
                     </p>
                 </div>
             </div>
 
-            <div className="container mx-auto px-4 py-12">
-                {/* ── Top Horizontal Category Pills Bar (Amazon / Modern E-Commerce Style) ── */}
+            <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-10 max-w-7xl">
+                {/* ── TOP HORIZONTAL CATEGORY PILLS BAR ── */}
                 <div className="mb-8 overflow-x-auto custom-scrollbar pb-2">
-                    <div className="flex items-center gap-2 min-w-max">
+                    <div className="flex items-center gap-2.5 min-w-max">
                         {topPills.map((pill) => {
                             const isPillActive = (!category && !pill.slug) || (category === pill.slug);
                             return (
                                 <Link
                                     key={pill.slug || 'all'}
                                     href={buildPillLink(pill.slug)}
-                                    className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 ${isPillActive
-                                        ? 'bg-primary text-white scale-105 shadow-md shadow-primary/20'
-                                        : 'bg-white dark:bg-dark-surface text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-800 hover:border-primary hover:text-primary'
+                                    className={`px-4 sm:px-5 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-300 flex items-center gap-1.5 ${isPillActive
+                                        ? 'bg-[#182B48] dark:bg-blue-600 text-white shadow-md scale-105 border border-[#2B4268] dark:border-blue-400'
+                                        : 'bg-[#ECE5DC] dark:bg-[#121A2C] text-slate-700 dark:text-slate-300 hover:bg-[#E2D9CD] dark:hover:bg-[#1A253E] border border-white/60 dark:border-white/5 shadow-[2px_2px_6px_rgba(0,0,0,0.04),-2px_-2px_6px_rgba(255,255,255,0.7)] dark:shadow-none'
                                         }`}
                                 >
                                     <span>{pill.label}</span>
@@ -157,28 +174,33 @@ export default async function ProductsPage({
                 </div>
 
                 <div className="flex flex-col lg:flex-row gap-8">
-
-                    {/* Filter Sidebar */}
+                    {/* ── 3D SOURCING FILTERS SIDEBAR ── */}
                     <div className="w-full lg:w-72 shrink-0">
                         <ProductFilter categories={categories as any} />
                     </div>
 
-                    {/* Product Marketplace */}
-                    <div className="flex-grow">
-                        <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-white dark:bg-dark-surface rounded-2xl border border-gray-200 dark:border-gray-700 gap-4">
+                    {/* ── 3D PRODUCT MARKETPLACE & LIVE RESULTS ── */}
+                    <div className="flex-grow min-w-0">
+                        {/* Live Results Bar */}
+                        <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 sm:p-5 sidebar-3d-panel rounded-[22px] gap-4">
                             <div>
-                                <h2 className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-widest mb-1">Live Results</h2>
-                                <p className="text-gray-900 dark:text-white font-bold">
-                                    Showing <span className="text-primary dark:text-blue-400">{products.length > 0 ? skip + 1 : 0}-{Math.min(skip + limit, totalProducts)}</span> of {totalProducts} items matching your criteria
+                                <h2 className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-0.5">
+                                    LIVE RESULTS
+                                </h2>
+                                <p className="text-slate-900 dark:text-white font-bold text-xs sm:text-sm">
+                                    Showing <span className="text-blue-600 dark:text-blue-400 font-black">{products.length > 0 ? skip + 1 : 0}-{Math.min(skip + limit, totalProducts)}</span> of {totalProducts} items matching your criteria
                                 </p>
                             </div>
 
-                            <div className="flex items-center gap-3">
-                                <label htmlFor="product-sort-select" className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase">Sort By</label>
+                            <div className="flex items-center gap-2.5">
+                                <label htmlFor="product-sort-select" className="text-[10px] font-black text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                                    SORT BY
+                                </label>
                                 <select
                                     id="product-sort-select"
                                     aria-label="Sort garments by criteria"
-                                    className="bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-bold p-2 focus:ring-2 focus:ring-primary outline-none"
+                                    defaultValue={sort || 'latest'}
+                                    className="input-3d-inset text-slate-900 dark:text-white rounded-xl text-xs font-bold px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500/40 cursor-pointer"
                                 >
                                     <option value="latest">Latest Arrival</option>
                                     <option value="name">Name (A-Z)</option>
@@ -187,26 +209,34 @@ export default async function ProductsPage({
                             </div>
                         </div>
 
+                        {/* Product Grid */}
                         {products.length > 0 ? (
                             <ProductGrid products={products as any} />
                         ) : (
-                            <div className="p-20 text-center bg-white dark:bg-dark-surface rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-800">
-                                <div className="w-20 h-20 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300">
-                                    <X size={40} />
+                            <div className="p-16 text-center sidebar-3d-panel rounded-[28px]">
+                                <div className="w-16 h-16 bg-slate-200 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
+                                    <X size={32} />
                                 </div>
-                                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">No items found</h3>
-                                <p className="text-gray-500 max-w-xs mx-auto mb-8">We couldn't find any products matching your current filters. Try broadening your search or clearing filters.</p>
-                                <Link href="/products" className="bg-primary text-white font-bold px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all">Clear All Filters</Link>
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1.5">No products found</h3>
+                                <p className="text-slate-500 dark:text-slate-400 text-xs max-w-xs mx-auto mb-6">
+                                    We couldn't find any items matching your current filters.
+                                </p>
+                                <Link
+                                    href="/products"
+                                    className="inline-block bg-[#1B2B44] text-white text-xs font-bold px-6 py-2.5 rounded-xl shadow-md hover:bg-black transition-all"
+                                >
+                                    Clear All Filters
+                                </Link>
                             </div>
                         )}
 
                         {/* Smart Pagination */}
                         {totalPages > 1 && (
-                            <div className="mt-16 flex justify-center items-center gap-3">
+                            <div className="mt-12 flex justify-center items-center gap-2">
                                 {currentPage > 1 && (
                                     <a
                                         href={buildQueryString(currentPage - 1)}
-                                        className="w-10 h-10 flex items-center justify-center rounded-xl bg-white dark:bg-dark-surface border border-gray-100 dark:border-gray-800 hover:bg-primary hover:text-white transition-all shadow-sm"
+                                        className="w-9 h-9 flex items-center justify-center rounded-xl bg-[#ECE5DC] dark:bg-[#121A2C] text-slate-700 dark:text-slate-300 hover:bg-[#1B2B44] hover:text-white transition-all shadow-xs text-xs font-bold"
                                     >
                                         &larr;
                                     </a>
@@ -214,19 +244,13 @@ export default async function ProductsPage({
 
                                 {Array.from({ length: totalPages }).map((_, i) => {
                                     const pageNum = i + 1;
-                                    // Only show pages near current page or start/end
-                                    if (totalPages > 7 && Math.abs(currentPage - pageNum) > 2 && pageNum !== 1 && pageNum !== totalPages) {
-                                        if (Math.abs(currentPage - pageNum) === 3) return <span key={i} className="text-gray-400">...</span>;
-                                        return null;
-                                    }
-
                                     return (
                                         <a
                                             key={i}
                                             href={buildQueryString(pageNum)}
-                                            className={`w-10 h-10 flex items-center justify-center rounded-xl font-bold transition-all shadow-sm border ${currentPage === pageNum
-                                                ? 'bg-primary text-white border-primary scale-110'
-                                                : 'bg-white dark:bg-dark-surface text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 border-gray-100 dark:border-gray-800'
+                                            className={`w-9 h-9 flex items-center justify-center rounded-xl font-black text-xs transition-all shadow-xs ${currentPage === pageNum
+                                                ? 'bg-[#1B2B44] text-white scale-105 shadow-md'
+                                                : 'bg-[#ECE5DC] dark:bg-[#121A2C] text-slate-700 dark:text-slate-300 hover:bg-[#E0D7CC] dark:hover:bg-[#1A253E]'
                                                 }`}
                                         >
                                             {pageNum}
@@ -237,7 +261,7 @@ export default async function ProductsPage({
                                 {currentPage < totalPages && (
                                     <a
                                         href={buildQueryString(currentPage + 1)}
-                                        className="w-10 h-10 flex items-center justify-center rounded-xl bg-white dark:bg-dark-surface border border-gray-100 dark:border-gray-800 hover:bg-primary hover:text-white transition-all shadow-sm"
+                                        className="w-9 h-9 flex items-center justify-center rounded-xl bg-[#ECE5DC] dark:bg-[#121A2C] text-slate-700 dark:text-slate-300 hover:bg-[#1B2B44] hover:text-white transition-all shadow-xs text-xs font-bold"
                                     >
                                         &rarr;
                                     </a>
@@ -250,4 +274,3 @@ export default async function ProductsPage({
         </div>
     );
 }
-

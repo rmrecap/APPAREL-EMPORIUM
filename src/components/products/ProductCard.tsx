@@ -1,8 +1,9 @@
 'use client';
 
+import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { Product } from '@/types';
-import { ArrowRight, Eye, ShoppingCart, Columns2, Check } from 'lucide-react';
+import { Eye, Columns2, Check, ArrowRight, ChevronRight } from 'lucide-react';
 import { useAddToCompare } from '@/hooks/useAddToCompare';
 import { extractFeaturedImage } from '@/lib/utils';
 
@@ -14,6 +15,32 @@ interface ProductCardProps {
 export default function ProductCard({ product, onQuickView }: ProductCardProps) {
     const { addToCompare, isInCompare } = useAddToCompare();
     const isComparing = isInCompare(product.id);
+    const cardRef = useRef<HTMLDivElement>(null);
+
+    // 3D Parallax Tilt State
+    const [tilt, setTilt] = useState({ rotateX: 0, rotateY: 0, shineX: 50, shineY: 50 });
+    const [isHovered, setIsHovered] = useState(false);
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!cardRef.current) return;
+        const rect = cardRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const rotateX = ((y - centerY) / centerY) * -7;
+        const rotateY = ((x - centerX) / centerX) * 7;
+        const shineX = (x / rect.width) * 100;
+        const shineY = (y / rect.height) * 100;
+
+        setTilt({ rotateX, rotateY, shineX, shineY });
+    };
+
+    const handleMouseLeave = () => {
+        setIsHovered(false);
+        setTilt({ rotateX: 0, rotateY: 0, shineX: 50, shineY: 50 });
+    };
 
     // Parse specifications safely
     let specs: any = {};
@@ -21,121 +48,165 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
         if (typeof product.specifications === 'string') {
             specs = JSON.parse(product.specifications);
         } else {
-            specs = product.specifications;
+            specs = product.specifications || {};
         }
     } catch (e) {
-        console.error('Failed to parse specs', e);
+        specs = {};
     }
 
     // Handle images
     const mainImage = extractFeaturedImage(product.images);
 
+    // Dynamic top badge logic based on product type matching screenshots
+    const getTopBadgeText = () => {
+        const name = product.name.toLowerCase();
+        if (name.includes('boot') || name.includes('leather')) return 'CARE / LEATHER & HATS';
+        if (name.includes('denim') || name.includes('jacket')) return 'JACKETS & OUTERWEAR';
+        if (name.includes('white') || (name.includes('classic') && name.includes('t-shirt'))) return 'T-SHIRT & RAYON';
+        if (name.includes('pique polo') || (name === 'pique polo')) return 'POLO PIQUE';
+        if (name.includes('piqué') || name.includes('classic piqué') || name.includes('classic pique')) return 'POLO SHIRTS';
+        if (name.includes('crew') || name.includes('premium') || name.includes('neck')) return 'T-SHIRT & KNIT';
+        return product.category?.name?.toUpperCase() || 'CUSTOM APPAREL';
+    };
+
+    // SKU display
+    const skuDisplay = (product as any).sku || product.slug.split('-').slice(-1)[0]?.toUpperCase() || 'AEL-BD';
+
     return (
-        <div className="group relative flex flex-col bg-white dark:bg-dark-surface rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-800">
-            {/* Image Frame */}
-            <div className="relative aspect-[4/5] bg-gray-100 dark:bg-gray-800 overflow-hidden cursor-pointer">
-                <Link
-                    href={`/products/${product.slug}`}
-                    className="absolute inset-0 w-full h-full"
-                >
-                    <img
-                        src={mainImage}
-                        alt={product.name}
-                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        loading="lazy"
-                    />
-                </Link>
+        <div
+            ref={cardRef}
+            onMouseMove={handleMouseMove}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={handleMouseLeave}
+            style={{
+                transform: isHovered
+                    ? `perspective(1000px) rotateX(${tilt.rotateX}deg) rotateY(${tilt.rotateY}deg) translateY(-4px)`
+                    : 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)',
+            }}
+            className="group relative flex flex-col neumorphic-card-3d rounded-[28px] p-3.5 sm:p-4 transition-all duration-300 select-none overflow-hidden"
+        >
+            {/* Dynamic Glass Specular Light Reflection */}
+            <div
+                className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-[28px]"
+                style={{
+                    background: `radial-gradient(circle at ${tilt.shineX}% ${tilt.shineY}%, rgba(255,255,255,0.25) 0%, transparent 60%)`
+                }}
+            />
 
-                {/* Overlay with Quick View button */}
-                <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center p-4">
-                    <button
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); onQuickView?.(product); }}
-                        className="bg-white text-gray-900 font-bold px-6 py-3 rounded-full flex items-center gap-2 hover:bg-primary hover:text-white transition-all transform translate-y-4 group-hover:translate-y-0 shadow-lg"
-                    >
-                        <Eye size={18} /> Quick View
-                    </button>
-
-                    {/* Action buttons on left */}
-                    <div className="absolute bottom-6 left-6 flex flex-col gap-2 translate-x-[-20px] group-hover:translate-x-0 opacity-0 group-hover:opacity-100 transition-all delay-75">
-                        <button
-                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCompare(product); }}
-                            className={`p-3 rounded-full shadow-md transition-all ${isComparing ? 'bg-primary text-white scale-110 shadow-primary/40' : 'bg-white text-gray-900 hover:bg-primary hover:text-white'}`}
-                            title={isComparing ? "In Comparison" : "Add to Comparison"}
-                        >
-                            {isComparing ? <Check size={18} /> : <Columns2 size={18} />}
-                        </button>
-                    </div>
+            {/* ── 3D RECESSED CONCAVE PEDESTAL DISPLAY STAGE ── */}
+            <div className="relative aspect-[4/4.5] w-full rounded-[22px] pedestal-stage-3d p-4 flex flex-col items-center justify-center overflow-hidden cursor-pointer">
+                {/* Top Embossed Arch Badge */}
+                <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 arch-badge-3d px-3.5 py-1 rounded-full text-[9px] sm:text-[10px] font-black tracking-wider uppercase text-slate-700 dark:text-slate-200 transition-transform duration-300 group-hover:scale-105 whitespace-nowrap shadow-xs">
+                    {getTopBadgeText()}
                 </div>
 
-                {/* Badge Overlay */}
-                <div className="absolute top-4 left-4 z-10">
-                    <span className="bg-white/95 dark:bg-black/90 backdrop-blur-md text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-tighter text-primary dark:text-gray-200 shadow-sm">
-                        {product.category?.name || 'In Stock'}
-                    </span>
+                {/* Floating 3D Garment Image Frame */}
+                <Link
+                    href={`/products/${product.slug}`}
+                    className="relative w-full h-full flex items-center justify-center z-10 p-1"
+                >
+                    <div className="relative w-full h-full flex items-center justify-center rounded-xl overflow-hidden">
+                        <img
+                            src={mainImage}
+                            alt={product.name}
+                            className="max-h-[86%] max-w-[90%] object-contain filter drop-shadow-md transition-all duration-500 group-hover:scale-110 group-hover:-translate-y-2 dark:brightness-95 dark:contrast-105"
+                            loading="lazy"
+                        />
+                    </div>
+
+                    {/* Realistic Ambient Contact Floor Shadow */}
+                    <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-3/4 h-3.5 rounded-[50%] floating-garment-shadow transition-all duration-500 group-hover:scale-110 group-hover:opacity-80" />
+                </Link>
+
+                {/* Interactive Quick View & Compare Overlay */}
+                <div className="absolute inset-0 bg-black/25 dark:bg-black/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center p-4 z-20">
+                    <button
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); onQuickView?.(product); }}
+                        className="bg-white/95 dark:bg-slate-900/95 text-slate-900 dark:text-white font-bold text-xs px-5 py-2.5 rounded-full flex items-center gap-1.5 shadow-xl hover:scale-105 transition-transform"
+                    >
+                        <Eye size={14} /> Quick Specs
+                    </button>
+
+                    {/* Compare Button */}
+                    <button
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCompare(product); }}
+                        className={`absolute bottom-3 left-3 p-2.5 rounded-full shadow-lg transition-all ${isComparing
+                            ? 'bg-blue-600 text-white scale-110'
+                            : 'bg-white/90 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 hover:bg-blue-600 hover:text-white'
+                            }`}
+                        title={isComparing ? "In Comparison" : "Add to Compare"}
+                    >
+                        {isComparing ? <Check size={14} /> : <Columns2 size={14} />}
+                    </button>
                 </div>
             </div>
 
-            {/* Content ... remains similar ... */}
-            <div className="p-6 flex flex-col flex-grow">
-                <div className="mb-2 min-w-0">
+            {/* ── CARD INFORMATION SECTION ── */}
+            <div className="pt-4 px-1 pb-1 flex flex-col flex-grow">
+                {/* Title & SKU */}
+                <div className="mb-2">
                     <Link href={`/products/${product.slug}`}>
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-1 transition-colors hover:text-primary leading-tight truncate">
+                        <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white mb-0.5 line-clamp-1 transition-colors hover:text-blue-600 dark:hover:text-blue-400">
                             {product.name}
                         </h3>
                     </Link>
-                    <p className="text-xs text-gray-700 dark:text-gray-300 font-mono font-bold tracking-tight truncate">
-                        SKU: {product.slug.split('-').slice(-2, -1)[0]?.toUpperCase() || product.slug.slice(0, 8).toUpperCase()}
+                    <p className="text-[11px] font-mono font-bold text-slate-500 dark:text-slate-400 tracking-wider">
+                        SKU : {skuDisplay}
                     </p>
                 </div>
 
-                {/* B2B Sourcing Tag (NO PUBLIC PRICES) */}
-                <div className="mb-3 flex items-center justify-between min-w-0 gap-2">
-                    <span className="inline-flex items-center gap-1.5 text-xs font-extrabold text-blue-700 dark:text-blue-200 bg-blue-50 dark:bg-blue-900/60 border border-blue-200/80 dark:border-blue-700/60 px-2.5 py-1 rounded-md truncate">
-                        B2B Sourcing & Export
+                {/* B2B Sourcing Pill Tag */}
+                <div className="mb-2.5 flex items-center justify-between gap-2">
+                    <span className="inline-flex items-center text-[10px] font-extrabold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/70 px-2 py-0.5 rounded-md">
+                        B2B Sourcing &amp; Ex
                     </span>
-                    <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 shrink-0">
+                    <span className="text-[10.5px] font-bold text-slate-500 dark:text-slate-400 shrink-0">
                         Custom Tech-Pack
                     </span>
                 </div>
 
-                <p className="text-xs text-gray-700 dark:text-gray-300 line-clamp-2 mb-4 flex-grow leading-relaxed break-words">
+                {/* Short Description */}
+                <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 mb-3 leading-relaxed">
                     {product.shortDescription || product.description}
                 </p>
 
-                {/* Specs highlight grid */}
-                <div className="grid grid-cols-2 gap-2 mb-4">
-                    <div className="bg-gray-50 dark:bg-gray-800 rounded-xl px-3 py-2 border border-gray-200 dark:border-gray-700 min-w-0">
-                        <span className="block text-[10px] text-slate-600 dark:text-slate-300 uppercase font-black tracking-wider mb-0.5">Min. Order</span>
-                        <span className="block text-xs font-bold text-gray-900 dark:text-white truncate" title={specs['MOQ'] || product.minOrder || '500 Pcs'}>
-                            {specs['MOQ'] || product.minOrder || '500 Pcs'}
+                {/* Inset Mini Specs Boxes (MOQ & Fabric) */}
+                <div className="grid grid-cols-2 gap-2 mb-4 mt-auto">
+                    <div className="spec-box-3d rounded-xl px-2.5 py-1.5 min-w-0">
+                        <span className="block text-[9px] text-slate-500 dark:text-slate-400 uppercase font-black tracking-wider">
+                            Min. Order
+                        </span>
+                        <span className="block text-xs font-bold text-slate-900 dark:text-white truncate" title={specs['MOQ'] || (product as any).minOrder || '300 pcs'}>
+                            {specs['MOQ'] || (product as any).minOrder || '300 pcs'}
                         </span>
                     </div>
-                    <div className="bg-gray-50 dark:bg-gray-800 rounded-xl px-3 py-2 border border-gray-200 dark:border-gray-700 min-w-0">
-                        <span className="block text-[10px] text-slate-600 dark:text-slate-300 uppercase font-black tracking-wider mb-0.5">Fabric</span>
-                        <span className="block text-xs font-bold text-gray-900 dark:text-white truncate" title={specs['Fabric'] || 'Custom Combed Cotton'}>
-                            {specs['Fabric'] || 'Custom Combed Cotton'}
+                    <div className="spec-box-3d rounded-xl px-2.5 py-1.5 min-w-0">
+                        <span className="block text-[9px] text-slate-500 dark:text-slate-400 uppercase font-black tracking-wider">
+                            Fabric
+                        </span>
+                        <span className="block text-xs font-bold text-slate-900 dark:text-white truncate" title={specs['Fabric'] || specs['Composition'] || specs['Material'] || '100% Cotton'}>
+                            {specs['Fabric'] || specs['Composition'] || specs['Material'] || '100% Cotton'}
                         </span>
                     </div>
                 </div>
 
-                {/* Main Action Component: Details & Request Quote */}
-                <div className="mt-auto flex items-center gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
+                {/* ── ACTION BUTTONS: SPECS & QUOTE ── */}
+                <div className="flex items-center gap-2 pt-1">
                     <Link
                         href={`/products/${product.slug}`}
-                        className="flex-1 text-center py-2 px-3 text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                        className="flex-1 text-center py-2 px-3 text-xs font-bold text-slate-800 dark:text-slate-200 bg-[#E8E1D6] dark:bg-[#1E293B] hover:bg-[#DDD4C7] dark:hover:bg-[#283548] rounded-xl border border-[#D8CFC2] dark:border-white/10 transition-all active:scale-95 shadow-xs"
                     >
                         Specs
                     </Link>
                     <Link
                         href={`/request-quote?product=${encodeURIComponent(product.name)}`}
-                        className="flex-1 py-2 px-3 text-xs sm:text-sm font-bold text-white bg-primary hover:bg-blue-600 rounded-lg shadow-sm transition-all text-center flex items-center justify-center gap-1"
+                        className="flex-1 text-center py-2 px-3 text-xs font-bold text-white bg-[#1B2B44] hover:bg-[#111C2E] dark:bg-blue-600 dark:hover:bg-blue-500 rounded-xl shadow-md dark:shadow-blue-600/30 transition-all active:scale-95 flex items-center justify-center gap-1"
                     >
                         <span>Quote</span>
-                        <ArrowRight size={13} />
+                        <ChevronRight size={13} className="stroke-[2.5]" />
                     </Link>
                 </div>
             </div>
         </div>
     );
 }
-

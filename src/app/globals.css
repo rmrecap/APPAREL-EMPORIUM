@@ -128,4 +128,213 @@ h6 {
 
 .animate-stage-float {
   animation: stageFloat 4.5s ease-in-out infinite;
-}
+}
+
+/* ─── 3D Animated Brand Logo Keyframes ─── */
+@keyframes logoFloat3D {
+  0%, 100% {
+    transform: perspective(1200px) rotateX(0deg) rotateY(0deg) translateY(0px) scale(1);
+  }
+  50% {
+    transform: perspective(1200px) rotateX(2.5deg) rotateY(-1.8deg) translateY(-2px) scale(1.015);
+  }
+}
+
+.animate-logo-float-3d {
+  animation: logoFloat3D 4.5s ease-in-out infinite;
+}
+
+@keyframes logoSheen {
+  0% {
+    transform: translateX(-160%) skewX(-25deg);
+  }
+  32%, 100% {
+    transform: translateX(190%) skewX(-25deg);
+  }
+}
+
+.animate-logo-sheen-loop {
+  animation: logoSheen 5.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.animate-logo-sheen-fast {
+  animation: logoSheen 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+
+/* ─── 3D Neumorphic & Skeuomorphic Garment Atelier Tokens ─── */
+.catalog-bg-canvas {
+  background-color: #EFE9E2;
+  background-image: 
+    radial-gradient(at 15% 15%, rgba(255, 255, 255, 0.7) 0px, transparent 50%),
+    radial-gradient(at 85% 85%, rgba(210, 200, 185, 0.3) 0px, transparent 50%);
+}
+
+.dark .catalog-bg-canvas {
+  background-color: #070D1B;
+  background-image: 
+    radial-gradient(at 20% 20%, rgba(14, 25, 48, 0.8) 0px, transparent 60%),
+    radial-gradient(at 80% 80%, rgba(2, 6, 23, 0.9) 0px, transparent 60%);
+}
+
+/* 3D Neumorphic Card Body */
+.neumorphic-card-3d {
+  background: linear-gradient(145deg, #F7F3ED, #ECE5DC);
+  box-shadow: 
+    8px 10px 24px rgba(0, 0, 0, 0.06),
+    -8px -8px 20px rgba(255, 255, 255, 0.95),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(226, 218, 206, 0.7);
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease;
+}
+
+.dark .neumorphic-card-3d {
+  background: linear-gradient(145deg, #111A2D, #0B1220);
+  box-shadow: 
+    8px 12px 28px rgba(0, 0, 0, 0.6),
+    -4px -4px 16px rgba(255, 255, 255, 0.02),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.neumorphic-card-3d:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 
+    14px 18px 36px rgba(0, 0, 0, 0.1),
+    -10px -10px 24px rgba(255, 255, 255, 0.98),
+    inset 1px 1px 2px rgba(255, 255, 255, 1);
+}
+
+.dark .neumorphic-card-3d:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 
+    14px 20px 40px rgba(0, 0, 0, 0.75),
+    -4px -4px 20px rgba(56, 189, 248, 0.06),
+    inset 0 1px 2px rgba(56, 189, 248, 0.2);
+  border-color: rgba(56, 189, 248, 0.25);
+}
+
+/* 3D Recessed Concave Pedestal Stage */
+.pedestal-stage-3d {
+  background: linear-gradient(180deg, #E6DEC8 0%, #EFEBE4 40%, #E8E1D5 100%);
+  box-shadow: 
+    inset 4px 5px 12px rgba(0, 0, 0, 0.09),
+    inset -4px -5px 12px rgba(255, 255, 255, 0.9),
+    0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(216, 206, 192, 0.8);
+}
+
+.dark .pedestal-stage-3d {
+  background: radial-gradient(circle at 50% 30%, #152238 0%, #0D1626 60%, #060B14 100%);
+  box-shadow: 
+    inset 4px 6px 18px rgba(0, 0, 0, 0.85),
+    inset -2px -3px 12px rgba(56, 189, 248, 0.05),
+    0 1px 0 rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* 3D Floating Garment Contact Shadow */
+.floating-garment-shadow {
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.08) 50%, transparent 75%);
+  filter: blur(4px);
+}
+
+.dark .floating-garment-shadow {
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.2) 50%, transparent 75%);
+  filter: blur(5px);
+}
+
+/* 3D Arch Header Badge */
+.arch-badge-3d {
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 
+    0 2px 6px rgba(0, 0, 0, 0.08),
+    inset 0 1px 1px #FFFFFF;
+  border: 1px solid rgba(220, 212, 200, 0.8);
+}
+
+.dark .arch-badge-3d {
+  background: rgba(15, 23, 42, 0.85);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* 3D Inset Mini Spec Boxes */
+.spec-box-3d {
+  background: #EFE9E1;
+  box-shadow: 
+    inset 2px 2px 5px rgba(0, 0, 0, 0.05),
+    inset -2px -2px 5px rgba(255, 255, 255, 0.8),
+    0 1px 1px rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(222, 214, 202, 0.7);
+}
+
+.dark .spec-box-3d {
+  background: #0C1322;
+  box-shadow: 
+    inset 2px 3px 6px rgba(0, 0, 0, 0.6),
+    inset -1px -1px 3px rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* 3D Sidebar Container */
+.sidebar-3d-panel {
+  background: linear-gradient(150deg, #F6F1EB, #EBE4D9);
+  box-shadow: 
+    8px 10px 25px rgba(0, 0, 0, 0.05),
+    -8px -8px 22px rgba(255, 255, 255, 0.9),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(226, 218, 206, 0.75);
+}
+
+.dark .sidebar-3d-panel {
+  background: linear-gradient(150deg, #10192C, #090F1B);
+  box-shadow: 
+    8px 12px 30px rgba(0, 0, 0, 0.6),
+    -4px -4px 16px rgba(255, 255, 255, 0.02),
+    inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* 3D Inset Input */
+.input-3d-inset {
+  background: #ECE5DC;
+  box-shadow: 
+    inset 2px 2px 5px rgba(0, 0, 0, 0.07),
+    inset -2px -2px 5px rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(218, 208, 195, 0.8);
+}
+
+.dark .input-3d-inset {
+  background: #090E1A;
+  box-shadow: 
+    inset 2px 3px 8px rgba(0, 0, 0, 0.7),
+    inset -1px -1px 3px rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* 3D Pill Button */
+.pill-3d-tactile {
+  box-shadow: 
+    3px 4px 10px rgba(0, 0, 0, 0.05),
+    -3px -3px 8px rgba(255, 255, 255, 0.85);
+}
+
+.dark .pill-3d-tactile {
+  box-shadow: 
+    3px 4px 12px rgba(0, 0, 0, 0.5),
+    -1px -1px 4px rgba(255, 255, 255, 0.03);
+}
+
+.pill-3d-tactile:active {
+  box-shadow: 
+    inset 2px 2px 5px rgba(0, 0, 0, 0.1),
+    inset -2px -2px 5px rgba(255, 255, 255, 0.8);
+}
+
+.dark .pill-3d-tactile:active {
+  box-shadow: 
+    inset 2px 2px 6px rgba(0, 0, 0, 0.7);
+}
+

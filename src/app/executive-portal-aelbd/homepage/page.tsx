@@ -11,7 +11,7 @@ import ImagePicker from '@/components/admin/ImagePicker';
 
 type SectionID =
     | 'announcement_bar' | 'hero_slider' | 'stats_counter'
-    | 'category_grid' | 'featured_products' | 'delivery_feed'
+    | 'category_grid' | 'featured_products' | 'production_process' | 'our_products_3d' | 'core_values_3d' | 'delivery_feed'
     | 'why_choose_us' | 'certifications' | 'testimonials' | 'cta_section';
 
 const SECTION_NAMES: Record<SectionID, string> = {
@@ -20,6 +20,9 @@ const SECTION_NAMES: Record<SectionID, string> = {
     stats_counter: 'Stats Counter (কোয়ালিটি ও মেট্রিক কাউন্টার)',
     category_grid: 'Our Manufacturing Capabilities (ক্যাটাগরি গ্রিড)',
     featured_products: 'Featured Products (ফিচার্ড প্রোডাক্টস)',
+    production_process: 'Our Premium Production Process (প্রোডাকশন প্রসেস থ্রিডি শোকেস)',
+    our_products_3d: 'Our Products Categories (আওয়ার প্রোডাক্টস থ্রিডি শোকেস)',
+    core_values_3d: 'Our Core Values (আওয়ার কোর ভ্যালুজ থ্রিডি শোকেস)',
     delivery_feed: 'Recent Deliveries & Production (লাইভ ডেলিভারি ফিড)',
     why_choose_us: 'Why Partner With Us (কর্পোরেট সুবিধা)',
     certifications: 'Compliance & Production Standards (কমপ্লায়েন্স ও স্ট্যান্ডার্ড)',
@@ -28,8 +31,8 @@ const SECTION_NAMES: Record<SectionID, string> = {
 };
 
 const DEFAULT_ORDER: SectionID[] = [
-    'hero_slider', 'stats_counter', 'category_grid', 'featured_products',
-    'delivery_feed', 'why_choose_us', 'certifications', 'testimonials', 'cta_section'
+    'hero_slider', 'stats_counter', 'category_grid', 'featured_products', 'production_process',
+    'our_products_3d', 'core_values_3d', 'delivery_feed', 'why_choose_us', 'certifications', 'testimonials', 'cta_section'
 ];
 
 /* ─────────────────────────────────────────────────────────────
@@ -56,6 +59,18 @@ const HEADING_FIELDS: HeadingField[] = [
     // Featured Products
     { key: 'featured_products_eyebrow', label: 'Featured Products — Eyebrow Tag', placeholder: 'Premium Quality', hint: 'Appears next to the star icon above the heading.' },
     { key: 'featured_products_heading', label: 'Featured Products — Section Heading', placeholder: 'Featured Products' },
+    // Production Process 3D
+    { key: 'production_process_heading', label: 'Production Process — Heading', placeholder: 'Our Premium Production Process' },
+    { key: 'production_process_p1', label: 'Production Process — Paragraph 1', placeholder: 'Apparel Emporium is a leading apparel sourcing...' },
+    { key: 'production_process_p2', label: 'Production Process — Paragraph 2', placeholder: 'Our vertically integrated production process ensures...' },
+    { key: 'production_process_btn_text', label: 'Production Process — Button Label', placeholder: 'VIEW PRODUCTION DETAILS' },
+    // Our Products 3D
+    { key: 'our_products_heading', label: 'Our Products — Main Heading', placeholder: 'OUR PRODUCTS' },
+    { key: 'our_products_btn_text', label: 'Our Products — Button Label', placeholder: 'VIEW ALL PRODUCTS' },
+    { key: 'our_products_btn_url', label: 'Our Products — Button URL', placeholder: '/products' },
+    // Core Values 3D
+    { key: 'core_values_heading', label: 'Core Values — Main Heading', placeholder: 'OUR CORE VALUES' },
+    { key: 'core_values_subheading', label: 'Core Values — Subheading Description', placeholder: 'We offer great quality, value, and an inspiring trading experience...' },
 ];
 
 /* ─────────────────────────────────────────────────────────────
@@ -175,6 +190,17 @@ export default function HomepageBuilderPage() {
             else if (id === 'testimonials') initialData = [];
             else if (id === 'cta_section') initialData = { heading: '', subheading: '', ctaText: '', ctaLink: '', image: '' };
             else if (id === 'announcement_bar') initialData = { text: '', link: '', bgColor: '#1B365D', textColor: '#ffffff' };
+            else if (id === 'production_process') initialData = { heading: 'Our Premium Production Process', p1: 'Apparel Emporium is a leading apparel sourcing and manufacturing partner based in Bangladesh...', p2: 'Our vertically integrated production process ensures strict quality control...', btnText: 'VIEW PRODUCTION DETAILS' };
+            else if (id === 'our_products_3d') initialData = [
+                { id: 'knit', title: 'KNIT', tag: 'MEN • WOMEN • KIDS', url: '/products?category=knitwear', imgLight: '/images/3d/cluster_knit_light.jpg', imgDark: '/images/3d/cluster_knit_dark.jpg' },
+                { id: 'woven', title: 'WOVEN', tag: 'MEN • WOMEN • KIDS', url: '/products?category=woven', imgLight: '/images/3d/cluster_woven_light.jpg', imgDark: '/images/3d/cluster_woven_dark.jpg' },
+                { id: 'sweater', title: 'SWEATER', tag: 'MEN • WOMEN • KIDS', url: '/products?category=sweater', imgLight: '/images/3d/cluster_sweater_light.jpg', imgDark: '/images/3d/cluster_sweater_dark.jpg' }
+            ];
+            else if (id === 'core_values_3d') initialData = [
+                { id: 'ownership', title: 'Ownership', desc: 'We believe in ownership and mutual growth across every partnership.' },
+                { id: 'excellence', title: 'Excellence', desc: 'We go all-out to excel in every aspect of garment manufacturing.' },
+                { id: 'social', title: 'Social Responsibility', desc: 'Ensuring a sustainable future through green technology and ethical practices.' }
+            ];
         }
         setEditorData(initialData); setEditingSection(id);
     };
@@ -332,6 +358,40 @@ export default function HomepageBuilderPage() {
                                         </div>
                                     )}
 
+                                    {/* PRODUCTION PROCESS */}
+                                    {editingSection === 'production_process' && (
+                                        <div className="space-y-5">
+                                            <FieldLabel>Section Headline</FieldLabel>
+                                            <input type="text" value={editorData.heading || ''} onChange={e => updateEditorData('heading', e.target.value)} className="w-full px-4 py-2 border rounded-lg text-sm font-bold bg-white dark:bg-dark-bg" placeholder="Our Premium Production Process" />
+                                            <FieldLabel>Primary Description (Paragraph 1)</FieldLabel>
+                                            <textarea value={editorData.p1 || ''} onChange={e => updateEditorData('p1', e.target.value)} rows={3} className="w-full px-4 py-2 border rounded-lg text-sm bg-white dark:bg-dark-bg" />
+                                            <FieldLabel>Secondary Description (Paragraph 2)</FieldLabel>
+                                            <textarea value={editorData.p2 || ''} onChange={e => updateEditorData('p2', e.target.value)} rows={3} className="w-full px-4 py-2 border rounded-lg text-sm bg-white dark:bg-dark-bg" />
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <FieldLabel>Button Label</FieldLabel>
+                                                    <input type="text" value={editorData.btnText || ''} onChange={e => updateEditorData('btnText', e.target.value)} className="w-full px-4 py-2 border rounded-lg text-sm bg-white dark:bg-dark-bg" placeholder="VIEW PRODUCTION DETAILS" />
+                                                </div>
+                                                <div>
+                                                    <FieldLabel>Button URL (Leave empty for Workflow Modal)</FieldLabel>
+                                                    <input type="text" value={editorData.btnUrl || ''} onChange={e => updateEditorData('btnUrl', e.target.value)} className="w-full px-4 py-2 border rounded-lg text-sm font-mono bg-white dark:bg-dark-bg" placeholder="/about or empty" />
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-3 pt-2">
+                                                <input 
+                                                    type="checkbox" 
+                                                    id="prod_showDecor"
+                                                    checked={editorData.showDecor !== false} 
+                                                    onChange={e => updateEditorData('showDecor', e.target.checked)} 
+                                                    className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                                                />
+                                                <label htmlFor="prod_showDecor" className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+                                                    Show 3D Floating Craft Elements (Scissors, Buttons, Thread)
+                                                </label>
+                                            </div>
+                                        </div>
+                                    )}
+
                                     {editingSection === 'delivery_feed' && (
                                         <div className="space-y-4 p-6 text-center bg-gray-50 dark:bg-gray-800/20 rounded-xl border border-gray-200 dark:border-gray-700">
                                             <p className="text-sm text-gray-600 dark:text-gray-300">
@@ -454,6 +514,43 @@ export default function HomepageBuilderPage() {
                                                                 <textarea value={item.quote || ''} onChange={e => updateArrayItem(idx, 'quote', e.target.value)} className="w-full text-sm p-2.5 border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700 outline-none" rows={3} />
                                                             </>
                                                         )}
+
+                                                        {editingSection === 'our_products_3d' && (
+                                                            <>
+                                                                <div className="grid grid-cols-2 gap-4">
+                                                                    <div><FieldLabel>Category Title</FieldLabel><input type="text" value={item.title || ''} onChange={e => updateArrayItem(idx, 'title', e.target.value)} className="w-full text-sm p-2.5 border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700 outline-none font-bold" /></div>
+                                                                    <div><FieldLabel>Audience Tag</FieldLabel><input type="text" value={item.tag || ''} onChange={e => updateArrayItem(idx, 'tag', e.target.value)} className="w-full text-sm p-2.5 border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700 outline-none" placeholder="MEN • WOMEN • KIDS" /></div>
+                                                                </div>
+                                                                <div><FieldLabel>Category Link URL</FieldLabel><input type="text" value={item.url || ''} onChange={e => updateArrayItem(idx, 'url', e.target.value)} className="w-full text-sm p-2 border rounded font-mono" /></div>
+                                                                <div className="grid grid-cols-2 gap-4">
+                                                                    <div>
+                                                                        <FieldLabel>Light Theme 3D Cluster Image</FieldLabel>
+                                                                        <ImagePicker value={item.imgLight || ''} onChange={url => updateArrayItem(idx, 'imgLight', url)} />
+                                                                    </div>
+                                                                    <div>
+                                                                        <FieldLabel>Dark Theme 3D Cluster Image</FieldLabel>
+                                                                        <ImagePicker value={item.imgDark || ''} onChange={url => updateArrayItem(idx, 'imgDark', url)} />
+                                                                    </div>
+                                                                </div>
+                                                            </>
+                                                        )}
+
+                                                        {editingSection === 'core_values_3d' && (
+                                                            <>
+                                                                <div><FieldLabel>Value Title</FieldLabel><input type="text" value={item.title || ''} onChange={e => updateArrayItem(idx, 'title', e.target.value)} className="w-full text-sm p-2.5 border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700 outline-none font-bold" /></div>
+                                                                <div><FieldLabel>Description</FieldLabel><textarea value={item.desc || ''} onChange={e => updateArrayItem(idx, 'desc', e.target.value)} className="w-full text-sm p-2.5 border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700 outline-none" rows={3} /></div>
+                                                                <div className="grid grid-cols-2 gap-4">
+                                                                    <div>
+                                                                        <FieldLabel>Light Theme 3D Emblem</FieldLabel>
+                                                                        <ImagePicker value={item.emblemLight || ''} onChange={url => updateArrayItem(idx, 'emblemLight', url)} />
+                                                                    </div>
+                                                                    <div>
+                                                                        <FieldLabel>Dark Theme 3D Emblem</FieldLabel>
+                                                                        <ImagePicker value={item.emblemDark || ''} onChange={url => updateArrayItem(idx, 'emblemDark', url)} />
+                                                                    </div>
+                                                                </div>
+                                                            </>
+                                                        )}
                                                     </div>
                                                 </div>
                                             ))}
@@ -464,7 +561,9 @@ export default function HomepageBuilderPage() {
                                                         editingSection === 'why_choose_us' ? { title: 'New Feature', description: '', icon: 'Star' } :
                                                             editingSection === 'stats_counter' ? { label: 'Metric', number: 0, suffix: '+', icon: 'Users' } :
                                                                 editingSection === 'certifications' ? { name: 'ISO', image: '', link: '' } :
-                                                                    editingSection === 'testimonials' ? { name: 'John Doe', avatar: '', company: 'Acme', country: 'US', quote: '' } : {};
+                                                                    editingSection === 'testimonials' ? { name: 'John Doe', avatar: '', company: 'Acme', country: 'US', quote: '' } :
+                                                                        editingSection === 'our_products_3d' ? { title: 'NEW CATEGORY', tag: 'MEN • WOMEN • KIDS', url: '/products', imgLight: '/images/3d/cluster_knit_light.jpg', imgDark: '/images/3d/cluster_knit_dark.jpg' } :
+                                                                            editingSection === 'core_values_3d' ? { title: 'New Value', desc: 'Description of company commitment...' } : {};
                                                 addToArray(baseObj);
                                             }} className="w-full py-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl text-sm font-bold text-gray-500 hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2 bg-gray-50 dark:bg-gray-800/20">
                                                 <Plus size={18} /> Append New Block
@@ -524,10 +623,13 @@ export default function HomepageBuilderPage() {
                     <div className="space-y-4">
                         {/* Group by section */}
                         {[
-                            { section: 'Certifications / Logo Marquee', keys: ['certifications_label'] },
-                            { section: 'Why Choose Us / Partner Features', keys: ['why_choose_us_eyebrow', 'why_choose_us_heading', 'why_choose_us_subheading'] },
-                            { section: 'Shop By Category', keys: ['category_grid_eyebrow', 'category_grid_heading'] },
+                            { section: 'Our Premium Production Process (3D Showroom)', keys: ['production_process_heading', 'production_process_p1', 'production_process_p2', 'production_process_btn_text'] },
+                            { section: 'Our Products Categories (3D Showroom)', keys: ['our_products_heading', 'our_products_btn_text', 'our_products_btn_url'] },
+                            { section: 'Our Core Values (3D Showroom)', keys: ['core_values_heading', 'core_values_subheading'] },
                             { section: 'Featured Products', keys: ['featured_products_eyebrow', 'featured_products_heading'] },
+                            { section: 'Shop By Category', keys: ['category_grid_eyebrow', 'category_grid_heading'] },
+                            { section: 'Why Choose Us / Partner Features', keys: ['why_choose_us_eyebrow', 'why_choose_us_heading', 'why_choose_us_subheading'] },
+                            { section: 'Certifications / Logo Marquee', keys: ['certifications_label'] },
                         ].map(group => (
                             <HeadingGroup key={group.section} title={group.section}>
                                 {HEADING_FIELDS.filter(f => group.keys.includes(f.key)).map(field => (
