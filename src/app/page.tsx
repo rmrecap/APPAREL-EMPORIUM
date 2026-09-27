@@ -7,6 +7,7 @@ import Category3DStage from '@/components/home/Category3DStage';
 import ProductionProcess3D from '@/components/home/ProductionProcess3D';
 import OurProducts3D from '@/components/home/OurProducts3D';
 import CoreValues3D from '@/components/home/CoreValues3D';
+import TelegramVideoGallery from '@/components/home/TelegramVideoGallery';
 
 const HeroSlider = nextDynamic(() => import('@/components/home/HeroSlider'), { ssr: false });
 const StatsCounter = nextDynamic(() => import('@/components/home/StatsCounter'), { ssr: false });
@@ -44,7 +45,7 @@ export default async function HomePage() {
     let sectionOrder: string[] = [];
     try { sectionOrder = JSON.parse(settingsMap['homepage_sections_order'] || '[]'); } catch (e) { }
     if (sectionOrder.length === 0) {
-        sectionOrder = ['category_3d_stage', 'featured_products', 'production_process', 'our_products_3d', 'core_values_3d', 'delivery_feed', 'why_choose_us', 'certifications', 'testimonials', 'cta_section'];
+        sectionOrder = ['category_3d_stage', 'featured_products', 'production_process', 'our_products_3d', 'core_values_3d', 'telegram_video_gallery', 'delivery_feed', 'why_choose_us', 'certifications', 'testimonials', 'cta_section'];
     } else {
         if (!sectionOrder.includes('category_3d_stage')) {
             sectionOrder.unshift('category_3d_stage');
@@ -64,8 +65,13 @@ export default async function HomePage() {
             if (prodIdx !== -1) sectionOrder.splice(prodIdx + 1, 0, 'core_values_3d');
             else sectionOrder.push('core_values_3d');
         }
+        if (!sectionOrder.includes('telegram_video_gallery')) {
+            const valIdx = sectionOrder.indexOf('core_values_3d');
+            if (valIdx !== -1) sectionOrder.splice(valIdx + 1, 0, 'telegram_video_gallery');
+            else sectionOrder.push('telegram_video_gallery');
+        }
         if (!sectionOrder.includes('delivery_feed')) {
-            const idx = sectionOrder.indexOf('core_values_3d');
+            const idx = sectionOrder.indexOf('telegram_video_gallery');
             if (idx !== -1) sectionOrder.splice(idx + 1, 0, 'delivery_feed');
             else sectionOrder.push('delivery_feed');
         }
@@ -86,6 +92,9 @@ export default async function HomePage() {
     }
     if (visibility['core_values_3d'] === undefined) {
         visibility['core_values_3d'] = true;
+    }
+    if (visibility['telegram_video_gallery'] === undefined) {
+        visibility['telegram_video_gallery'] = true;
     }
 
     // Section headings — ALL editable labels from the admin dashboard
@@ -109,6 +118,7 @@ export default async function HomePage() {
         'production_process': <ProductionProcess3D headings={headings} data={settingsMap['homepage_production_process']} key="production_process" />,
         'our_products_3d': <OurProducts3D headings={headings} data={settingsMap['homepage_our_products_3d']} key="our_products_3d" />,
         'core_values_3d': <CoreValues3D headings={headings} data={settingsMap['homepage_core_values_3d']} key="core_values_3d" />,
+        'telegram_video_gallery': <TelegramVideoGallery headings={headings} key="telegram_video_gallery" />,
         'why_choose_us': <WhyChooseUs data={settingsMap['homepage_why_choose_us'] || '[]'} headings={headings} key="why_choose_us" />,
         'certifications': <Certifications data={settingsMap['homepage_certifications'] || '[]'} headings={headings} key="certifications" />,
         'testimonials': <Testimonials key="testimonials" />,

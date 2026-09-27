@@ -263,3 +263,23 @@ model DeliveryUpdate {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model TelegramVideo {
+  id           String   @id @default(cuid())
+  messageId    Int      @unique
+  fileId       String
+  fileUniqueId String?
+  caption      String?
+  title        String?
+  mimeType     String?  @default("video/mp4")
+  fileSize     Int?     @default(0)
+  duration     Int?     @default(0)
+  width        Int?     @default(0)
+  height       Int?     @default(0)
+  thumbnailUrl String?
+  viewsCount   Int      @default(0)
+  isActive     Boolean  @default(true)
+  publishedAt  DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}

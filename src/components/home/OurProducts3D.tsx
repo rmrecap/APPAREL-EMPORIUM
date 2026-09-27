@@ -20,8 +20,8 @@ export default function OurProducts3D({ headings, data }: OurProductsProps) {
     // Dynamic settings from Admin or defaults
     const parsedData = typeof data === 'string' ? (() => { try { return JSON.parse(data); } catch { return []; } })() : (data || []);
     
-    const sectionHeading = headings?.our_products_heading || 'OUR PRODUCTS';
-    const btnText = headings?.our_products_btn_text || 'VIEW ALL PRODUCTS';
+    const sectionHeading = headings?.our_products_categories_heading || headings?.our_products_heading || 'OUR PRODUCT CATEGORIES';
+    const btnText = headings?.our_products_btn_text || 'VIEW ALL COLLECTIONS';
     const btnUrl = headings?.our_products_btn_url || '/products';
 
     const defaultCategories = [

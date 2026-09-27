@@ -4,6 +4,14 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight, Sparkles, ArrowRight } from 'lucide-react';
+import { 
+    GarmentButton3D, 
+    NeedleWithThread3D, 
+    Hanger3D, 
+    ThreadSpool3D, 
+    Scissors3D, 
+    GenderSilhouette3D 
+} from './Garment3DElements';
 
 interface PillarItem {
     id: string;
@@ -162,6 +170,39 @@ export default function Category3DStage() {
 
             {/* Subtle luxury studio background grid */}
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000006_1px,transparent_1px),linear-gradient(to_bottom,#00000006_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#ffffff04_1px,transparent_1px),linear-gradient(to_bottom,#ffffff04_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none" />
+
+            {/* ── FLOATING 3D DECORATIVE ELEMENTS (Export Garments Sourcing) ── */}
+            <div className="pointer-events-none absolute inset-0 overflow-hidden z-0 hidden lg:block">
+                {/* Needle & Thread (Top Left) */}
+                <div className="absolute top-12 left-[5%] animate-[bounce_8s_infinite_ease-in-out]">
+                    <NeedleWithThread3D size={84} rotation={-35} />
+                </div>
+
+                {/* Garment Button (Top Right) */}
+                <div className="absolute top-16 right-[6%] animate-[bounce_7.5s_infinite_ease-in-out_1s]">
+                    <GarmentButton3D size={52} rotation={20} />
+                </div>
+
+                {/* Clothes Hanger (Center Left) */}
+                <div className="absolute top-[45%] left-[3%] animate-[bounce_9s_infinite_ease-in-out_0.5s]">
+                    <Hanger3D size={72} rotation={-15} />
+                </div>
+
+                {/* Thread Spool (Bottom Right) */}
+                <div className="absolute bottom-12 right-[5%] animate-[bounce_8.5s_infinite_ease-in-out_1.5s]">
+                    <ThreadSpool3D size={56} rotation={15} threadColor="#D97706" />
+                </div>
+
+                {/* Scissors (Bottom Left) */}
+                <div className="absolute bottom-10 left-[6%] animate-[bounce_9.5s_infinite_ease-in-out_2s]">
+                    <Scissors3D size={70} rotation={25} />
+                </div>
+
+                {/* Male Silhouette (Center Right) */}
+                <div className="absolute top-[48%] right-[4%] animate-[bounce_8s_infinite_ease-in-out_1.2s]">
+                    <GenderSilhouette3D gender="male" size={32} />
+                </div>
+            </div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
                 {/* Header Title */}
