@@ -70,10 +70,8 @@ const nextConfig = {
         // OneDrive sync + large webpack filesystem cache causes:
         //   "RangeError: Array buffer allocation failed"
         //   "Fatal process out of memory: Zone"
-        // Solution: use in-memory cache in dev (no disk writes, no file locks).
-        if (dev) {
-            config.cache = { type: 'memory' };
-        }
+        // Prevent OneDrive file locking and ArrayBuffer/Zone allocation crash
+        config.cache = false;
 
         return config;
     },

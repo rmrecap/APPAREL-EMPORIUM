@@ -77,16 +77,16 @@ export default function Header() {
 
     return (
         <>
-            <header className="fixed top-0 left-0 right-0 z-[100] flex justify-center px-3 sm:px-6 pt-3 sm:pt-4 pointer-events-none transition-all duration-300">
+            <header className="fixed top-0 left-0 right-0 z-[100] flex justify-center px-2.5 sm:px-6 pt-2.5 sm:pt-4 pointer-events-none transition-all duration-300">
                 <div
-                    className={`pointer-events-auto relative w-full max-w-6xl mx-auto flex items-center justify-between px-4 sm:px-6 py-2 sm:py-2.5 rounded-full transition-all duration-300
+                    className={`pointer-events-auto relative w-full max-w-6xl mx-auto flex items-center justify-between px-3 sm:px-6 py-2 sm:py-2.5 rounded-full transition-all duration-300
                     bg-[#FAF6F0]/90 dark:bg-[#101726]/85 backdrop-blur-xl
                     border border-[#E8E0D2] dark:border-white/10
                     shadow-[0_10px_35px_rgba(0,0,0,0.06)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.5)]`}
                 >
                     {/* Brand / Corporate Logo */}
-                    <Link href="/" className="flex items-center gap-2 group h-9 sm:h-10 w-auto shrink-0">
-                        <div className="h-8 sm:h-9 max-w-[220px] sm:max-w-[260px] flex items-center transition-all duration-300">
+                    <Link href="/" className="flex items-center gap-2 group h-8 sm:h-9 md:h-10 w-auto shrink min-w-0">
+                        <div className="h-7 sm:h-8 md:h-9 max-w-[140px] xs:max-w-[170px] sm:max-w-[220px] md:max-w-[260px] flex items-center transition-all duration-300">
                             <img
                                 src={logoSrc}
                                 alt={settings.company_name || 'Apparel Emporium'}
@@ -130,34 +130,35 @@ export default function Header() {
                     </nav>
 
                     {/* Right Utilities */}
-                    <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                    <div className="flex items-center gap-1.5 sm:gap-2.5 md:gap-3 shrink-0">
                         <ThemeToggle />
 
                         <Link
                             href="/buyer-portal"
-                            className="p-2 text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-white transition-colors hover:bg-black/5 dark:hover:bg-white/5 rounded-full"
+                            className="p-1.5 sm:p-2 text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-white transition-colors hover:bg-black/5 dark:hover:bg-white/5 rounded-full"
                             title="Buyer Portal"
                             aria-label="Buyer Portal"
                         >
-                            <User size={19} />
+                            <User size={18} className="sm:w-[19px] sm:h-[19px]" />
                         </Link>
 
+                        {/* Desktop & Tablet Get a Quote CTA */}
                         <Link
                             href="/contact"
-                            className="text-xs font-bold uppercase tracking-wider px-4 sm:px-5 py-2 rounded-xl transition-all duration-200 active:scale-95 shadow-sm
+                            className="hidden md:inline-flex text-xs font-bold uppercase tracking-wider px-4 sm:px-5 py-2 rounded-xl transition-all duration-200 active:scale-95 shadow-sm
                             bg-[#2D2A26] hover:bg-black text-white
-                            dark:bg-white/5 dark:hover:bg-white/10 dark:text-white dark:border dark:border-white/20"
+                            dark:bg-white/10 dark:hover:bg-white/20 dark:text-white dark:border dark:border-white/20"
                         >
                             Get a Quote
                         </Link>
 
-                        {/* Mobile Hamburger */}
+                        {/* Mobile Hamburger Menu Toggle Button - Always cleanly positioned & visible on mobile */}
                         <button
-                            className="lg:hidden p-2 text-slate-700 dark:text-white hover:text-primary transition-colors bg-black/5 dark:bg-white/5 rounded-full"
+                            className="lg:hidden flex items-center justify-center w-9 h-9 text-slate-800 dark:text-white hover:text-primary bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/20 rounded-full border border-black/5 dark:border-white/10 transition-all active:scale-95 shadow-xs"
                             onClick={() => setMobileOpen(true)}
-                            aria-label="Toggle Menu"
+                            aria-label="Open Navigation Menu"
                         >
-                            <Menu size={20} />
+                            <Menu size={19} className="stroke-[2.2]" />
                         </button>
                     </div>
 
@@ -181,7 +182,7 @@ export default function Header() {
             </header>
 
             <MobileNav
-                menus={mobileMenus.length > 0 ? mobileMenus : menus}
+                menus={mobileMenus.length > 0 ? mobileMenus : (menus.length > 0 ? menus : navItems)}
                 isOpen={mobileOpen}
                 onClose={() => setMobileOpen(false)}
             />

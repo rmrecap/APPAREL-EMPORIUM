@@ -49,6 +49,12 @@ export async function POST(req: NextRequest) {
         const categoryBySlug = new Map(allCategories.map(c => [c.slug, c.id]));
         const categoryById = new Map(allCategories.map(c => [c.id, c.slug]));
 
+        // Check Dashboard Auto-Publish Setting
+        const autoPublishSetting = await prisma.siteSetting.findUnique({
+            where: { key: 'api_products_auto_publish' }
+        });
+        const defaultAutoPublish = autoPublishSetting ? autoPublishSetting.value !== 'false' : true;
+
         for (let i = 0; i < items.length; i++) {
             const item = items[i];
             const {
@@ -61,7 +67,8 @@ export async function POST(req: NextRequest) {
                 images,
                 specifications,
                 isFeatured = false,
-                isActive = true,
+                isActive,
+                status,
                 sku,
                 tags,
                 priceDisplay = true,
@@ -103,7 +110,8 @@ export async function POST(req: NextRequest) {
                             ? JSON.stringify(specifications)
                             : (specifications || '{}'),
                         isFeatured,
-                        isActive,
+                        isActive: isActive !== undefined ? Boolean(isActive) : defaultAutoPublish,
+                        status: status || ((isActive !== undefined ? Boolean(isActive) : defaultAutoPublish) ? 'PUBLISHED' : 'DRAFT'),
                         sku: sku || `AE-BLK-${Date.now()}-${i}`,
                         tags: Array.isArray(tags) ? tags.join(', ') : (tags || ''),
                         priceDisplay,
@@ -115,7 +123,13 @@ export async function POST(req: NextRequest) {
                         seoKeywords: seoKeywords || (Array.isArray(tags) ? tags.join(', ') : (tags || ''))
                     }
                 });
-                results.push({ id: product.id, name: product.name, slug: product.slug });
+                results.push({
+                    id: product.id,
+                    name: product.name,
+                    slug: product.slug,
+                    isActive: product.isActive,
+                    status: product.status,
+                });
             } catch (err: any) {
                 errors.push({ index: i, name, error: err.message });
             }

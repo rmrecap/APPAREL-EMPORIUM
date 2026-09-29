@@ -42,7 +42,8 @@ export async function POST(req: NextRequest) {
             images,
             specifications,
             isFeatured = false,
-            isActive = true,
+            isActive,
+            status,
             sku,
             tags,
             priceDisplay = true,
@@ -53,6 +54,15 @@ export async function POST(req: NextRequest) {
             seoDescription,
             seoKeywords
         } = body;
+
+        // Check Dashboard Auto-Publish Setting
+        const autoPublishSetting = await prisma.siteSetting.findUnique({
+            where: { key: 'api_products_auto_publish' }
+        });
+        // Default to true if not configured; if set to 'false', products are saved as DRAFT
+        const defaultAutoPublish = autoPublishSetting ? autoPublishSetting.value !== 'false' : true;
+        const finalIsActive = isActive !== undefined ? Boolean(isActive) : defaultAutoPublish;
+        const finalStatus = status || (finalIsActive ? 'PUBLISHED' : 'DRAFT');
 
         // 3. Validate required fields
         if (!name || !description || (!categorySlug && !categoryId)) {
@@ -128,7 +138,8 @@ export async function POST(req: NextRequest) {
                     ? JSON.stringify(specifications)
                     : (specifications || '{}'),
                 isFeatured,
-                isActive,
+                isActive: finalIsActive,
+                status: finalStatus,
                 sku: sku || `AE-EXT-${Date.now()}`,
                 tags: Array.isArray(tags) ? tags.join(', ') : (tags || ''),
                 priceDisplay,
@@ -144,9 +155,14 @@ export async function POST(req: NextRequest) {
             }
         });
 
+        const statusMessage = finalIsActive
+            ? `✅ Product "${product.name}" published LIVE successfully to website!`
+            : `📝 Product "${product.name}" saved as DRAFT in Admin Dashboard (Awaiting Approval)!`;
+
         return withCors(req, NextResponse.json({
             success: true,
-            message: `✅ Product "${product.name}" created successfully!`,
+            message: statusMessage,
+            mode: finalIsActive ? 'PUBLISHED_LIVE' : 'SAVED_DRAFT',
             product: {
                 id: product.id,
                 name: product.name,
@@ -155,6 +171,8 @@ export async function POST(req: NextRequest) {
                 category: product.category.name,
                 categorySlug: product.category.slug,
                 priceRange: product.priceRange,
+                isActive: product.isActive,
+                status: product.status,
                 url: `/products/${product.slug}`
             }
         }, { status: 201 }));

@@ -7,7 +7,7 @@ import {
     Edit2, Trash2, CheckCircle2, XCircle, Search,
     MoreVertical, Copy, Download, Trash,
     CheckCircle, ChevronLeft, ChevronRight, Loader2,
-    Filter, LayoutGrid, List, AlertCircle
+    Filter, LayoutGrid, List, AlertCircle, Zap, Globe, FileText
 } from 'lucide-react';
 import { extractFeaturedImage } from '@/lib/utils';
 
@@ -21,12 +21,31 @@ export default function ProductManagementTable({ categories }: ProductManagement
     const [page, setPage] = useState(1);
     const [limit] = useState(15);
     const [search, setSearch] = useState('');
+    const [statusFilter, setStatusFilter] = useState<'ALL' | 'LIVE' | 'DRAFT'>('ALL');
     const [loading, setLoading] = useState(true);
     const [isExporting, setIsExporting] = useState(false);
 
     // Selection state
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+    const toggleProductStatus = async (id: string, currentIsActive: boolean) => {
+        setActionLoading(`status-${id}`);
+        try {
+            const res = await fetch('/api/admin/products/bulk', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ids: [id], action: 'STATUS', value: !currentIsActive })
+            });
+            if ((await res.json()).success) {
+                fetchProducts();
+            }
+        } catch {
+            alert('Status update failed');
+        } finally {
+            setActionLoading(null);
+        }
+    };
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -188,6 +207,52 @@ export default function ProductManagementTable({ categories }: ProductManagement
                 </div>
             </div>
 
+            {/* Status Filter Tabs & Tool Mode Notice */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800/80 p-1.5 rounded-2xl border border-gray-200/60 dark:border-gray-700/60 shrink-0">
+                    <button
+                        onClick={() => setStatusFilter('ALL')}
+                        className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                            statusFilter === 'ALL'
+                                ? 'bg-white dark:bg-dark-surface text-gray-900 dark:text-white shadow-xs'
+                                : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
+                        }`}
+                    >
+                        All Products ({products.length})
+                    </button>
+                    <button
+                        onClick={() => setStatusFilter('LIVE')}
+                        className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                            statusFilter === 'LIVE'
+                                ? 'bg-white dark:bg-dark-surface text-green-600 shadow-xs'
+                                : 'text-gray-500 hover:text-green-600'
+                        }`}
+                    >
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                        Live / Published ({products.filter(p => p.isActive).length})
+                    </button>
+                    <button
+                        onClick={() => setStatusFilter('DRAFT')}
+                        className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                            statusFilter === 'DRAFT'
+                                ? 'bg-white dark:bg-dark-surface text-amber-600 shadow-xs'
+                                : 'text-gray-500 hover:text-amber-600'
+                        }`}
+                    >
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                        Drafts ({products.filter(p => !p.isActive).length})
+                    </button>
+                </div>
+
+                <Link
+                    href="/executive-portal-aelbd/api-manager"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline bg-indigo-50 dark:bg-indigo-950/30 px-3 py-1.5 rounded-xl border border-indigo-100 dark:border-indigo-900/40 w-fit"
+                >
+                    <Zap size={13} className="text-amber-500" />
+                    <span>External Tool Mode (Auto-Publish / Draft Settings) →</span>
+                </Link>
+            </div>
+
             {/* Table Area */}
             <div className="bg-white dark:bg-dark-surface rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden relative">
                 {loading && (
@@ -211,13 +276,19 @@ export default function ProductManagementTable({ categories }: ProductManagement
                                 <th className="p-5 w-20">Media</th>
                                 <th className="p-5">Product Definition</th>
                                 <th className="p-5">Classification</th>
-                                <th className="p-5">Status</th>
+                                <th className="p-5">Status (Click to Switch)</th>
                                 <th className="p-5">Growth</th>
                                 <th className="p-5 text-right">Ops</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50 dark:divide-gray-800/50">
-                            {products.map((product) => {
+                            {products
+                                .filter(p => {
+                                    if (statusFilter === 'LIVE') return p.isActive;
+                                    if (statusFilter === 'DRAFT') return !p.isActive;
+                                    return true;
+                                })
+                                .map((product) => {
                                 const img = extractFeaturedImage(product.images);
 
                                 return (
@@ -248,13 +319,27 @@ export default function ProductManagementTable({ categories }: ProductManagement
                                         </td>
                                         <td className="p-5 text-xs">
                                             {product.isActive ? (
-                                                <div className="flex items-center gap-1.5 text-green-500 font-bold uppercase tracking-wider text-[9px]">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] animate-pulse" /> Live
-                                                </div>
+                                                <button
+                                                    onClick={() => toggleProductStatus(product.id, true)}
+                                                    disabled={actionLoading === `status-${product.id}`}
+                                                    title="Click to switch to Draft mode"
+                                                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-green-700 bg-green-50 hover:bg-green-100 dark:bg-green-950/40 dark:text-green-400 border border-green-200 dark:border-green-800 font-bold uppercase tracking-wider text-[9px] transition-all cursor-pointer group/btn"
+                                                >
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] animate-pulse" />
+                                                    <span>Live</span>
+                                                    <span className="text-[8px] text-green-600 opacity-60 group-hover/btn:opacity-100 font-normal">⇄ Draft</span>
+                                                </button>
                                             ) : (
-                                                <div className="flex items-center gap-1.5 text-gray-400 font-bold uppercase tracking-wider text-[9px]">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-gray-300" /> Offline
-                                                </div>
+                                                <button
+                                                    onClick={() => toggleProductStatus(product.id, false)}
+                                                    disabled={actionLoading === `status-${product.id}`}
+                                                    title="Click to Publish LIVE to website"
+                                                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-amber-700 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200 dark:border-amber-800 font-bold uppercase tracking-wider text-[9px] transition-all cursor-pointer group/btn"
+                                                >
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                                                    <span>Draft</span>
+                                                    <span className="text-[8px] text-amber-600 opacity-60 group-hover/btn:opacity-100 font-normal">⇄ Publish</span>
+                                                </button>
                                             )}
                                         </td>
                                         <td className="p-5">

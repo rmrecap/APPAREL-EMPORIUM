@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { KeyRound, Copy, Check, RefreshCw, Send, CheckCircle2, AlertCircle, Code, ShieldCheck, Terminal, Layers, UploadCloud, Loader2 } from 'lucide-react';
+import { KeyRound, Copy, Check, RefreshCw, Send, CheckCircle2, AlertCircle, Code, ShieldCheck, Terminal, Layers, UploadCloud, Loader2, Globe, FileText, ToggleLeft, ToggleRight, Sparkles } from 'lucide-react';
 
 export default function ApiManagerPage() {
     const [apiKey, setApiKey] = useState('');
+    const [autoPublish, setAutoPublish] = useState<boolean>(true);
+    const [toggleLoading, setToggleLoading] = useState(false);
     const [loading, setLoading] = useState(true);
     const [copied, setCopied] = useState(false);
     const [regenerating, setRegenerating] = useState(false);
@@ -31,10 +33,37 @@ export default function ApiManagerPage() {
             if (data.settings?.api_external_key) {
                 setApiKey(data.settings.api_external_key);
             }
+            if (data.settings?.api_products_auto_publish !== undefined) {
+                setAutoPublish(data.settings.api_products_auto_publish !== 'false');
+            }
         } catch (e) {
             console.error('Failed to load settings', e);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleToggleAutoPublish = async (newValue: boolean) => {
+        setToggleLoading(true);
+        try {
+            const res = await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    key: 'api_products_auto_publish',
+                    value: String(newValue),
+                    group: 'developer'
+                })
+            });
+            if (res.ok) {
+                setAutoPublish(newValue);
+            } else {
+                alert('Failed to update publishing mode setting');
+            }
+        } catch (e) {
+            alert('Failed to update publishing mode setting');
+        } finally {
+            setToggleLoading(false);
         }
     };
 
@@ -281,6 +310,71 @@ curl -X POST "https://aelbd.net/api/external/delivery-feed" \\
                         {copied ? <Check size={14} /> : <Copy size={14} />}
                         <span>{copied ? 'Copied!' : 'Copy Key'}</span>
                     </button>
+                </div>
+            </div>
+
+            {/* External Tool Publishing Mode Toggle Card */}
+            <div className="bg-white dark:bg-dark-surface rounded-3xl p-6 sm:p-7 shadow-sm border border-gray-100 dark:border-gray-800 space-y-4">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="space-y-1.5 max-w-2xl">
+                        <div className="flex items-center gap-2">
+                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
+                                autoPublish
+                                    ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 border border-emerald-200 dark:border-emerald-800'
+                                    : 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 border border-amber-200 dark:border-amber-800'
+                            }`}>
+                                {autoPublish ? (
+                                    <>
+                                        <Globe size={13} />
+                                        <span>Direct Live Publish (সরাসরি লাইভ পাবলিশ)</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <FileText size={13} />
+                                        <span>Draft Mode Only (ড্রাফট আকারে জমা)</span>
+                                    </>
+                                )}
+                            </span>
+                            <span className="text-[11px] font-mono text-gray-400">
+                                {autoPublish ? 'Status: PUBLISHED' : 'Status: DRAFT'}
+                            </span>
+                        </div>
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                            <span>External Tool &amp; API Product Publishing Policy</span>
+                        </h3>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                            {autoPublish
+                                ? 'টুল থেকে যে প্রোডাক্টগুলো API এর মাধ্যমে আপলোড হবে, সেগুলো সরাসরি লাইভ পাবলিশ হয়ে যাবে এবং ক্যাটালগ (aelbd.net/products)-এ দর্শকরা দেখতে পাবে।'
+                                : 'টুল থেকে যে প্রোডাক্টগুলো API এর মাধ্যমে আসবে, সেগুলো সরাসরি লাইভ হবে না। সেগুলো ড্রাফট (Draft) আকারে সেভ হয়ে ড্যাশবোর্ডের Products মেনুতে জমা থাকবে। আপনি রিভিউ করার পর সেখান থেকে পাবলিশ করতে পারবেন।'}
+                        </p>
+                    </div>
+
+                    <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/60 p-3 rounded-2xl border border-gray-200 dark:border-gray-700 shrink-0">
+                        <div className="flex flex-col text-right">
+                            <span className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-wider">
+                                {autoPublish ? 'Auto-Publish' : 'Draft Only'}
+                            </span>
+                            <span className="text-[10px] text-gray-400 font-semibold">
+                                {autoPublish ? 'Direct to Live' : 'Requires Approval'}
+                            </span>
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={() => handleToggleAutoPublish(!autoPublish)}
+                            disabled={toggleLoading}
+                            className={`relative inline-flex h-7 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none disabled:opacity-50 ${
+                                autoPublish ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-600'
+                            }`}
+                            aria-label="Toggle Auto-Publish Mode"
+                        >
+                            <span
+                                className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+                                    autoPublish ? 'translate-x-7' : 'translate-x-0'
+                                }`}
+                            />
+                        </button>
+                    </div>
                 </div>
             </div>
 

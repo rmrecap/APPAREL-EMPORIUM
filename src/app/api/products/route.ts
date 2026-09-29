@@ -243,6 +243,14 @@ export async function POST(req: NextRequest) {
 
         const tagsString = Array.isArray(tags) ? tags.join(', ') : (tags || '');
 
+        // Check Dashboard Auto-Publish Setting
+        const autoPublishSetting = await prisma.siteSetting.findUnique({
+            where: { key: 'api_products_auto_publish' },
+        });
+        const defaultAutoPublish = autoPublishSetting ? autoPublishSetting.value !== 'false' : true;
+        const finalIsActive = isActive !== undefined ? Boolean(isActive) : defaultAutoPublish;
+        const finalStatus = status || (finalIsActive ? 'PUBLISHED' : 'DRAFT');
+
         // ৬. ডাটাবেসে সেভ করা (Prisma Create / Upsert)
         const productData = {
             name: productTitle,
@@ -283,23 +291,28 @@ export async function POST(req: NextRequest) {
             variants: typeof variants === 'string' ? variants : JSON.stringify(variants || []),
             tieredPricing: typeof tieredPricing === 'string' ? tieredPricing : JSON.stringify(tieredPricing || []),
             isFeatured: isFeatured ?? false,
-            isActive: isActive ?? true,
+            isActive: finalIsActive,
             priceDisplay: priceDisplay ?? false,
             minOrder: minOrder || null,
             priceRange: priceRange || null,
             isHumanVerified: Boolean(isHumanVerified),
             verifiedBy: verifiedBy || null,
-            status: status || 'PUBLISHED',
+            status: finalStatus,
         };
 
         const product = await prisma.product.create({
             data: productData,
         });
 
+        const statusNotice = finalIsActive
+            ? 'Style successfully published to AELBD sourcing catalog (LIVE)!'
+            : 'Style saved as DRAFT in AELBD Admin Portal (Awaiting Review)!';
+
         return NextResponse.json(
             {
                 success: true,
-                message: 'Style successfully published to AELBD sourcing catalog!',
+                message: statusNotice,
+                mode: finalIsActive ? 'PUBLISHED_LIVE' : 'SAVED_DRAFT',
                 product,
             },
             { status: 201, headers: CORS_HEADERS }
