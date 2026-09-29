@@ -14,6 +14,7 @@ interface Stat {
 
 interface StatsCounterProps {
     data: any;
+    showIcons?: boolean;
 }
 
 // Authentic, Trust-First B2B Quality & Reliability Metrics for Apparel Emporium
@@ -26,17 +27,17 @@ const DEFAULT_STATS: Stat[] = [
 
 // Trust badges / verifiers to show under each stat
 const statTrustInfo: Record<string, { source: string; badge: string }> = {
-    'QUALITY PASS RATE': { source: 'AQL 2.5 Standard · ISO 9001', badge: '🛡️' },
+    'QUALITY PASS RATE': { source: 'Buyer Standards · QC Audits', badge: '🛡️' },
     'ON-TIME SHIPMENT': { source: 'Milestone Tracking Protocol', badge: '⏱️' },
     'ON-TIME DELIVERY': { source: 'Critical Path Management', badge: '⏱️' },
-    'ETHICAL COMPLIANCE': { source: 'BSCI & OEKO-TEX Audited', badge: '🌱' },
-    'COMPLIANT SOURCING': { source: 'BSCI, GOTS & OEKO-TEX', badge: '🌱' },
+    'ETHICAL COMPLIANCE': { source: 'Audited Partner Mills', badge: '🌱' },
+    'COMPLIANT SOURCING': { source: 'Audited Factory Network', badge: '🌱' },
     'DEDICATED QA SUPPORT': { source: 'In-House Merchandising & QC', badge: '👔' },
     'QA SUPPORT': { source: 'In-House Merchandising & QC', badge: '👔' },
     'TRADE & QC SUPPORT': { source: 'Dedicated Merchandisers', badge: '👔' },
-    'AQL PASS RATE': { source: 'AQL 1.5 / 2.5 Level II', badge: '🛡️' },
+    'AQL PASS RATE': { source: 'Pre-Shipment Inspections', badge: '🛡️' },
     'CLIENT RETENTION': { source: 'Repeat Buyer Rate', badge: '⭐' },
-    'COMPLIANCE RATE': { source: 'BSCI & OEKO-TEX Standard', badge: '🌱' },
+    'COMPLIANCE RATE': { source: 'Audited Sourcing Standard', badge: '🌱' },
 };
 
 // Filter out legacy unrealistic stats (e.g., 500+ buyers, 100M+ pcs, etc.)
@@ -54,7 +55,7 @@ function sanitizeStats(rawList: any[]): Stat[] {
 
 // Certifications strip
 const CERTS = [
-    { label: 'ISO 9001:2015', icon: <ShieldCheck size={14} className="text-secondary" /> },
+    { label: 'Export Quality', icon: <ShieldCheck size={14} className="text-secondary" /> },
     { label: 'BSCI Certified', icon: <Award size={14} className="text-secondary" /> },
     { label: 'OEKO-TEX®', icon: <ShieldCheck size={14} className="text-secondary" /> },
     { label: 'GOTS Compliant', icon: <Star size={14} className="text-secondary" /> },
@@ -62,7 +63,7 @@ const CERTS = [
     { label: 'Fair Trade', icon: <TrendingUp size={14} className="text-secondary" /> },
 ];
 
-export default function StatsCounter({ data }: StatsCounterProps) {
+export default function StatsCounter({ data, showIcons = false }: StatsCounterProps) {
     const [stats, setStats] = useState<Stat[]>(DEFAULT_STATS);
     const [isVisible, setIsVisible] = useState(false);
     const sectionRef = useRef<HTMLDivElement>(null);
@@ -121,9 +122,11 @@ export default function StatsCounter({ data }: StatsCounterProps) {
                                 )}
 
                                 {/* Icon */}
-                                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/[0.06] border border-secondary/20 text-secondary mb-5 group-hover:bg-secondary/10 group-hover:border-secondary/50 transition-all duration-500 shadow-lg">
-                                    <IconComponent size={26} className="text-secondary" />
-                                </div>
+                                {showIcons && (
+                                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/[0.06] border border-secondary/20 text-secondary mb-5 group-hover:bg-secondary/10 group-hover:border-secondary/50 transition-all duration-500 shadow-lg">
+                                        <IconComponent size={26} className="text-secondary" />
+                                    </div>
+                                )}
 
                                 {/* Number */}
                                 <div className="text-4xl md:text-5xl font-black text-white font-heading mb-1 flex items-center justify-center tabular-nums">
@@ -138,7 +141,7 @@ export default function StatsCounter({ data }: StatsCounterProps) {
 
                                 {/* Trust indicator */}
                                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.05] border border-white/10 text-[10px] font-medium text-slate-400">
-                                    <span>{trustInfo.badge}</span>
+                                    {showIcons && <span>{trustInfo.badge}</span>}
                                     <span>{trustInfo.source}</span>
                                 </div>
                             </div>
@@ -154,7 +157,7 @@ export default function StatsCounter({ data }: StatsCounterProps) {
                         <span className="text-[10px] text-slate-600 font-bold uppercase tracking-widest mr-2">Internationally Certified:</span>
                         {CERTS.map((cert, i) => (
                             <div key={i} className="flex items-center gap-1.5 text-slate-400 hover:text-secondary transition-colors">
-                                {cert.icon}
+                                {showIcons && cert.icon}
                                 <span className="text-[11px] font-semibold">{cert.label}</span>
                             </div>
                         ))}

@@ -90,9 +90,9 @@ function FeedCard({ item }: { item: DeliveryUpdate }) {
     const [imgError, setImgError] = useState(false);
 
     return (
-        <div className="flex-none w-[300px] sm:w-[340px] bg-white/5 border border-white/10 hover:border-primary/50 rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:bg-white/[0.08] group cursor-default hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-0.5">
+        <div className="flex-none w-[300px] sm:w-[340px] bg-[#EDE9E1] dark:bg-[#0C1628] border border-white/80 dark:border-white/10 rounded-2xl overflow-hidden flex flex-col transition-all duration-300 group cursor-default shadow-[6px_6px_16px_rgba(160,155,145,0.35),-5px_-5px_12px_rgba(255,255,255,0.9)] dark:shadow-[0_10px_25px_rgba(0,0,0,0.5)] hover:-translate-y-1">
             {/* Product Image */}
-            <div className="relative h-44 w-full overflow-hidden bg-slate-800/60 flex-shrink-0">
+            <div className="relative h-44 w-full overflow-hidden bg-stone-200 dark:bg-slate-800/60 flex-shrink-0">
                 {!imgError ? (
                     <img
                         src={imgSrc}
@@ -102,9 +102,9 @@ function FeedCard({ item }: { item: DeliveryUpdate }) {
                         loading="lazy"
                     />
                 ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-slate-600">
+                    <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-stone-400 dark:text-slate-600">
                         <ShoppingBag size={36} />
-                        <span className="text-xs font-medium text-slate-500">{item.category}</span>
+                        <span className="text-xs font-medium text-stone-500 dark:text-slate-500">{item.category}</span>
                     </div>
                 )}
                 {/* Status badge on image */}
@@ -116,36 +116,34 @@ function FeedCard({ item }: { item: DeliveryUpdate }) {
                 </div>
                 {/* Category chip */}
                 <div className="absolute top-3 left-3">
-                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-black/50 text-white backdrop-blur-sm border border-white/10 uppercase tracking-wider">
+                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-black/60 text-white backdrop-blur-sm border border-white/20 uppercase tracking-wider">
                         {item.category}
                     </span>
                 </div>
-                {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f1e]/80 via-transparent to-transparent pointer-events-none" />
             </div>
 
             {/* Card Body */}
             <div className="p-4 flex flex-col gap-2.5 flex-1">
-                <h3 className="text-sm font-bold text-white leading-snug line-clamp-2 group-hover:text-primary/90 transition-colors">
+                <h3 className="text-sm font-bold text-[#1A1D20] dark:text-white leading-snug line-clamp-2 transition-colors">
                     {item.title}
                 </h3>
-                <p className="text-slate-400 text-xs leading-relaxed line-clamp-2 flex-1">
+                <p className="text-stone-600 dark:text-slate-400 text-xs leading-relaxed line-clamp-2 flex-1">
                     {item.description}
                 </p>
 
                 {/* Meta row */}
-                <div className="flex items-center justify-between pt-2.5 border-t border-white/[0.07] mt-auto">
+                <div className="flex items-center justify-between pt-2.5 border-t border-stone-300/60 dark:border-white/[0.07] mt-auto">
                     <div className="flex items-center gap-3">
                         <div className="flex items-center gap-1.5">
                             <span className="text-sm leading-none">{getCountryFlag(item.buyerCountry)}</span>
-                            <span className="text-[11px] font-semibold text-slate-300">{item.buyerCountry}</span>
+                            <span className="text-[11px] font-semibold text-stone-700 dark:text-slate-300">{item.buyerCountry}</span>
                         </div>
-                        <div className="flex items-center gap-1 text-slate-500">
+                        <div className="flex items-center gap-1 text-stone-500 dark:text-slate-500">
                             <Package size={10} />
                             <span className="text-[10px] font-medium">{item.quantity}</span>
                         </div>
                     </div>
-                    <span className="text-[10px] text-slate-600 font-medium tabular-nums">
+                    <span className="text-[10px] text-stone-500 dark:text-slate-500 font-medium tabular-nums">
                         {timeAgo(item.createdAt)}
                     </span>
                 </div>
@@ -207,30 +205,30 @@ export default function DeliveryFeed() {
     const doubled = [...items, ...items];
 
     return (
-        <section className="py-14 bg-slate-950 border-y border-white/5 overflow-hidden relative" id="live-feed">
-            <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-slate-950 to-transparent z-10 pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-slate-950 to-transparent z-10 pointer-events-none" />
+        <section className="py-14 bg-[#DDD8CF] dark:bg-[#080D1A] border-y border-stone-300/70 dark:border-white/5 overflow-hidden relative" id="live-feed">
+            <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#DDD8CF] to-transparent dark:from-[#080D1A] z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#DDD8CF] to-transparent dark:from-[#080D1A] z-10 pointer-events-none" />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-10">
                 <div className="flex items-center justify-between flex-wrap gap-4">
                     <div>
                         <div className="flex items-center gap-2 mb-2">
                             <span className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400"></span>
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                             </span>
-                            <span className="text-green-400 font-bold text-xs uppercase tracking-widest">Live Updates</span>
+                            <span className="text-emerald-700 dark:text-cyan-400 font-bold text-xs uppercase tracking-widest">Live Updates</span>
                         </div>
-                        <h2 className="text-2xl md:text-3xl font-black text-white font-heading">
+                        <h2 className="text-2xl md:text-3xl font-black text-[#1A1D20] dark:text-white font-heading">
                             Recent Deliveries &amp; Production
                         </h2>
-                        <p className="text-slate-500 text-xs mt-1.5 max-w-lg">
+                        <p className="text-stone-600 dark:text-slate-400 text-xs mt-1.5 max-w-lg font-medium">
                             Real-time updates on active orders, recent shipments and completed deliveries to our global buyers.
                         </p>
                     </div>
                     <a
                         href="/contact"
-                        className="flex items-center gap-2 px-5 py-2.5 bg-primary/10 hover:bg-primary text-primary hover:text-white border border-primary/30 rounded-xl text-xs font-bold transition-all"
+                        className="flex items-center gap-2 px-5 py-2.5 bg-[#EDE9E1] hover:bg-[#E2DDD4] dark:bg-cyan-500/10 dark:hover:bg-cyan-500 text-[#1A1D20] dark:text-cyan-300 dark:hover:text-black border border-stone-400/40 dark:border-cyan-400/30 rounded-xl text-xs font-bold transition-all shadow-sm"
                     >
                         Get Your Order Started
                         <ChevronRight size={14} />

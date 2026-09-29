@@ -1,18 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireSuperAdmin } from '@/lib/auth-guards';
 import { sendEmail, getTransporter } from '@/lib/email';
-import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
-    const session = await getServerSession();
-    if (!session || !session.user || !session.user.email) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-    const user = await prisma.user.findUnique({ where: { email: session.user.email } });
-    if (!user || !['DEVELOPER', 'SUPER_ADMIN'].includes(user.role)) {
-        return NextResponse.json({ error: 'Permission Denied' }, { status: 403 });
-    }
+    const guard = await requireSuperAdmin();
+    if (!guard.ok) return guard.response;
 
     try {
         const { to } = await req.json();

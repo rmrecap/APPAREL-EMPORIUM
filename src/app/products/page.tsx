@@ -2,10 +2,68 @@ import { prisma } from '@/lib/prisma';
 import ProductGrid from '@/components/products/ProductGrid';
 import ProductFilter from '@/components/products/ProductFilter';
 import AtelierDecorations3D from '@/components/products/AtelierDecorations3D';
+import CatalogTaxonomyDirectory from '@/components/products/CatalogTaxonomyDirectory';
+import { DEFAULT_CATALOG_TAXONOMY, TaxonomyDivision } from '@/lib/catalog-taxonomy';
 import { X } from 'lucide-react';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({
+    searchParams,
+}: {
+    searchParams: { category?: string; q?: string; page?: string };
+}): Promise<Metadata> {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
+    if (searchParams.category) {
+        let cat = null;
+        try {
+            cat = await prisma.category.findUnique({
+                where: { slug: searchParams.category },
+                select: { name: true, description: true, slug: true }
+            });
+        } catch { }
+
+        if (cat) {
+            return {
+                title: `${cat.name} Sourcing & Export Manufacturing | AELBD`,
+                description: cat.description || `Source export-quality ${cat.name.toLowerCase()} manufactured in certified Bangladesh garment factories. Custom tech-pack development, private label, and volume production.`,
+                alternates: {
+                    canonical: `/products?category=${encodeURIComponent(cat.slug)}`,
+                },
+                openGraph: {
+                    title: `${cat.name} Sourcing & Export Manufacturing | AELBD`,
+                    description: `Custom ${cat.name.toLowerCase()} production and export sourcing in Bangladesh.`,
+                    url: `${baseUrl}/products?category=${encodeURIComponent(cat.slug)}`,
+                    images: ['/logo.jpg'],
+                }
+            };
+        }
+    }
+
+    if (searchParams.q) {
+        return {
+            title: `Search: "${searchParams.q}" | Apparel Catalog | AELBD`,
+            description: `Browse garment manufacturing catalog search results for ${searchParams.q}.`,
+            robots: { index: false, follow: true },
+        };
+    }
+
+    return {
+        title: 'Export Garments & Apparel Catalog | AELBD Bangladesh',
+        description: 'Explore our B2B ready-to-export garments catalog: custom knitwear, woven garments, denim, sweaters, and apparel accessories manufactured in Bangladesh.',
+        alternates: {
+            canonical: '/products',
+        },
+        openGraph: {
+            title: 'Export Garments & Apparel Catalog | AELBD Bangladesh',
+            description: 'B2B export sourcing catalog for readymade garments, knitwear, woven apparel, and sweaters.',
+            url: `${baseUrl}/products`,
+            images: ['/logo.jpg'],
+        }
+    };
+}
 
 export default async function ProductsPage({
     searchParams,
@@ -25,12 +83,12 @@ export default async function ProductsPage({
         orderBy: { order: 'asc' }
     });
 
-    // Top Category Pills from Screenshot: All Items, Knitwear, Woven, Sweater, Accessories
+    // Top Category Pills: All Items + 4 Main Categories
     const topPills = [
         { label: 'All Items', slug: '' },
-        { label: 'Knitwear', slug: 'knitwear' },
-        { label: 'Woven', slug: 'woven' },
-        { label: 'Sweater', slug: 'sweater' },
+        { label: 'Fashion', slug: 'fashion' },
+        { label: 'Home Textiles', slug: 'hometextiles' },
+        { label: 'Footwear', slug: 'footwear' },
         { label: 'Accessories', slug: 'accessories' },
     ];
 
@@ -130,6 +188,20 @@ export default async function ProductsPage({
         if (sort) params.set('sort', sort);
         return `/products?${params.toString()}`;
     };
+
+    // Fetch dynamic catalog taxonomy matrix from DB or fallback
+    let catalogTaxonomy: TaxonomyDivision[] = DEFAULT_CATALOG_TAXONOMY;
+    try {
+        const taxonomySetting = await prisma.siteSetting.findUnique({
+            where: { key: 'catalog_taxonomy_matrix' }
+        });
+        if (taxonomySetting?.value) {
+            const parsed = JSON.parse(taxonomySetting.value);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                catalogTaxonomy = parsed;
+            }
+        }
+    } catch (e) { }
 
     return (
         <div className="catalog-bg-canvas min-h-screen text-slate-800 dark:text-slate-100 transition-colors duration-500 relative">
@@ -270,6 +342,9 @@ export default async function ProductsPage({
                         )}
                     </div>
                 </div>
+
+                {/* ── COMPLETE BRAND TAXONOMY & PRODUCT DIRECTORY ── */}
+                <CatalogTaxonomyDirectory initialTaxonomy={catalogTaxonomy} />
             </div>
         </div>
     );

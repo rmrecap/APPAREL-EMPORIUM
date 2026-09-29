@@ -1,16 +1,15 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { requireAuth } from '@/lib/auth-guards';
 import { prisma } from '@/lib/prisma';
 import { logActivity } from '@/lib/activity-logger';
 import { hasPermission } from '@/lib/permissions';
 
 export async function POST(req: Request) {
     try {
-        const session = await getServerSession(authOptions);
-        if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+        const guard = await requireAuth();
+        if (!guard.ok) return guard.response;
 
-        const role = (session.user as any).role;
+        const role = guard.user.role;
         const { ids, action, value } = await req.json();
 
         if (!ids || !Array.isArray(ids) || ids.length === 0) {
@@ -48,7 +47,7 @@ export async function POST(req: Request) {
         }
 
         await logActivity({
-            userId: (session.user as any).id,
+            userId: guard.user.id,
             action: 'UPDATE',
             entity: 'Product',
             details: `Performed bulk action ${action} on ${ids.length} products`,

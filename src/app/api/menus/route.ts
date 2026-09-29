@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { requirePermission, requireAuth } from '@/lib/auth-guards';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
@@ -41,12 +42,18 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
     try {
-        const session = await getServerSession(authOptions);
-        const role = (session?.user as any)?.role;
-        if (!session || (!hasPermission(role, 'menus.create') && !['SUPER_ADMIN', 'DEVELOPER'].includes(role))) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+        const guard = await requirePermission('menus.create');
+        let allowed = guard.ok;
+        if (!allowed) {
+            const adminGuard = await requireAuth();
+            if (adminGuard.ok && ['SUPER_ADMIN', 'DEVELOPER'].includes(adminGuard.user.role)) {
+                allowed = true;
+            } else {
+                return guard.response;
+            }
         }
 
+        const session = (guard.ok ? guard.session : await getServerSession(authOptions)) as any;
         const data = await req.json();
         const { menuLocation, label, url: menuUrl, target, icon, parentId, isMegaMenu, megaMenuData } = data;
 
@@ -73,7 +80,7 @@ export async function POST(req: Request) {
         });
 
         await logActivity({
-            userId: (session.user as any).id,
+            userId: session.user.id,
             action: 'CREATE',
             entity: 'MenuItem',
             entityId: menuItem.id,
@@ -90,10 +97,15 @@ export async function POST(req: Request) {
 
 export async function PUT(req: Request) {
     try {
-        const session = await getServerSession(authOptions);
-        const role = (session?.user as any)?.role;
-        if (!session || (!hasPermission(role, 'menus.update') && !['SUPER_ADMIN', 'DEVELOPER'].includes(role))) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+        const guard = await requirePermission('menus.update');
+        let allowed = guard.ok;
+        if (!allowed) {
+            const adminGuard = await requireAuth();
+            if (adminGuard.ok && ['SUPER_ADMIN', 'DEVELOPER'].includes(adminGuard.user.role)) {
+                allowed = true;
+            } else {
+                return guard.response;
+            }
         }
 
         const data = await req.json();
@@ -123,12 +135,18 @@ export async function PUT(req: Request) {
 
 export async function DELETE(req: Request) {
     try {
-        const session = await getServerSession(authOptions);
-        const role = (session?.user as any)?.role;
-        if (!session || (!hasPermission(role, 'menus.delete') && !['SUPER_ADMIN', 'DEVELOPER'].includes(role))) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+        const guard = await requirePermission('menus.delete');
+        let allowed = guard.ok;
+        if (!allowed) {
+            const adminGuard = await requireAuth();
+            if (adminGuard.ok && ['SUPER_ADMIN', 'DEVELOPER'].includes(adminGuard.user.role)) {
+                allowed = true;
+            } else {
+                return guard.response;
+            }
         }
 
+        const session = (guard.ok ? guard.session : await getServerSession(authOptions)) as any;
         const url = new URL(req.url);
         const id = url.searchParams.get('id');
 
@@ -152,7 +170,7 @@ export async function DELETE(req: Request) {
         });
 
         await logActivity({
-            userId: (session.user as any).id,
+            userId: session.user.id,
             action: 'DELETE',
             entity: 'MenuItem',
             details: `Deleted menu item and its ${idsToDelete.length - 1} children`,

@@ -102,12 +102,15 @@ export default function MobileNav({ menus, isOpen, onClose }: MobileNavProps) {
         const hasMegaMenu = item.isMegaMenu && item.megaMenuData;
         const isActive = pathname === item.url || (pathname.startsWith(item.url) && item.url !== '/');
 
+        const linkTarget = item.target && item.target !== '_self' ? item.target : undefined;
+
         return (
-            <div key={item.id} className="w-full">
+            <div key={item.url || item.id} className="w-full">
                 <div className={`flex justify-between items-center py-4 border-b border-gray-100 dark:border-gray-800 transition-colors ${isActive ? 'text-primary border-primary/20' : 'text-gray-900 dark:text-white hover:text-primary'}`}>
                     <Link
                         href={item.url}
-                        target={item.target}
+                        target={linkTarget}
+                        prefetch={true}
                         onClick={() => { if (!hasChildren && !hasMegaMenu) onClose(); }}
                         className={`font-semibold text-lg flex-1 ${depth > 0 ? 'text-base font-medium text-gray-700 dark:text-gray-300' : ''}`}
                     >

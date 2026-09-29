@@ -1,26 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireSuperAdmin } from '@/lib/auth-guards';
 import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
 
 export const dynamic = 'force-dynamic';
 
-
-async function isAuthorized() {
-    const session = await getServerSession();
-    if (!session || !session.user || !session.user.email) return false;
-    const user = await prisma.user.findUnique({ where: { email: session.user.email } });
-    return user && ['DEVELOPER', 'SUPER_ADMIN'].includes(user.role);
-}
-
 export async function GET(req: NextRequest) {
-    if (!(await isAuthorized())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const guard = await requireSuperAdmin();
+    if (!guard.ok) return guard.response;
 
     try {
         const { searchParams } = new URL(req.url);
         const action = searchParams.get('action');
         const entity = searchParams.get('entity');
-        const page = parseInt(searchParams.get('page') || '1');
-        const limit = parseInt(searchParams.get('limit') || '25');
+        const page = Math.max(parseInt(searchParams.get('page') || '1'), 1);
+        const limit = Math.min(parseInt(searchParams.get('limit') || '25'), 100);
 
         const where: any = {};
         if (action && action !== 'ALL') where.action = action;
@@ -29,7 +22,7 @@ export async function GET(req: NextRequest) {
         const [logs, total] = await Promise.all([
             prisma.activityLog.findMany({
                 where,
-                include: { user: { select: { name: true, email: true, avatar: true } } },
+                include: { user: { select: { id: true, name: true, email: true, avatar: true } } },
                 orderBy: { createdAt: 'desc' },
                 skip: (page - 1) * limit,
                 take: limit

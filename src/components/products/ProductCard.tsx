@@ -3,8 +3,9 @@
 import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { Product } from '@/types';
-import { Eye, Columns2, Check, ArrowRight, ChevronRight } from 'lucide-react';
+import { Eye, Columns2, Check, ChevronRight } from 'lucide-react';
 import { useAddToCompare } from '@/hooks/useAddToCompare';
+import { useSettings } from '@/context/SettingsContext';
 import { extractFeaturedImage } from '@/lib/utils';
 
 interface ProductCardProps {
@@ -16,6 +17,14 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
     const { addToCompare, isInCompare } = useAddToCompare();
     const isComparing = isInCompare(product.id);
     const cardRef = useRef<HTMLDivElement>(null);
+    const { settings } = useSettings();
+
+    // Dynamic visibility controls managed via Developer Options / Admin Dashboard
+    // Default to false for clutter-free, clean e-commerce look matching user requirement
+    const showSku = settings['product_card_show_sku'] === 'true';
+    const showB2bTag = settings['product_card_show_b2b_tag'] === 'true';
+    const showDescription = settings['product_card_show_description'] === 'true';
+    const showMinOrder = settings['product_card_show_min_order'] === 'true';
 
     // 3D Parallax Tilt State
     const [tilt, setTilt] = useState({ rotateX: 0, rotateY: 0, shineX: 50, shineY: 50 });
@@ -95,7 +104,7 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
 
             {/* ── 3D RECESSED CONCAVE PEDESTAL DISPLAY STAGE ── */}
             <div className="relative aspect-[4/4.5] w-full rounded-[22px] pedestal-stage-3d p-4 flex flex-col items-center justify-center overflow-hidden cursor-pointer">
-                {/* Top Embossed Arch Badge */}
+                {/* Top Embossed Arch Badge (Category Name) */}
                 <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 arch-badge-3d px-3.5 py-1 rounded-full text-[9px] sm:text-[10px] font-black tracking-wider uppercase text-slate-700 dark:text-slate-200 transition-transform duration-300 group-hover:scale-105 whitespace-nowrap shadow-xs">
                     {getTopBadgeText()}
                 </div>
@@ -141,57 +150,65 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
                 </div>
             </div>
 
-            {/* ── CARD INFORMATION SECTION ── */}
-            <div className="pt-4 px-1 pb-1 flex flex-col flex-grow">
-                {/* Title & SKU */}
+            {/* ── CARD INFORMATION SECTION (Clean 3D E-Commerce Style) ── */}
+            <div className="pt-3 px-1 pb-1 flex flex-col flex-grow">
+                {/* Title & Optional SKU */}
                 <div className="mb-2">
                     <Link href={`/products/${product.slug}`}>
                         <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white mb-0.5 line-clamp-1 transition-colors hover:text-blue-600 dark:hover:text-blue-400">
                             {product.name}
                         </h3>
                     </Link>
-                    <p className="text-[11px] font-mono font-bold text-slate-500 dark:text-slate-400 tracking-wider">
-                        SKU : {skuDisplay}
+                    {showSku && (
+                        <p className="text-[11px] font-mono font-bold text-slate-500 dark:text-slate-400 tracking-wider">
+                            SKU : {skuDisplay}
+                        </p>
+                    )}
+                </div>
+
+                {/* Optional B2B Sourcing Pill Tag (Controlled dynamically) */}
+                {showB2bTag && (
+                    <div className="mb-2.5 flex items-center justify-between gap-2">
+                        <span className="inline-flex items-center text-[10px] font-extrabold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/70 px-2 py-0.5 rounded-md">
+                            B2B Sourcing &amp; Ex
+                        </span>
+                        <span className="text-[10.5px] font-bold text-slate-500 dark:text-slate-400 shrink-0">
+                            Custom Tech-Pack
+                        </span>
+                    </div>
+                )}
+
+                {/* Optional Short Description (Controlled dynamically) */}
+                {showDescription && (
+                    <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 mb-3 leading-relaxed">
+                        {product.shortDescription || product.description}
                     </p>
-                </div>
+                )}
 
-                {/* B2B Sourcing Pill Tag */}
-                <div className="mb-2.5 flex items-center justify-between gap-2">
-                    <span className="inline-flex items-center text-[10px] font-extrabold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/70 px-2 py-0.5 rounded-md">
-                        B2B Sourcing &amp; Ex
-                    </span>
-                    <span className="text-[10.5px] font-bold text-slate-500 dark:text-slate-400 shrink-0">
-                        Custom Tech-Pack
-                    </span>
-                </div>
-
-                {/* Short Description */}
-                <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 mb-3 leading-relaxed">
-                    {product.shortDescription || product.description}
-                </p>
-
-                {/* Inset Mini Specs Boxes (MOQ & Fabric) */}
-                <div className="grid grid-cols-2 gap-2 mb-4 mt-auto">
-                    <div className="spec-box-3d rounded-xl px-2.5 py-1.5 min-w-0">
-                        <span className="block text-[9px] text-slate-500 dark:text-slate-400 uppercase font-black tracking-wider">
-                            Min. Order
-                        </span>
-                        <span className="block text-xs font-bold text-slate-900 dark:text-white truncate" title={specs['MOQ'] || (product as any).minOrder || '300 pcs'}>
-                            {specs['MOQ'] || (product as any).minOrder || '300 pcs'}
-                        </span>
+                {/* Optional Inset Mini Specs Boxes (Controlled dynamically) */}
+                {showMinOrder && (
+                    <div className="grid grid-cols-2 gap-2 mb-4 mt-auto">
+                        <div className="spec-box-3d rounded-xl px-2.5 py-1.5 min-w-0">
+                            <span className="block text-[9px] text-slate-500 dark:text-slate-400 uppercase font-black tracking-wider">
+                                Min. Order
+                            </span>
+                            <span className="block text-xs font-bold text-slate-900 dark:text-white truncate" title={specs['MOQ'] || (product as any).minOrder || 'Custom'}>
+                                {specs['MOQ'] || (product as any).minOrder || 'Custom'}
+                            </span>
+                        </div>
+                        <div className="spec-box-3d rounded-xl px-2.5 py-1.5 min-w-0">
+                            <span className="block text-[9px] text-slate-500 dark:text-slate-400 uppercase font-black tracking-wider">
+                                Fabric
+                            </span>
+                            <span className="block text-xs font-bold text-slate-900 dark:text-white truncate" title={specs['Fabric'] || specs['Composition'] || specs['Material'] || 'Custom'}>
+                                {specs['Fabric'] || specs['Composition'] || specs['Material'] || 'Custom'}
+                            </span>
+                        </div>
                     </div>
-                    <div className="spec-box-3d rounded-xl px-2.5 py-1.5 min-w-0">
-                        <span className="block text-[9px] text-slate-500 dark:text-slate-400 uppercase font-black tracking-wider">
-                            Fabric
-                        </span>
-                        <span className="block text-xs font-bold text-slate-900 dark:text-white truncate" title={specs['Fabric'] || specs['Composition'] || specs['Material'] || '100% Cotton'}>
-                            {specs['Fabric'] || specs['Composition'] || specs['Material'] || '100% Cotton'}
-                        </span>
-                    </div>
-                </div>
+                )}
 
                 {/* ── ACTION BUTTONS: SPECS & QUOTE ── */}
-                <div className="flex items-center gap-2 pt-1">
+                <div className="flex items-center gap-2 pt-2 mt-auto">
                     <Link
                         href={`/products/${product.slug}`}
                         className="flex-1 text-center py-2 px-3 text-xs font-bold text-slate-800 dark:text-slate-200 bg-[#E8E1D6] dark:bg-[#1E293B] hover:bg-[#DDD4C7] dark:hover:bg-[#283548] rounded-xl border border-[#D8CFC2] dark:border-white/10 transition-all active:scale-95 shadow-xs"

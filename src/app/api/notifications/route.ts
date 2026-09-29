@@ -1,29 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth, requireAdmin } from '@/lib/auth-guards';
 import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
 
 export const dynamic = 'force-dynamic';
 
-
-// Helper for generic session/role parsing internally
-async function getUser() {
-    const session = await getServerSession();
-    if (!session || !session.user || !session.user.email) return null;
-    return await prisma.user.findUnique({ where: { email: session.user.email } });
-}
-
 export async function GET(req: NextRequest) {
-    const user = await getUser();
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const guard = await requireAuth();
+    if (!guard.ok) return guard.response;
 
     try {
         const { searchParams } = new URL(req.url);
         const unread = searchParams.get('unread') === 'true';
         const type = searchParams.get('type');
-        const limit = parseInt(searchParams.get('limit') || '50');
-        const page = parseInt(searchParams.get('page') || '1');
+        const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100);
+        const page = Math.max(parseInt(searchParams.get('page') || '1'), 1);
 
-        const where: any = { userId: user.id };
+        const where: any = { userId: guard.user.id };
         if (unread) where.isRead = false;
         if (type && type !== 'ALL') where.type = type;
 
@@ -44,15 +36,15 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-    const user = await getUser();
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const guard = await requireAuth();
+    if (!guard.ok) return guard.response;
 
     try {
         const { id, isRead } = await req.json();
 
         await prisma.notification.update({
-            where: { id, userId: user.id }, // Security constraint bounding mutator only against owner
-            data: { isRead }
+            where: { id, userId: guard.user.id }, // Security constraint bounding mutator only against owner
+            data: { isRead: Boolean(isRead) }
         });
 
         return NextResponse.json({ success: true });
@@ -62,15 +54,15 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-    const user = await getUser();
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const guard = await requireAuth();
+    if (!guard.ok) return guard.response;
 
     try {
         const id = new URL(req.url).searchParams.get('id');
         if (!id) return NextResponse.json({ error: 'ID is required' }, { status: 400 });
 
         await prisma.notification.delete({
-            where: { id, userId: user.id }
+            where: { id, userId: guard.user.id }
         });
 
         return NextResponse.json({ success: true });
@@ -79,20 +71,20 @@ export async function DELETE(req: NextRequest) {
     }
 }
 
-// Internal programmatic proxy to create notifications explicitly bound from internal Node streams (e.g. from /api/rfq payload ingestion mapping internally to valid admin accounts) 
+// Internal programmatic proxy to create notifications explicitly bound from internal Node streams
 export async function POST(req: NextRequest) {
-    const user = await getUser();
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-    // Only internal microservices / Admins can trigger these manually
-    if (!['DEVELOPER', 'SUPER_ADMIN', 'ADMIN'].includes(user.role)) {
-        return NextResponse.json({ error: 'System Access Denied' }, { status: 403 });
-    }
+    const guard = await requireAdmin();
+    if (!guard.ok) return guard.response;
 
     try {
         const { targetUserId, type, title, message } = await req.json();
+
+        if (!targetUserId || !title || !message) {
+            return NextResponse.json({ error: 'Missing required notification fields' }, { status: 400 });
+        }
+
         const notification = await prisma.notification.create({
-            data: { userId: targetUserId, type, title, message }
+            data: { userId: targetUserId, type: type || 'INFO', title, message }
         });
         return NextResponse.json({ success: true, notification });
     } catch (error: any) {

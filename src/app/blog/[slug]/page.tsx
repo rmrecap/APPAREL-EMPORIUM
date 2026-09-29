@@ -10,14 +10,25 @@ export const dynamic = 'force-dynamic';
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
     const post = await prisma.blogPost.findUnique({ where: { slug: params.slug } });
     if (!post) return { title: 'Post Not Found' };
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
     return {
         title: `${post.title} | Apparel Emporium Blog`,
         description: post.excerpt || post.content.replace(/<[^>]*>/g, '').substring(0, 160),
+        alternates: {
+            canonical: `/blog/${post.slug}`,
+        },
         openGraph: {
             title: post.title,
             description: post.excerpt || '',
+            url: `${baseUrl}/blog/${post.slug}`,
             images: post.coverImage ? [{ url: post.coverImage }] : [],
             type: 'article',
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: post.title,
+            description: post.excerpt || '',
+            images: post.coverImage ? [post.coverImage] : [],
         },
     };
 }
@@ -30,6 +41,7 @@ function getReadingTime(html: string): number {
 }
 
 export default async function BlogPostPage({ params }: { params: { slug: string } }) {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
     const [post, recentPosts] = await Promise.all([
         prisma.blogPost.findUnique({
             where: { slug: params.slug },
@@ -51,7 +63,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
         : '';
 
     // Social share URLs (populated server-side with the post title + slug)
-    const postUrl = `https://www.apparelemporium.com/blog/${post.slug}`;
+    const postUrl = `${baseUrl}/blog/${post.slug}`;
     const encodedUrl = encodeURIComponent(postUrl);
     const encodedTitle = encodeURIComponent(post.title);
 
@@ -76,8 +88,52 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
         },
     ];
 
+    const articleSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'BlogPosting',
+        'headline': post.title,
+        'description': post.excerpt || '',
+        'image': post.coverImage ? [post.coverImage] : [],
+        'datePublished': post.publishedAt ? new Date(post.publishedAt).toISOString() : new Date().toISOString(),
+        'dateModified': post.updatedAt ? new Date(post.updatedAt).toISOString() : new Date().toISOString(),
+        'author': {
+            '@type': 'Person',
+            'name': post.author?.name || 'Apparel Emporium Editorial Team',
+        },
+        'publisher': {
+            '@type': 'Organization',
+            'name': 'Apparel Emporium',
+            'logo': {
+                '@type': 'ImageObject',
+                'url': `${baseUrl}/logo.jpg`,
+            },
+        },
+        'mainEntityOfPage': {
+            '@type': 'WebPage',
+            '@id': `${baseUrl}/blog/${post.slug}`,
+        },
+    };
+
+    const breadcrumbSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        'itemListElement': [
+            { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': baseUrl },
+            { '@type': 'ListItem', 'position': 2, 'name': 'Blog', 'item': `${baseUrl}/blog` },
+            { '@type': 'ListItem', 'position': 3, 'name': post.title, 'item': `${baseUrl}/blog/${post.slug}` },
+        ],
+    };
+
     return (
         <div className="bg-light-bg dark:bg-dark-bg min-h-screen pt-28 pb-16">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+            />
             <div className="container mx-auto px-4 max-w-7xl">
 
                 {/* Breadcrumb */}

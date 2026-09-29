@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireSuperAdmin } from '@/lib/auth-guards';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { syncTelegramChannelVideos, TELEGRAM_CONFIG } from '@/lib/telegram';
 
@@ -43,7 +46,7 @@ const DEMO_GARMENT_VIDEOS = [
         messageId: 104,
         fileId: 'https://assets.mixkit.co/videos/preview/mixkit-hands-of-a-tailor-working-with-a-needle-and-thread-41587-large.mp4',
         title: 'Final In-line QA Inspection & Needle Detection',
-        caption: 'Rigorous AQL 1.5/2.5 multi-stage quality assurance check, computerized needle detection, and barcode poly packaging for global dispatch.',
+        caption: 'Rigorous multi-stage quality assurance check customized to buyer standards, computerized needle detection, and barcode poly packaging for global dispatch.',
         duration: 25,
         thumbnailUrl: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&auto=format&fit=crop&q=80',
         width: 1920,
@@ -57,8 +60,13 @@ export async function GET(req: NextRequest) {
         const { searchParams } = new URL(req.url);
         const shouldSync = searchParams.get('sync') === 'true';
 
+        // Only authenticated admins can trigger live channel sync
         if (shouldSync) {
-            await syncTelegramChannelVideos();
+            const session = await getServerSession(authOptions);
+            const userRole = (session?.user as any)?.role;
+            if (session && ['DEVELOPER', 'SUPER_ADMIN'].includes(userRole)) {
+                await syncTelegramChannelVideos();
+            }
         }
 
         let videos: any[] = await (prisma as any).telegramVideo.findMany({
@@ -121,6 +129,9 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
     try {
+        const guard = await requireSuperAdmin();
+        if (!guard.ok) return guard.response;
+
         const body = await req.json();
 
         if (body.action === 'sync') {

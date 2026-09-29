@@ -29,7 +29,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         const apiKey = req.headers.get('x-api-key');
 
         let isAuthorized = false;
-        if (session && (session.user as any)?.role) {
+        const userRole = (session?.user as any)?.role;
+        if (session && ['DEVELOPER', 'SUPER_ADMIN', 'ADMIN', 'EDITOR'].includes(userRole)) {
             isAuthorized = true;
         } else if (apiKey) {
             const validKeySetting = await prisma.siteSetting.findUnique({
@@ -41,7 +42,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         }
 
         if (!isAuthorized) {
-            return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+            return NextResponse.json({ success: false, error: 'Unauthorized: Staff role or valid API key required' }, { status: 401 });
         }
 
         const body = await req.json();
@@ -87,7 +88,8 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
         const apiKey = req.headers.get('x-api-key');
 
         let isAuthorized = false;
-        if (session && (session.user as any)?.role) {
+        const userRole = (session?.user as any)?.role;
+        if (session && ['DEVELOPER', 'SUPER_ADMIN', 'ADMIN', 'EDITOR'].includes(userRole)) {
             isAuthorized = true;
         } else if (apiKey) {
             const validKeySetting = await prisma.siteSetting.findUnique({
@@ -99,7 +101,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
         }
 
         if (!isAuthorized) {
-            return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+            return NextResponse.json({ success: false, error: 'Unauthorized: Staff role or valid API key required' }, { status: 401 });
         }
 
         await prisma.deliveryUpdate.delete({

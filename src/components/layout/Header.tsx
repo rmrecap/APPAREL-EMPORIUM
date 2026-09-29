@@ -100,18 +100,20 @@ export default function Header() {
                         {navItems.map((item) => {
                             const hasMega = Boolean(item.isMegaMenu && item.megaMenuData);
                             const isActive = pathname === item.url || (item.url !== '/' && pathname.startsWith(item.url));
+                            const linkTarget = item.target && item.target !== '_self' ? item.target : undefined;
 
                             return (
                                 <div
-                                    key={item.id}
+                                    key={item.url || item.id}
                                     className="relative flex items-center"
                                     onMouseEnter={() => hasMega && setHoveredMenu(item.id)}
                                     onMouseLeave={() => setHoveredMenu(null)}
                                 >
                                     <Link
                                         href={item.url}
-                                        target={item.target}
-                                        className={`px-3.5 py-1.5 rounded-full font-bold text-xs uppercase tracking-widest transition-all duration-200 flex items-center gap-1
+                                        target={linkTarget}
+                                        prefetch={true}
+                                        className={`px-3.5 py-1.5 rounded-full font-bold text-xs uppercase tracking-widest transition-all duration-200 flex items-center gap-1 cursor-pointer
                                         ${isActive
                                                 ? 'bg-white dark:bg-white/10 text-slate-900 dark:text-white shadow-xs border border-[#E5DEC8] dark:border-white/15'
                                                 : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 border border-transparent'

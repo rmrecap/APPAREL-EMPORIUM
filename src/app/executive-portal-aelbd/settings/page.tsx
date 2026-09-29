@@ -277,6 +277,27 @@ export default function SettingsPage() {
                     </div>
                 </div>
             </section>
+
+            {/* SECTION 4: Developer Options & Feature Toggles Card */}
+            <section className="bg-gradient-to-br from-slate-900 via-primary to-slate-800 text-white rounded-2xl shadow-lg border border-primary/30 overflow-hidden">
+                <div className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                    <div className="space-y-2">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-emerald-300 text-xs font-bold uppercase tracking-wider">
+                            Developer Switchboard
+                        </div>
+                        <h2 className="text-xl font-bold text-white">System Feature Toggles & UI Controls</h2>
+                        <p className="text-sm text-slate-300 max-w-xl">
+                            সিস্টেমের RFQ ফর্ম, ২৪-আওয়ার গ্যারান্টি, সাপোর্ট FAQ/প্রোটোকল, হোমপেজ ৩ডি ক্রাফট আইকন এবং প্রোডাক্ট শোকেস সহজে বন্ধ বা চালু করার জন্য ডেডিকেটেড ডেভেলপার প্যানেল।
+                        </p>
+                    </div>
+                    <a
+                        href="/executive-portal-aelbd/developer-options"
+                        className="px-6 py-3 bg-white hover:bg-slate-100 text-primary font-bold rounded-xl transition shadow-lg whitespace-nowrap text-sm"
+                    >
+                        Open Developer Options →
+                    </a>
+                </div>
+            </section>
         </div>
     );
 }

@@ -1,19 +1,12 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { requirePermission } from '@/lib/auth-guards';
 import { prisma } from '@/lib/prisma';
 import { logActivity } from '@/lib/activity-logger';
-import { hasPermission } from '@/lib/permissions';
 
 export async function POST(req: Request) {
     try {
-        const session = await getServerSession(authOptions);
-        if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-
-        const role = (session.user as any).role;
-        if (!hasPermission(role, 'products.create')) {
-            return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
-        }
+        const guard = await requirePermission('products.create');
+        if (!guard.ok) return guard.response;
 
         const { id } = await req.json();
         const sourceProduct = await prisma.product.findUnique({ where: { id } });
@@ -42,7 +35,7 @@ export async function POST(req: Request) {
         });
 
         await logActivity({
-            userId: (session.user as any).id,
+            userId: guard.user.id,
             action: 'CREATE',
             entity: 'Product',
             entityId: clonedProduct.id,

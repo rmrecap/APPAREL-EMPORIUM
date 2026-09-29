@@ -19,6 +19,7 @@ interface CertProps {
         certifications_heading?: string;
         certifications_subheading?: string;
     };
+    showIcons?: boolean;
 }
 
 const DEFAULT_CERTS: Certification[] = [
@@ -35,8 +36,8 @@ const DEFAULT_CERTS: Certification[] = [
 const COMPLIANCE_PILLARS = [
     {
         icon: <ShieldCheck size={18} className="text-secondary" />,
-        title: 'AQL 2.5 Inspection Standard',
-        desc: 'Strict inline and final AQL 2.5 / 1.5 quality checks for zero-defect exports.'
+        title: 'Buyer-Driven Quality Control',
+        desc: 'Strict inline and final quality checks customized strictly to buyer standards for defect-free exports.'
     },
     {
         icon: <Leaf size={18} className="text-secondary" />,
@@ -55,7 +56,7 @@ const COMPLIANCE_PILLARS = [
     }
 ];
 
-export default function Certifications({ data, headings }: CertProps) {
+export default function Certifications({ data, headings, showIcons = true }: CertProps) {
     const [certs, setCerts] = useState<Certification[]>(DEFAULT_CERTS);
 
     useEffect(() => {
@@ -92,40 +93,42 @@ export default function Certifications({ data, headings }: CertProps) {
     const marqueeCerts = [...certs, ...certs, ...certs];
 
     return (
-        <section className="py-20 bg-slate-50 dark:bg-dark-bg/60 border-y border-gray-100 dark:border-gray-800/80 transition-colors duration-300 overflow-hidden relative">
+        <section className="py-20 bg-[#DDD8CF] dark:bg-[#080D1A] border-y border-slate-300/40 dark:border-white/5 transition-colors duration-500 overflow-hidden relative">
             
             {/* Background ambient lighting */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[300px] bg-secondary/5 blur-[120px] pointer-events-none -z-0" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[300px] bg-cyan-500/5 blur-[120px] pointer-events-none -z-0" />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
 
                 {/* Section Header */}
                 <div className="text-center mb-12 max-w-3xl mx-auto">
-                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-primary/10 dark:bg-primary/20 text-primary dark:text-blue-400 font-bold tracking-wider uppercase text-[11px] mb-3 border border-primary/20">
-                        <ShieldCheck size={14} />
+                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 font-extrabold tracking-wider uppercase text-[11px] mb-3 border border-cyan-500/20">
+                        {showIcons && <ShieldCheck size={14} />}
                         {headings?.certifications_label || 'Compliance & Production Standards'}
                     </span>
-                    <h2 className="text-2xl md:text-4xl font-extrabold text-gray-900 dark:text-white font-heading tracking-tight mb-4">
+                    <h2 className="text-2xl md:text-4xl font-black text-[#1A1D20] dark:text-white font-heading tracking-tight mb-4">
                         {headings?.certifications_heading || 'Engineered to the Standards of Leading Global Apparel Brands'}
                     </h2>
-                    <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
-                        {headings?.certifications_subheading || 'We manufacture apparel strictly aligned with world-class quality benchmarks, zero-defect AQL 2.5 standards, and comprehensive social and environmental audits. Our manufacturing units produce garments that meet the exact quality and compliance demands of premier European, American, and international retailers.'}
+                    <p className="text-sm md:text-base text-[#4B5563] dark:text-slate-300 leading-relaxed font-medium">
+                        {headings?.certifications_subheading || 'We manufacture apparel strictly aligned with world-class quality benchmarks, buyer-specified standards, and comprehensive social and environmental audits. Our manufacturing units produce garments that meet the exact quality and compliance demands of premier European, American, and international retailers.'}
                     </p>
-                    <div className="w-20 h-1 bg-secondary mx-auto mt-6 rounded-full" />
+                    <div className="w-20 h-1 bg-cyan-600 mx-auto mt-6 rounded-full" />
                 </div>
 
                 {/* 4 Compliance Pillars Strip */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
                     {COMPLIANCE_PILLARS.map((pillar, i) => (
-                        <div key={i} className="bg-white dark:bg-dark-surface p-4 rounded-xl border border-gray-200/80 dark:border-gray-800 shadow-sm flex items-start gap-3 transition-all hover:border-secondary/50">
-                            <div className="p-2 rounded-lg bg-secondary/10 text-secondary shrink-0 mt-0.5">
-                                {pillar.icon}
-                            </div>
+                        <div key={i} className="bg-[#EDE9E1] dark:bg-[#0C1628] p-4 rounded-2xl border border-white/70 dark:border-white/10 shadow-[6px_6px_14px_rgba(160,155,145,0.35),-5px_-5px_12px_rgba(255,255,255,0.85)] dark:shadow-[0_10px_20px_rgba(0,0,0,0.5)] flex items-start gap-3 transition-all hover:scale-[1.02]">
+                            {showIcons && (
+                                <div className="p-2 rounded-xl bg-[#E2DDD4] dark:bg-[#121E36] text-cyan-700 dark:text-cyan-400 shrink-0 mt-0.5 border border-white/50 dark:border-white/5 shadow-xs">
+                                    {pillar.icon}
+                                </div>
+                            )}
                             <div>
-                                <h4 className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wide mb-1">
+                                <h4 className="text-xs font-bold text-[#1A1D20] dark:text-white uppercase tracking-wide mb-1">
                                     {pillar.title}
                                 </h4>
-                                <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                                <p className="text-[11px] text-[#4B5563] dark:text-slate-300 leading-relaxed font-medium">
                                     {pillar.desc}
                                 </p>
                             </div>
@@ -134,7 +137,7 @@ export default function Certifications({ data, headings }: CertProps) {
                 </div>
 
                 {/* Marquee Logo Slider Container */}
-                <div className="relative w-full overflow-hidden flex items-center py-4 bg-white/80 dark:bg-dark-surface/60 rounded-2xl border border-gray-200/60 dark:border-gray-800 backdrop-blur-sm shadow-sm">
+                <div className="relative w-full overflow-hidden flex items-center py-4 bg-[#EDE9E1] dark:bg-[#0C1628] rounded-2xl border border-white/70 dark:border-white/10 backdrop-blur-sm shadow-[8px_8px_18px_rgba(160,155,145,0.35),-6px_-6px_14px_rgba(255,255,255,0.85)]">
 
                     {/* Gradient Fades for Smooth Illusion */}
                     <div className="absolute left-0 top-0 bottom-0 w-24 sm:w-36 bg-gradient-to-r from-white dark:from-dark-surface to-transparent z-10 pointer-events-none" />

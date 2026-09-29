@@ -1,21 +1,24 @@
 import { NextResponse } from 'next/server';
+import { requirePermission } from '@/lib/auth-guards';
 import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
+
+const SAFE_AUTHOR_SELECT = {
+    name: true,
+    avatar: true,
+} as const;
 
 // ── GET: Fetch single post by ID or slug ────────────────────────────────────
 export async function GET(req: Request, { params }: { params: { slug: string } }) {
     try {
-        // Detect if it looks like a CUID (starts with 'c' and is ~25 chars) or UUID
         const looksLikeId = /^[a-z0-9]{20,36}$/.test(params.slug) && !params.slug.includes('-blog-');
 
         const post = await prisma.blogPost.findFirst({
             where: looksLikeId
                 ? { OR: [{ id: params.slug }, { slug: params.slug }] }
                 : { slug: params.slug },
-            include: { author: { select: { name: true, email: true, avatar: true } } }
+            include: { author: { select: SAFE_AUTHOR_SELECT } }
         });
 
         if (!post) return NextResponse.json({ error: 'Post not found' }, { status: 404 });
@@ -29,8 +32,8 @@ export async function GET(req: Request, { params }: { params: { slug: string } }
 // ── PATCH: Update a blog post (edit + publish toggle) ───────────────────────
 export async function PATCH(req: Request, { params }: { params: { slug: string } }) {
     try {
-        const session = await getServerSession(authOptions);
-        if (!(session?.user as any)?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const guard = await requirePermission('blog.edit');
+        if (!guard.ok) return guard.response;
 
         const body = await req.json();
         const {
@@ -65,7 +68,7 @@ export async function PATCH(req: Request, { params }: { params: { slug: string }
         const updated = await prisma.blogPost.update({
             where: { id: existing.id },
             data: updateData,
-            include: { author: { select: { name: true } } }
+            include: { author: { select: SAFE_AUTHOR_SELECT } }
         });
 
         return NextResponse.json({ success: true, id: updated.id, slug: updated.slug, post: updated });
@@ -81,8 +84,8 @@ export async function PATCH(req: Request, { params }: { params: { slug: string }
 // ── DELETE: Remove a blog post ────────────────────────────────────────────
 export async function DELETE(req: Request, { params }: { params: { slug: string } }) {
     try {
-        const session = await getServerSession(authOptions);
-        if (!(session?.user as any)?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const guard = await requirePermission('blog.delete');
+        if (!guard.ok) return guard.response;
 
         await prisma.blogPost.deleteMany({
             where: { OR: [{ id: params.slug }, { slug: params.slug }] }

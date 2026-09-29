@@ -62,6 +62,15 @@ export const authOptions: NextAuthOptions = {
     pages: {
         signIn: '/executive-login',
     },
-    secret: process.env.NEXTAUTH_SECRET || 'super-secret-key-32-chars-long-at-least',
+    secret: (() => {
+        const secret = process.env.NEXTAUTH_SECRET;
+        if (!secret) {
+            if (process.env.NODE_ENV === 'production') {
+                throw new Error('[CRITICAL_SECURITY_ERROR] NEXTAUTH_SECRET environment variable is missing.');
+            }
+            console.warn('[SECURITY_WARNING] NEXTAUTH_SECRET environment variable is missing. Authentication cannot be secured without a secret.');
+        }
+        return secret;
+    })(),
 };
 

@@ -1,20 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireDeveloper } from '@/lib/auth-guards';
 import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
 import fs from 'fs';
 import path from 'path';
 
 export const dynamic = 'force-dynamic';
 
-
 export async function GET(req: NextRequest) {
-    const session = await getServerSession();
-    if (!session || !session.user || !session.user.email) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-    const user = await prisma.user.findUnique({ where: { email: session.user.email } });
-    if (!user || user.role !== 'DEVELOPER') {
-        return NextResponse.json({ error: 'Permission Denied. DEVELOPER access required for binary cloning.' }, { status: 403 });
-    }
+    const guard = await requireDeveloper();
+    if (!guard.ok) return guard.response;
 
     try {
         const dbPath = path.join(process.cwd(), 'prisma', 'dev.db');
@@ -38,13 +32,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-    const session = await getServerSession();
-    if (!session || !session.user || !session.user.email) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-    const user = await prisma.user.findUnique({ where: { email: session.user.email } });
-    if (!user || user.role !== 'DEVELOPER') {
-        return NextResponse.json({ error: 'Permission Denied. God mode routing required for hardware rollback.' }, { status: 403 });
-    }
+    const guard = await requireDeveloper();
+    if (!guard.ok) return guard.response;
 
     try {
         const formData = await req.formData();

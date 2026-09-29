@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireSuperAdmin } from '@/lib/auth-guards';
 import { extractVideoFromMessage, upsertTelegramVideo, syncTelegramChannelVideos, TELEGRAM_CONFIG } from '@/lib/telegram';
 import { prisma } from '@/lib/prisma';
 
@@ -37,6 +38,9 @@ export async function POST(req: NextRequest) {
  * Helper endpoint for testing, viewing webhook status, or running manual sync
  */
 export async function GET(req: NextRequest) {
+    const guard = await requireSuperAdmin();
+    if (!guard.ok) return guard.response;
+
     try {
         const { searchParams } = new URL(req.url);
         const action = searchParams.get('action');

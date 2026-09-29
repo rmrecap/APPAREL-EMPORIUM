@@ -90,12 +90,12 @@ export default function RegisterPage() {
                         <div>
                             <p className="text-xs font-black uppercase tracking-widest text-gray-400 mb-1">Quality Pass Rate</p>
                             <p className="text-3xl font-black font-heading text-primary">99%</p>
-                            <p className="text-[10px] text-gray-400 font-medium">AQL 2.5 Standard</p>
+                            <p className="text-[10px] text-gray-400 font-medium">Buyer Quality Standards</p>
                         </div>
                         <div>
                             <p className="text-xs font-black uppercase tracking-widest text-gray-400 mb-1">Ethical Compliance</p>
                             <p className="text-3xl font-black font-heading text-secondary">100%</p>
-                            <p className="text-[10px] text-gray-400 font-medium">BSCI & OEKO-TEX Audited</p>
+                            <p className="text-[10px] text-gray-400 font-medium">Audited Partner Factories</p>
                         </div>
                     </div>
                 </div>

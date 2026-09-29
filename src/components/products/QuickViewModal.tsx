@@ -91,7 +91,7 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
                             <span className="text-[10px] uppercase font-black text-gray-400 tracking-tighter">Est. Lead Time</span>
                             <div className="flex items-center gap-2">
                                 <Truck size={16} className="text-primary" />
-                                <span className="font-bold text-sm text-gray-900 dark:text-white">{specs['Lead Time'] || '45-60 Days'}</span>
+                                <span className="font-bold text-sm text-gray-900 dark:text-white">{specs['Lead Time'] || 'Order Specific'}</span>
                             </div>
                         </div>
                     </div>

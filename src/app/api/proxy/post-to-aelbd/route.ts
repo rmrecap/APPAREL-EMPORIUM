@@ -19,15 +19,26 @@ export async function POST(req: NextRequest) {
   };
 
   try {
-    // 1. API Secret Key Security Check
+    // 1. API Secret Key Security Check (Fail closed: No hardcoded fallback strings)
     const authHeader = req.headers.get('authorization');
-    const secretKey = process.env.API_SECRET_KEY || 'aelbd_live_auth_secret_2026_x89a';
+    const secretKey = process.env.API_SECRET_KEY;
 
-    if (secretKey && authHeader !== `Bearer ${secretKey}`) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized: Invalid or missing API Secret Key' },
-        { status: 401, headers: corsHeaders }
-      );
+    if (secretKey) {
+      if (authHeader !== `Bearer ${secretKey}`) {
+        return NextResponse.json(
+          { success: false, error: 'Unauthorized: Invalid or missing API Secret Key' },
+          { status: 401, headers: corsHeaders }
+        );
+      }
+    } else {
+      // Check database site setting for external API key
+      const keySetting = await prisma.siteSetting.findUnique({ where: { key: 'api_external_key' } });
+      if (!keySetting?.value || authHeader !== `Bearer ${keySetting.value}`) {
+        return NextResponse.json(
+          { success: false, error: 'Unauthorized: Invalid or unconfigured API Secret Key' },
+          { status: 401, headers: corsHeaders }
+        );
+      }
     }
 
     // 2. Parse Request Payload

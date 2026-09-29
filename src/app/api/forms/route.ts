@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/auth-guards';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
-
 export async function GET() {
     try {
+        const guard = await requireAdmin();
+        if (!guard.ok) return guard.response;
+
         const forms = await prisma.customForm.findMany({
             orderBy: { createdAt: 'desc' },
             include: {
@@ -23,12 +26,21 @@ export async function GET() {
 
 export async function POST(req: Request) {
     try {
+        const guard = await requireAdmin();
+        if (!guard.ok) return guard.response;
+
         const body = await req.json();
+
+        if (!body.name || !body.slug) {
+            return NextResponse.json({ error: "Form name and slug are required" }, { status: 400 });
+        }
+
         const form = await prisma.customForm.create({
             data: {
                 name: body.name,
                 slug: body.slug,
-                fields: JSON.stringify(body.fields || []),
+                description: body.description || null,
+                fields: typeof body.fields === 'string' ? body.fields : JSON.stringify(body.fields || []),
                 submitEmail: body.submitEmail || null,
                 successMessage: body.successMessage || null,
                 isActive: body.isActive !== false

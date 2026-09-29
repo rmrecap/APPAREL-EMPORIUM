@@ -163,14 +163,14 @@ h6 {
 
 /* ─── 3D Neumorphic & Skeuomorphic Garment Atelier Tokens ─── */
 .catalog-bg-canvas {
-  background-color: #EFE9E2;
+  background-color: #DDD8CF;
   background-image: 
-    radial-gradient(at 15% 15%, rgba(255, 255, 255, 0.7) 0px, transparent 50%),
-    radial-gradient(at 85% 85%, rgba(210, 200, 185, 0.3) 0px, transparent 50%);
+    radial-gradient(at 15% 15%, rgba(255, 255, 255, 0.6) 0px, transparent 50%),
+    radial-gradient(at 85% 85%, rgba(185, 175, 160, 0.25) 0px, transparent 50%);
 }
 
 .dark .catalog-bg-canvas {
-  background-color: #070D1B;
+  background-color: #080D1A;
   background-image: 
     radial-gradient(at 20% 20%, rgba(14, 25, 48, 0.8) 0px, transparent 60%),
     radial-gradient(at 80% 80%, rgba(2, 6, 23, 0.9) 0px, transparent 60%);

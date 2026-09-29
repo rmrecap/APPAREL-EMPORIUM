@@ -37,11 +37,20 @@ export async function middleware(req: NextRequest) {
     // For now, allow passthrough if not explicitly intercepted below.
 
     // 2. Authentication Check for Admin Portals
+    const nextAuthSecret = process.env.NEXTAUTH_SECRET;
+    if (!nextAuthSecret && (isAdminRoute || isAdminApiRoute)) {
+        console.error('[CRITICAL_SECURITY_ERROR] NEXTAUTH_SECRET is not configured in middleware.');
+        if (isApiRoute) {
+            return NextResponse.json({ error: "Server misconfiguration: missing auth secret" }, { status: 500 });
+        }
+        return NextResponse.redirect(new URL('/executive-login?error=ConfigurationError', req.url));
+    }
+
     let token = null;
     if (isAdminRoute || isAdminApiRoute) {
         token = await getToken({
             req,
-            secret: process.env.NEXTAUTH_SECRET || 'super-secret-key-12345'
+            secret: nextAuthSecret
         });
 
         if (!token) {
@@ -77,7 +86,10 @@ export async function middleware(req: NextRequest) {
 
         // Block all non-GET requests if not authenticated (except forms)
         if (req.method !== 'GET' && !isPublicFormSubmission) {
-            const apiToken = await getToken({ req, secret: process.env.NEXTAUTH_SECRET || 'super-secret-key-12345' });
+            if (!nextAuthSecret) {
+                return NextResponse.json({ error: "Server misconfiguration: missing auth secret" }, { status: 500 });
+            }
+            const apiToken = await getToken({ req, secret: nextAuthSecret });
             if (!apiToken) {
                 return NextResponse.json({ error: "Unauthorized Mutation" }, { status: 401 });
             }

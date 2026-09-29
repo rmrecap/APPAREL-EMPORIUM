@@ -11,7 +11,7 @@ import ImagePicker from '@/components/admin/ImagePicker';
 
 type SectionID =
     | 'announcement_bar' | 'hero_slider' | 'stats_counter'
-    | 'category_grid' | 'featured_products' | 'production_process' | 'our_products_3d' | 'core_values_3d' | 'delivery_feed'
+    | 'category_grid' | 'featured_products' | 'production_process' | 'our_products_3d' | 'core_values_3d' | 'telegram_video_gallery' | 'delivery_feed'
     | 'why_choose_us' | 'certifications' | 'testimonials' | 'cta_section';
 
 const SECTION_NAMES: Record<SectionID, string> = {
@@ -23,6 +23,7 @@ const SECTION_NAMES: Record<SectionID, string> = {
     production_process: 'Our Premium Production Process (প্রোডাকশন প্রসেস থ্রিডি শোকেস)',
     our_products_3d: 'Our Products Categories (আওয়ার প্রোডাক্টস থ্রিডি শোকেস)',
     core_values_3d: 'Our Core Values (আওয়ার কোর ভ্যালুজ থ্রিডি শোকেস)',
+    telegram_video_gallery: 'Telegram Video Gallery (ভিডিও গ্যালারি)',
     delivery_feed: 'Recent Deliveries & Production (লাইভ ডেলিভারি ফিড)',
     why_choose_us: 'Why Partner With Us (কর্পোরেট সুবিধা)',
     certifications: 'Compliance & Production Standards (কমপ্লায়েন্স ও স্ট্যান্ডার্ড)',
@@ -32,7 +33,7 @@ const SECTION_NAMES: Record<SectionID, string> = {
 
 const DEFAULT_ORDER: SectionID[] = [
     'hero_slider', 'stats_counter', 'category_grid', 'featured_products', 'production_process',
-    'our_products_3d', 'core_values_3d', 'delivery_feed', 'why_choose_us', 'certifications', 'testimonials', 'cta_section'
+    'our_products_3d', 'core_values_3d', 'telegram_video_gallery', 'delivery_feed', 'why_choose_us', 'certifications', 'testimonials', 'cta_section'
 ];
 
 /* ─────────────────────────────────────────────────────────────
@@ -79,11 +80,18 @@ const HEADING_FIELDS: HeadingField[] = [
 export default function HomepageBuilderPage() {
     const { role } = usePermission();
 
-    const [activeTab, setActiveTab] = useState<'layout' | 'headings'>('layout');
+    const [activeTab, setActiveTab] = useState<'layout' | 'headings' | 'icons'>('layout');
 
     const [order, setOrder] = useState<SectionID[]>(DEFAULT_ORDER);
     const [visibility, setVisibility] = useState<Record<string, boolean>>({});
     const [settingsData, setSettingsData] = useState<Record<string, string>>({});
+
+    // Icon & Developer controls
+    const [floatingIconsEnabled, setFloatingIconsEnabled] = useState(false);
+    const [sectionIconsEnabled, setSectionIconsEnabled] = useState(false);
+    const [quickActionsEnabled, setQuickActionsEnabled] = useState(false);
+    const [iconsSaving, setIconsSaving] = useState(false);
+    const [iconsSaved, setIconsSaved] = useState(false);
 
     // Section headings (labels/titles for every section)
     const [headings, setHeadings] = useState<Record<string, string>>({});
@@ -120,6 +128,9 @@ export default function HomepageBuilderPage() {
                 }
                 if (map['homepage_sections_visibility']) setVisibility(JSON.parse(map['homepage_sections_visibility']));
                 if (map['homepage_section_headings']) setHeadings(JSON.parse(map['homepage_section_headings']));
+                setFloatingIconsEnabled(map['homepage_floating_icons_enabled'] === 'true');
+                setSectionIconsEnabled(map['homepage_section_icons_enabled'] === 'true');
+                setQuickActionsEnabled(map['homepage_quick_actions_enabled'] === 'true');
             }
         } catch (e) { console.error(e); }
         finally { setLoading(false); }
@@ -146,6 +157,26 @@ export default function HomepageBuilderPage() {
             await fetch('/api/revalidate?path=/').catch(() => {});
         } catch (e) { console.error('Save failed', e); }
         finally { setSaving(false); setEditingSection(null); }
+    };
+
+    const saveIconSettings = async () => {
+        setIconsSaving(true);
+        try {
+            await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    homepage_floating_icons_enabled: floatingIconsEnabled ? 'true' : 'false',
+                    homepage_section_icons_enabled: sectionIconsEnabled ? 'true' : 'false',
+                    homepage_quick_actions_enabled: quickActionsEnabled ? 'true' : 'false',
+                    group: 'homepage'
+                })
+            });
+            await fetch('/api/revalidate?path=/');
+            setIconsSaved(true);
+            setTimeout(() => setIconsSaved(false), 3000);
+        } catch (e) { console.error('Failed to save icon settings', e); }
+        finally { setIconsSaving(false); }
     };
 
     const saveHeadings = async () => {
@@ -232,7 +263,7 @@ export default function HomepageBuilderPage() {
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-1 mb-8 bg-gray-100 dark:bg-gray-800/60 rounded-xl p-1 w-fit">
+            <div className="flex flex-wrap gap-1 mb-8 bg-gray-100 dark:bg-gray-800/60 rounded-xl p-1 w-fit">
                 <button onClick={() => setActiveTab('layout')}
                     className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'layout' ? 'bg-white dark:bg-gray-900 shadow text-primary' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}>
                     <GripVertical size={16} /> Section Layout & Content
@@ -240,6 +271,10 @@ export default function HomepageBuilderPage() {
                 <button onClick={() => setActiveTab('headings')}
                     className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'headings' ? 'bg-white dark:bg-gray-900 shadow text-primary' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}>
                     <Type size={16} /> Section Titles & Labels
+                </button>
+                <button onClick={() => setActiveTab('icons')}
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'icons' ? 'bg-white dark:bg-gray-900 shadow text-primary' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}>
+                    <Icons.Sparkles size={16} /> Icon Controls & 3D Elements
                 </button>
             </div>
 
@@ -610,7 +645,7 @@ export default function HomepageBuilderPage() {
                     </div>
                 </div>
 
-            ) : (
+            ) : activeTab === 'headings' ? (
 
                 /* ════════════════════════════════════════════════
                    TAB 2: SECTION TITLES & LABELS
@@ -666,6 +701,128 @@ export default function HomepageBuilderPage() {
                                 className="flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:bg-primary/90 transition disabled:opacity-60">
                                 {headingsSaving ? <Icons.Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
                                 {headingsSaving ? 'Saving...' : 'Save All Headings'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            ) : (
+
+                /* ════════════════════════════════════════════════
+                   TAB 3: ICONS & 3D CRAFT ELEMENTS CONTROLS
+                ════════════════════════════════════════════════ */
+                <div className="space-y-6 max-w-4xl animate-in fade-in duration-300">
+                    <div className="p-6 rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 shadow-sm">
+                        <h3 className="font-bold text-lg mb-2 flex items-center gap-2 text-gray-900 dark:text-white font-heading">
+                            <Icons.Sparkles className="text-primary" size={20} />
+                            Homepage Icons, 3D Floating Elements & Decor Control
+                        </h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                            হোমপেজের বিভিন্ন সেকশনে থাকা ফ্লোটিং ৩ডি ক্রাফট আইকন (Scissors, Thread, Rulers, Tape), সেকশন ফিচার ব্যাজ এবং কুইক অ্যাকশন বাটন অন/অফ করার অপশন।
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Floating 3D Craft Icons */}
+                        <div
+                            onClick={() => setFloatingIconsEnabled(!floatingIconsEnabled)}
+                            className={`p-5 rounded-2xl border transition-all cursor-pointer select-none flex flex-col justify-between ${
+                                floatingIconsEnabled
+                                    ? 'bg-white dark:bg-dark-surface border-emerald-500 shadow-sm'
+                                    : 'bg-gray-50 dark:bg-dark-bg/60 border-gray-200 dark:border-gray-800 opacity-80'
+                            }`}
+                        >
+                            <div className="space-y-2">
+                                <div className="flex items-start justify-between">
+                                    <h4 className="font-bold text-sm text-gray-900 dark:text-white">
+                                        Floating 3D Craft Elements (ফ্লোটিং ৩ডি ক্রাফট আইকন)
+                                    </h4>
+                                    <div className={`w-11 h-6 rounded-full p-1 transition-colors flex items-center ${floatingIconsEnabled ? 'bg-emerald-500 justify-end' : 'bg-gray-300 dark:bg-gray-700 justify-start'}`}>
+                                        <div className="w-4 h-4 rounded-full bg-white shadow-sm" />
+                                    </div>
+                                </div>
+                                <p className="text-xs text-gray-500 leading-relaxed">
+                                    হোমপেজের ৩ডি স্টেজ, ক্যাটাগরি এবং ফিচার্ড সেকশনের চারপাশের ৩ডি কাঁচি, সুতার রিল, স্কেল ও ফ্যাব্রিক ব্যাজ।
+                                </p>
+                            </div>
+                            <div className="pt-3 mt-3 border-t border-gray-100 dark:border-gray-800 text-[11px] font-bold flex justify-between items-center">
+                                <span className="font-mono text-gray-400">homepage_floating_icons_enabled</span>
+                                <span className={floatingIconsEnabled ? 'text-emerald-600' : 'text-rose-600'}>
+                                    {floatingIconsEnabled ? 'ENABLED (চালু)' : 'DISABLED (বন্ধ)'}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Section Feature Icons */}
+                        <div
+                            onClick={() => setSectionIconsEnabled(!sectionIconsEnabled)}
+                            className={`p-5 rounded-2xl border transition-all cursor-pointer select-none flex flex-col justify-between ${
+                                sectionIconsEnabled
+                                    ? 'bg-white dark:bg-dark-surface border-emerald-500 shadow-sm'
+                                    : 'bg-gray-50 dark:bg-dark-bg/60 border-gray-200 dark:border-gray-800 opacity-80'
+                            }`}
+                        >
+                            <div className="space-y-2">
+                                <div className="flex items-start justify-between">
+                                    <h4 className="font-bold text-sm text-gray-900 dark:text-white">
+                                        Section Feature Icons & Badges (সেকশন ফিচার আইকন)
+                                    </h4>
+                                    <div className={`w-11 h-6 rounded-full p-1 transition-colors flex items-center ${sectionIconsEnabled ? 'bg-emerald-500 justify-end' : 'bg-gray-300 dark:bg-gray-700 justify-start'}`}>
+                                        <div className="w-4 h-4 rounded-full bg-white shadow-sm" />
+                                    </div>
+                                </div>
+                                <p className="text-xs text-gray-500 leading-relaxed">
+                                    স্ট্যাটাস কাউন্টার, কোয়ালিটি ব্যাজ, কর্পোরেট সুবিধা এবং কমপ্লায়েন্স সেকশনের ভেতরের আইকনগুলো।
+                                </p>
+                            </div>
+                            <div className="pt-3 mt-3 border-t border-gray-100 dark:border-gray-800 text-[11px] font-bold flex justify-between items-center">
+                                <span className="font-mono text-gray-400">homepage_section_icons_enabled</span>
+                                <span className={sectionIconsEnabled ? 'text-emerald-600' : 'text-rose-600'}>
+                                    {sectionIconsEnabled ? 'ENABLED (চালু)' : 'DISABLED (বন্ধ)'}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Quick Action Floating Buttons */}
+                        <div
+                            onClick={() => setQuickActionsEnabled(!quickActionsEnabled)}
+                            className={`p-5 rounded-2xl border transition-all cursor-pointer select-none flex flex-col justify-between ${
+                                quickActionsEnabled
+                                    ? 'bg-white dark:bg-dark-surface border-emerald-500 shadow-sm'
+                                    : 'bg-gray-50 dark:bg-dark-bg/60 border-gray-200 dark:border-gray-800 opacity-80'
+                            }`}
+                        >
+                            <div className="space-y-2">
+                                <div className="flex items-start justify-between">
+                                    <h4 className="font-bold text-sm text-gray-900 dark:text-white">
+                                        Floating Quick Actions (কুইক অ্যাকশন বাটন)
+                                    </h4>
+                                    <div className={`w-11 h-6 rounded-full p-1 transition-colors flex items-center ${quickActionsEnabled ? 'bg-emerald-500 justify-end' : 'bg-gray-300 dark:bg-gray-700 justify-start'}`}>
+                                        <div className="w-4 h-4 rounded-full bg-white shadow-sm" />
+                                    </div>
+                                </div>
+                                <p className="text-xs text-gray-500 leading-relaxed">
+                                    হোমপেজের ডান পাশের ফ্লোটিং হেল্প ও কুইক অ্যাকশন ইন্টারফেস।
+                                </p>
+                            </div>
+                            <div className="pt-3 mt-3 border-t border-gray-100 dark:border-gray-800 text-[11px] font-bold flex justify-between items-center">
+                                <span className="font-mono text-gray-400">homepage_quick_actions_enabled</span>
+                                <span className={quickActionsEnabled ? 'text-emerald-600' : 'text-rose-600'}>
+                                    {quickActionsEnabled ? 'ENABLED (চালু)' : 'DISABLED (বন্ধ)'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Save Button */}
+                    <div className="sticky bottom-4 mt-8">
+                        <div className="flex items-center justify-between bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border border-gray-100 dark:border-gray-800 shadow-2xl rounded-2xl px-6 py-4">
+                            <div className="text-sm text-gray-500">
+                                {iconsSaved ? <span className="text-green-600 font-bold flex items-center gap-2">✅ Icon Settings Saved & Applied!</span> : 'Click save to apply your changes to the live site.'}
+                            </div>
+                            <button onClick={saveIconSettings} disabled={iconsSaving}
+                                className="flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:bg-primary/90 transition disabled:opacity-60">
+                                {iconsSaving ? <Icons.Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                                {iconsSaving ? 'Saving...' : 'Save Icon Controls'}
                             </button>
                         </div>
                     </div>

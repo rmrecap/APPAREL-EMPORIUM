@@ -1,20 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireDeveloper, requireAdmin } from '@/lib/auth-guards';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import fs from 'fs';
 import path from 'path';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 
 const execAsync = promisify(exec);
 
 export async function POST(request: NextRequest) {
     try {
-        // Check DEVELOPER role by passing authOptions
-        const session: any = await getServerSession(authOptions);
-        if (!session || session?.user?.role !== 'DEVELOPER') {
-            return NextResponse.json({ error: 'Unauthorized: DEVELOPER role required' }, { status: 403 });
-        }
+        const guard = await requireDeveloper();
+        if (!guard.ok) return guard.response;
 
         const body = await request.json().catch(() => ({}));
         const action = body.action || 'full';
@@ -78,6 +74,9 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
     try {
+        const guard = await requireAdmin();
+        if (!guard.ok) return guard.response;
+
         const { checkForUpdates } = await import('@/lib/version');
         const info = await checkForUpdates();
         return NextResponse.json(info);

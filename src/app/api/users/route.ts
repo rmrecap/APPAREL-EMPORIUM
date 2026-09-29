@@ -1,21 +1,27 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { requireSuperAdmin } from '@/lib/auth-guards';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 
 export const dynamic = 'force-dynamic';
 
+const SAFE_USER_SELECT = {
+    id: true,
+    name: true,
+    email: true,
+    role: true,
+    avatar: true,
+    isActive: true,
+    lastLoginAt: true,
+    createdAt: true,
+} as const;
 
 export async function GET(req: Request) {
     try {
-        const session = await getServerSession(authOptions);
-        const currentUserRole = (session?.user as any)?.role;
+        const guard = await requireSuperAdmin();
+        if (!guard.ok) return guard.response;
 
-        if (!session || !['SUPER_ADMIN', 'DEVELOPER'].includes(currentUserRole)) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-        }
-
+        const currentUserRole = guard.user.role;
         const { searchParams } = new URL(req.url);
         const roleFilter = searchParams.get('role');
 
@@ -30,7 +36,7 @@ export async function GET(req: Request) {
 
         const users = await prisma.user.findMany({
             where: whereClause,
-            select: { id: true, name: true, email: true, role: true, avatar: true, isActive: true, lastLoginAt: true, createdAt: true },
+            select: SAFE_USER_SELECT,
             orderBy: { createdAt: 'desc' }
         });
 
@@ -42,13 +48,10 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
     try {
-        const session = await getServerSession(authOptions);
-        const currentUserRole = (session?.user as any)?.role;
+        const guard = await requireSuperAdmin();
+        if (!guard.ok) return guard.response;
 
-        if (!session || !['SUPER_ADMIN', 'DEVELOPER'].includes(currentUserRole)) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-        }
-
+        const currentUserRole = guard.user.role;
         const data = await req.json();
         const { name, email, password, role, isActive } = data;
 
@@ -56,9 +59,9 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "All fields are required" }, { status: 400 });
         }
 
-        // Role Validation
+        // Role Escalation Prevention
         if (currentUserRole === 'SUPER_ADMIN' && ['SUPER_ADMIN', 'DEVELOPER'].includes(role)) {
-            return NextResponse.json({ error: "Cannot create user with this role" }, { status: 403 });
+            return NextResponse.json({ error: "Cannot create user with equal or higher administrative role" }, { status: 403 });
         }
 
         const existing = await prisma.user.findUnique({ where: { email } });
@@ -76,7 +79,7 @@ export async function POST(req: Request) {
                 role,
                 isActive: isActive ?? true
             },
-            select: { id: true, name: true, email: true, role: true, isActive: true, lastLoginAt: true, createdAt: true }
+            select: SAFE_USER_SELECT
         });
 
         return NextResponse.json({ success: true, user });

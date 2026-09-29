@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { requirePermission } from '@/lib/auth-guards';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
@@ -13,16 +14,25 @@ export async function GET(req: Request) {
         const all = searchParams.get('all');
 
         const session = await getServerSession(authOptions);
-        const isAdmin = !!session?.user;
+        const userRole = (session?.user as any)?.role;
+        const isStaff = ['DEVELOPER', 'SUPER_ADMIN', 'ADMIN', 'EDITOR'].includes(userRole);
 
-        const where: any = isAdmin && all === '1' ? {} : { isPublished: true };
-        const take = limit ? parseInt(limit) : undefined;
+        const where: any = isStaff && all === '1' ? {} : { isPublished: true };
+        const take = limit ? Math.min(parseInt(limit), 100) : undefined;
 
         const posts = await prisma.blogPost.findMany({
             where,
             orderBy: { createdAt: 'desc' },
             take,
-            include: { author: { select: { name: true, email: true } } }
+            include: {
+                author: {
+                    select: {
+                        name: true,
+                        avatar: true,
+                        // Email explicitly omitted for public data partitioning
+                    }
+                }
+            }
         });
         const total = await prisma.blogPost.count({ where });
 
@@ -36,12 +46,10 @@ export async function GET(req: Request) {
 // ── POST: Create a new blog post ────────────────────────────────────────────
 export async function POST(req: Request) {
     try {
-        const session = await getServerSession(authOptions);
-        if (!(session?.user as any)?.id) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-        const userId = (session!.user as any).id as string;
+        const guard = await requirePermission('blog.create');
+        if (!guard.ok) return guard.response;
 
+        const userId = guard.user.id;
         const body = await req.json();
         const { title, slug, excerpt, content, coverImage, isPublished, publishedAt, seoTitle, seoDescription } = body;
 
@@ -59,7 +67,7 @@ export async function POST(req: Request) {
         const existing = await prisma.blogPost.findFirst({ where: { slug: finalSlug } });
         const uniqueSlug = existing ? `${finalSlug}-${Date.now().toString().slice(-5)}` : finalSlug;
 
-        const post = await (prisma.blogPost as any).create({
+        const post = await prisma.blogPost.create({
             data: {
                 title: title.trim(),
                 slug: uniqueSlug,
@@ -71,6 +79,14 @@ export async function POST(req: Request) {
                 seoTitle: seoTitle?.trim() || null,
                 seoDescription: seoDescription?.trim() || null,
                 authorId: userId,
+            },
+            include: {
+                author: {
+                    select: {
+                        name: true,
+                        avatar: true,
+                    }
+                }
             }
         });
 

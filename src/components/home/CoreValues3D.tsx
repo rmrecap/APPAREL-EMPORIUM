@@ -22,9 +22,11 @@ import {
 interface CoreValuesProps {
     headings?: Record<string, string>;
     data?: any;
+    showDecor?: boolean;
+    showIcons?: boolean;
 }
 
-export default function CoreValues3D({ headings, data }: CoreValuesProps) {
+export default function CoreValues3D({ headings, data, showDecor = false, showIcons = false }: CoreValuesProps) {
     const parsedData = typeof data === 'string' ? (() => { try { return JSON.parse(data); } catch { return []; } })() : (data || []);
 
     const sectionHeading = headings?.core_values_heading || 'OUR CORE VALUES';
@@ -102,59 +104,61 @@ export default function CoreValues3D({ headings, data }: CoreValuesProps) {
         <section 
             id="core-values-3d"
             aria-labelledby="core-values-heading"
-            className="relative py-16 sm:py-24 bg-[#EAE7E0] dark:bg-[#060B16] transition-colors duration-500 overflow-hidden border-t border-slate-300/40 dark:border-white/5"
+            className="relative py-16 sm:py-24 bg-[#DDD8CF] dark:bg-[#080D1A] transition-colors duration-500 overflow-hidden border-t border-slate-300/40 dark:border-white/5"
         >
             {/* Ambient Background Lighting */}
             <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-blue-500/10 dark:bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute bottom-1/4 right-1/3 w-96 h-96 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
             {/* ── FLOATING 3D CRAFT ELEMENTS (Matching User Mockup) ── */}
-            <div className="pointer-events-none absolute inset-0 overflow-hidden z-0 hidden lg:block">
-                {/* Needle & Thread (Top Left) */}
-                <div className="absolute top-8 left-[7%] animate-[bounce_8s_infinite_ease-in-out]">
-                    <NeedleWithThread3D size={84} rotation={-30} />
-                </div>
+            {showDecor && (
+                <div className="pointer-events-none absolute inset-0 overflow-hidden z-0 hidden lg:block">
+                    {/* Needle & Thread (Top Left) */}
+                    <div className="absolute top-8 left-[7%] animate-[bounce_8s_infinite_ease-in-out]">
+                        <NeedleWithThread3D size={84} rotation={-30} />
+                    </div>
 
-                {/* Garment Button (Left Edge) */}
-                <div className="absolute top-[42%] left-[4%] animate-[bounce_9s_infinite_ease-in-out_1s]">
-                    <GarmentButton3D size={46} rotation={-15} />
-                </div>
+                    {/* Garment Button (Left Edge) */}
+                    <div className="absolute top-[42%] left-[4%] animate-[bounce_9s_infinite_ease-in-out_1s]">
+                        <GarmentButton3D size={46} rotation={-15} />
+                    </div>
 
-                {/* Garment Button 2 (Left Lower) */}
-                <div className="absolute top-[56%] left-[6%] animate-[bounce_7s_infinite_ease-in-out_0.5s]">
-                    <GarmentButton3D size={38} rotation={25} />
-                </div>
+                    {/* Garment Button 2 (Left Lower) */}
+                    <div className="absolute top-[56%] left-[6%] animate-[bounce_7s_infinite_ease-in-out_0.5s]">
+                        <GarmentButton3D size={38} rotation={25} />
+                    </div>
 
-                {/* Clothes Hanger (Bottom Left) */}
-                <div className="absolute bottom-10 left-[8%] animate-[bounce_8.5s_infinite_ease-in-out_2s]">
-                    <Hanger3D size={80} rotation={-15} />
-                </div>
+                    {/* Clothes Hanger (Bottom Left) */}
+                    <div className="absolute bottom-10 left-[8%] animate-[bounce_8.5s_infinite_ease-in-out_2s]">
+                        <Hanger3D size={80} rotation={-15} />
+                    </div>
 
-                {/* Thread Spool (Bottom Center-Left) */}
-                <div className="absolute bottom-6 left-[28%] animate-[bounce_7.5s_infinite_ease-in-out_1.5s]">
-                    <ThreadSpool3D size={64} rotation={-20} threadColor="#3B82F6" />
-                </div>
+                    {/* Thread Spool (Bottom Center-Left) */}
+                    <div className="absolute bottom-6 left-[28%] animate-[bounce_7.5s_infinite_ease-in-out_1.5s]">
+                        <ThreadSpool3D size={64} rotation={-20} threadColor="#3B82F6" />
+                    </div>
 
-                {/* Family Line Silhouette (Bottom Center) matching Mockup! */}
-                <div className="absolute bottom-4 left-[46%] animate-[bounce_9s_infinite_ease-in-out_2.5s]">
-                    <GenderSilhouette3D gender="family" size={48} />
-                </div>
+                    {/* Family Line Silhouette (Bottom Center) matching Mockup! */}
+                    <div className="absolute bottom-4 left-[46%] animate-[bounce_9s_infinite_ease-in-out_2.5s]">
+                        <GenderSilhouette3D gender="family" size={48} />
+                    </div>
 
-                {/* Buttons (Top Right) */}
-                <div className="absolute top-10 right-[20%] animate-[bounce_6.5s_infinite_ease-in-out_0.8s]">
-                    <GarmentButton3D size={42} rotation={20} />
-                </div>
+                    {/* Buttons (Top Right) */}
+                    <div className="absolute top-10 right-[20%] animate-[bounce_6.5s_infinite_ease-in-out_0.8s]">
+                        <GarmentButton3D size={42} rotation={20} />
+                    </div>
 
-                {/* Thread Spool (Top Right) */}
-                <div className="absolute top-14 right-[8%] animate-[bounce_8s_infinite_ease-in-out_1.2s]">
-                    <ThreadSpool3D size={60} rotation={25} threadColor="#10B981" />
-                </div>
+                    {/* Thread Spool (Top Right) */}
+                    <div className="absolute top-14 right-[8%] animate-[bounce_8s_infinite_ease-in-out_1.2s]">
+                        <ThreadSpool3D size={60} rotation={25} threadColor="#10B981" />
+                    </div>
 
-                {/* Clothes Hanger (Right Edge) */}
-                <div className="absolute top-[44%] right-[4%] animate-[bounce_9s_infinite_ease-in-out_1.8s]">
-                    <Hanger3D size={86} rotation={12} />
+                    {/* Clothes Hanger (Right Edge) */}
+                    <div className="absolute top-[44%] right-[4%] animate-[bounce_9s_infinite_ease-in-out_1.8s]">
+                        <Hanger3D size={86} rotation={12} />
+                    </div>
                 </div>
-            </div>
+            )}
 
             <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
 
@@ -324,7 +328,7 @@ export default function CoreValues3D({ headings, data }: CoreValuesProps) {
                                             </div>
                                             <div className="flex items-start gap-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
                                                 <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                                                <span>AQL 1.5 - 2.5 final inspection benchmarks with comprehensive photographic audit reports.</span>
+                                                <span>Customized final inspection benchmarks tailored to buyer specifications with comprehensive audit reports.</span>
                                             </div>
                                             <div className="flex items-start gap-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
                                                 <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />

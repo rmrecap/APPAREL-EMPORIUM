@@ -1,25 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requirePermission } from '@/lib/auth-guards';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
+const SAFE_CATEGORY_SELECT = {
+    id: true,
+    name: true,
+    slug: true,
+    image: true,
+} as const;
+
 export async function GET(req: NextRequest) {
     try {
         const { searchParams } = new URL(req.url);
-        const limit = parseInt(searchParams.get('limit') || '12');
-        const page = parseInt(searchParams.get('page') || '1');
+        const limit = Math.min(parseInt(searchParams.get('limit') || '12'), 100);
+        const page = Math.max(parseInt(searchParams.get('page') || '1'), 1);
         const skip = (page - 1) * limit;
 
         const q = searchParams.get('q');
         const featured = searchParams.get('featured');
         const category = searchParams.get('category');
         const categoryId = searchParams.get('category_id');
-        const includeAll = searchParams.get('include_all') === 'true';
+        const includeAllParam = searchParams.get('include_all') === 'true';
         const ids = searchParams.get('ids');
 
-        const where: any = {};
+        // Only authenticated staff may view inactive/draft products
+        let allowInactive = false;
+        if (includeAllParam) {
+            const session = await getServerSession(authOptions);
+            const userRole = (session?.user as any)?.role;
+            if (['DEVELOPER', 'SUPER_ADMIN', 'ADMIN', 'EDITOR'].includes(userRole)) {
+                allowInactive = true;
+            }
+        }
 
-        if (!includeAll) where.isActive = true;
+        const where: any = {};
+        if (!allowInactive) where.isActive = true;
         if (featured === 'true') where.isFeatured = true;
         if (category) where.category = { slug: category };
         if (categoryId) where.categoryId = categoryId;
@@ -37,7 +56,7 @@ export async function GET(req: NextRequest) {
         const [products, total] = await Promise.all([
             prisma.product.findMany({
                 where,
-                include: { category: true },
+                include: { category: { select: SAFE_CATEGORY_SELECT } },
                 skip,
                 take: limit,
                 orderBy: { createdAt: 'desc' },
@@ -54,6 +73,9 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: Request) {
     try {
+        const guard = await requirePermission('products.create');
+        if (!guard.ok) return guard.response;
+
         const body = await req.json();
 
         /* ── Validate required fields ── */

@@ -219,7 +219,7 @@ export default function AtelierDecorations3D({
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none rounded-xl" />
                         <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between text-[10px] font-extrabold text-white tracking-widest uppercase drop-shadow-md">
                             <span>Dhaka Atelier</span>
-                            <span className="text-cyan-300">ISO 9001:2015</span>
+                            <span className="text-cyan-300">Export Standard</span>
                         </div>
                     </div>
                 </div>

@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth-guards';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
     try {
+        const guard = await requireAuth();
+        if (!guard.ok) return guard.response;
+
         const { searchParams } = new URL(req.url);
         const folder = searchParams.get('folder');
         const limit = searchParams.get('limit');
@@ -27,7 +31,7 @@ export async function GET(req: Request) {
         }
 
         if (limit) {
-            params.take = parseInt(limit);
+            params.take = Math.min(parseInt(limit), 100);
         }
 
         const files = await prisma.mediaFile.findMany(params);

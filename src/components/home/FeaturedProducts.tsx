@@ -61,7 +61,13 @@ const MOCKUP_3D_PRODUCTS: Product[] = [
     }
 ];
 
-export default function FeaturedProducts({ headings }: { headings?: { featured_products_eyebrow?: string; featured_products_heading?: string; our_products_heading?: string } }) {
+interface FeaturedProductsProps {
+    headings?: { featured_products_eyebrow?: string; featured_products_heading?: string; our_products_heading?: string };
+    showDecor?: boolean;
+    showIcons?: boolean;
+}
+
+export default function FeaturedProducts({ headings, showDecor = false, showIcons = false }: FeaturedProductsProps = {}) {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -93,44 +99,46 @@ export default function FeaturedProducts({ headings }: { headings?: { featured_p
     return (
         <section className="relative py-20 sm:py-24 bg-[#FAF7F2] dark:bg-[#0B0F19] transition-colors duration-500 border-t border-slate-200/60 dark:border-white/5 overflow-hidden">
             {/* ── FLOATING 3D DECORATIVE ELEMENTS (Our Products) ── */}
-            <div className="pointer-events-none absolute inset-0 overflow-hidden z-0 hidden lg:block">
-                {/* Garment Button (Top Left) */}
-                <div className="absolute top-10 left-[6%] animate-[bounce_8s_infinite_ease-in-out]">
-                    <GarmentButton3D size={52} rotation={-15} />
-                </div>
+            {showDecor && (
+                <div className="pointer-events-none absolute inset-0 overflow-hidden z-0 hidden lg:block">
+                    {/* Garment Button (Top Left) */}
+                    <div className="absolute top-10 left-[6%] animate-[bounce_8s_infinite_ease-in-out]">
+                        <GarmentButton3D size={52} rotation={-15} />
+                    </div>
 
-                {/* Needle & Thread (Top Right) */}
-                <div className="absolute top-12 right-[6%] animate-[bounce_7.5s_infinite_ease-in-out_1s]">
-                    <NeedleWithThread3D size={82} rotation={40} />
-                </div>
+                    {/* Needle & Thread (Top Right) */}
+                    <div className="absolute top-12 right-[6%] animate-[bounce_7.5s_infinite_ease-in-out_1s]">
+                        <NeedleWithThread3D size={82} rotation={40} />
+                    </div>
 
-                {/* Scissors (Center Left) */}
-                <div className="absolute top-[45%] left-[3%] animate-[bounce_9s_infinite_ease-in-out_0.5s]">
-                    <Scissors3D size={72} rotation={-30} />
-                </div>
+                    {/* Scissors (Center Left) */}
+                    <div className="absolute top-[45%] left-[3%] animate-[bounce_9s_infinite_ease-in-out_0.5s]">
+                        <Scissors3D size={72} rotation={-30} />
+                    </div>
 
-                {/* Female Silhouette (Center Right) */}
-                <div className="absolute top-[48%] right-[4%] animate-[bounce_8.5s_infinite_ease-in-out_1.2s]">
-                    <GenderSilhouette3D gender="female" size={32} />
-                </div>
+                    {/* Female Silhouette (Center Right) */}
+                    <div className="absolute top-[48%] right-[4%] animate-[bounce_8.5s_infinite_ease-in-out_1.2s]">
+                        <GenderSilhouette3D gender="female" size={32} />
+                    </div>
 
-                {/* Clothes Hanger (Bottom Left) */}
-                <div className="absolute bottom-12 left-[5%] animate-[bounce_10s_infinite_ease-in-out_1.5s]">
-                    <Hanger3D size={70} rotation={10} />
-                </div>
+                    {/* Clothes Hanger (Bottom Left) */}
+                    <div className="absolute bottom-12 left-[5%] animate-[bounce_10s_infinite_ease-in-out_1.5s]">
+                        <Hanger3D size={70} rotation={10} />
+                    </div>
 
-                {/* Thread Spool (Bottom Right) */}
-                <div className="absolute bottom-10 right-[6%] animate-[bounce_9s_infinite_ease-in-out_2s]">
-                    <ThreadSpool3D size={56} rotation={-12} threadColor="#3B82F6" />
+                    {/* Thread Spool (Bottom Right) */}
+                    <div className="absolute bottom-10 right-[6%] animate-[bounce_9s_infinite_ease-in-out_2s]">
+                        <ThreadSpool3D size={56} rotation={-12} threadColor="#3B82F6" />
+                    </div>
                 </div>
-            </div>
+            )}
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
 
                 {/* Section Title matching mockup */}
                 <div className="text-center mb-12 sm:mb-16">
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-widest bg-blue-500/10 text-primary dark:text-blue-400 border border-blue-500/20 mb-3 shadow-xs">
-                        <Sparkles size={12} />
+                        {showIcons && <Sparkles size={12} />}
                         {headings?.featured_products_eyebrow || 'Export Sourcing Showcase'}
                     </span>
                     <h2 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white uppercase tracking-tight font-heading">

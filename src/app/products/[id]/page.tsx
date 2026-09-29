@@ -1,25 +1,73 @@
 import { prisma } from '@/lib/prisma';
-import { notFound } from 'next/navigation';
-import ProductImageGallery from '@/components/products/ProductImageGallery';
-import RelatedProducts from '@/components/products/RelatedProducts';
-import RecentlyViewedProducts from '@/components/products/RecentlyViewedProducts';
-import RecordProductVisit from '@/components/products/RecordProductVisit';
-import Link from 'next/link';
-import { Mail, CheckCircle, Truck, Package, Factory, Info } from 'lucide-react';
-import { extractProductImages } from '@/lib/utils';
-import DownloadCatalogButton from '@/components/shared/DownloadCatalogButton';
+import { notFound, redirect } from 'next/navigation';
+import ProductDetail3DView from '@/components/products/ProductDetail3DView';
+import { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
 
-export default async function ProductDetailPage({
-    params
-}: {
-    params: { id: string }
-}) {
+interface PageProps {
+    params: { id: string };
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     let decodedSlug = params.id;
     try {
         decodedSlug = decodeURIComponent(params.id);
-    } catch (e) { }
+    } catch { }
+
+    const product = await prisma.product.findFirst({
+        where: {
+            OR: [
+                { slug: params.id },
+                { slug: decodedSlug },
+                { id: params.id }
+            ]
+        },
+        select: { name: true, shortDescription: true, slug: true, images: true }
+    });
+
+    if (!product) {
+        return {
+            title: 'Product Details | Apparel Emporium',
+            description: 'B2B garment sourcing, manufacturing and export specifications.'
+        };
+    }
+
+    let firstImg = '/logo.jpg';
+    try {
+        const parsedImgs = JSON.parse(product.images);
+        if (Array.isArray(parsedImgs) && parsedImgs.length > 0) firstImg = parsedImgs[0];
+    } catch { }
+
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
+
+    return {
+        title: `${product.name} Wholesale Manufacturing & Sourcing | AELBD`,
+        description: product.shortDescription || `Explore specifications, MOQ, and wholesale production details for ${product.name}.`,
+        alternates: {
+            canonical: `/products/${product.slug}`,
+        },
+        openGraph: {
+            title: `${product.name} | Apparel Emporium B2B Sourcing`,
+            description: product.shortDescription || `Explore specifications, MOQ, and wholesale production details for ${product.name}.`,
+            url: `${baseUrl}/products/${product.slug}`,
+            images: [{ url: firstImg, alt: product.name }],
+            type: 'website',
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: `${product.name} | Apparel Emporium B2B Sourcing`,
+            description: product.shortDescription || '',
+            images: [firstImg],
+        }
+    };
+}
+
+export default async function ProductDetailPage({ params }: PageProps) {
+    let decodedSlug = params.id;
+    try {
+        decodedSlug = decodeURIComponent(params.id);
+    } catch { }
 
     const product = (await prisma.product.findFirst({
         where: {
@@ -36,184 +84,105 @@ export default async function ProductDetailPage({
         notFound();
     }
 
-    // Parse images using shared utility
-    const allImages = (product.images && typeof product.images === 'string')
-        ? (JSON.parse(product.images) || [])
-        : (product.images || []);
-    const images = extractProductImages(product.images);
-    const imageAlts = Array.isArray(allImages) && allImages.length > 0
-        ? allImages.map((img: any) => typeof img === 'object' ? (img.alt || product.name) : product.name)
-        : [product.name];
+    // ── 301 Permanent Redirect from raw ID to canonical slug ──────────────
+    if (params.id === product.id && product.slug && params.id !== product.slug) {
+        redirect(`/products/${encodeURIComponent(product.slug)}`);
+    }
 
-    let specs: any = {};
+    // Query related products in same category (or fallback to active products)
+    let relatedProducts = await prisma.product.findMany({
+        where: {
+            categoryId: product.categoryId,
+            id: { not: product.id },
+            isActive: true
+        },
+        take: 3,
+        include: { category: true }
+    });
+
+    // Ensure we always have 3 related cards if category has fewer products
+    if (relatedProducts.length < 3) {
+        const additional = await prisma.product.findMany({
+            where: {
+                id: {
+                    notIn: [product.id, ...relatedProducts.map(p => p.id)]
+                },
+                isActive: true
+            },
+            take: 3 - relatedProducts.length,
+            include: { category: true }
+        });
+        relatedProducts = [...relatedProducts, ...additional];
+    }
+
+    // Query recent items fallback (for the bottom pill card)
+    const fallbackRecent = await prisma.product.findMany({
+        where: {
+            id: { not: product.id },
+            isActive: true
+        },
+        take: 2,
+        orderBy: { createdAt: 'desc' },
+        include: { category: true }
+    });
+
+    // ── Schema.org Product & BreadcrumbList JSON-LD ─────────────────────────
+    let productImages: string[] = [];
     try {
-        if (typeof product.specifications === 'string') {
-            specs = JSON.parse(product.specifications);
+        const parsed = JSON.parse(product.images);
+        if (Array.isArray(parsed)) productImages = parsed;
+    } catch { }
+
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
+
+    const productSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        'name': product.name,
+        'image': productImages.map(img => img.startsWith('http') ? img : `${baseUrl}${img}`),
+        'description': product.shortDescription || product.description,
+        'brand': {
+            '@type': 'Brand',
+            'name': 'Apparel Emporium'
+        },
+        'category': product.category?.name || 'Garments',
+        'offers': {
+            '@type': 'AggregateOffer',
+            'priceCurrency': 'USD',
+            'availability': 'https://schema.org/InStock',
+            'seller': {
+                '@type': 'Organization',
+                'name': 'Apparel Emporium Ltd.'
+            }
         }
-    } catch (e) { }
+    };
+
+    const breadcrumbSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        'itemListElement': [
+            { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': baseUrl },
+            { '@type': 'ListItem', 'position': 2, 'name': 'Catalog', 'item': `${baseUrl}/products` },
+            { '@type': 'ListItem', 'position': 3, 'name': product.category?.name || 'Category', 'item': `${baseUrl}/products?category=${encodeURIComponent(product.category?.slug || '')}` },
+            { '@type': 'ListItem', 'position': 4, 'name': product.name, 'item': `${baseUrl}/products/${encodeURIComponent(product.slug)}` }
+        ]
+    };
 
     return (
-        <div className="bg-light-bg dark:bg-dark-bg min-h-screen pt-28 pb-16">
-            {/* Record this visit for "Recently Viewed" */}
-            <RecordProductVisit id={product.id} />
-
-            <div className="container mx-auto px-4">
-
-                {/* Breadcrumb Navigation */}
-                <nav className="flex gap-2 items-center text-sm mb-8 text-gray-500 dark:text-gray-400">
-                    <Link href="/" className="hover:text-primary transition-colors">Home</Link>
-                    <span>/</span>
-                    <Link href="/products" className="hover:text-primary transition-colors">Products</Link>
-                    <span>/</span>
-                    {product.category && (
-                        <>
-                            <Link href={`/products?category=${product.category.slug}`} className="hover:text-primary transition-colors">
-                                {product.category.name}
-                            </Link>
-                            <span>/</span>
-                        </>
-                    )}
-                    <span className="text-gray-900 dark:text-gray-200 font-medium truncate max-w-xs text-primary">{product.name}</span>
-                </nav>
-
-                <div className="bg-white dark:bg-dark-surface rounded-3xl p-6 md:p-12 shadow-sm border border-gray-100 dark:border-gray-800">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-
-                        {/* Left Column: Product Image Gallery */}
-                        <div>
-                            <ProductImageGallery images={images} alts={imageAlts} />
-                        </div>
-
-                        {/* Right Column: Key Details & Actions */}
-                        <div className="flex flex-col">
-                            <div className="mb-4">
-                                <span className="bg-primary/10 text-primary dark:bg-primary/20 dark:text-blue-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                                    {product.category?.name || 'Garments'}
-                                </span>
-                            </div>
-
-                            <h1 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 leading-tight">
-                                {product.name}
-                            </h1>
-
-                            <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
-                                {product.shortDescription}
-                            </p>
-
-                            {/* B2B Sourcing Callout (No Public Retail Pricing) */}
-                            <div className="mb-8 p-5 bg-blue-50/70 dark:bg-slate-800/60 border border-blue-100 dark:border-slate-700 rounded-2xl">
-                                <div className="flex items-center justify-between mb-2">
-                                    <span className="text-xs font-bold uppercase tracking-wider text-primary">
-                                        B2B Factory Pricing & Sourcing
-                                    </span>
-                                    <span className="text-xs font-semibold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-950/60 px-2.5 py-0.5 rounded-full">
-                                        Custom Tech-Pack Ready
-                                    </span>
-                                </div>
-                                <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
-                                    FOB / CIF prices are calculated on a per-order basis depending on your target order quantity, fabric composition/GSM, wash effects, and destination country.
-                                </p>
-                            </div>
-
-                            {/* Key Highlights (MOQ, Lead Time, Capacity) */}
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-                                <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl flex items-center gap-3">
-                                    <Package className="text-primary w-6 h-6" />
-                                    <div>
-                                        <span className="block text-xs text-gray-500 uppercase font-bold">MOQ</span>
-                                        <span className="font-bold text-gray-900 dark:text-white">{specs['MOQ'] || '500 pcs'}</span>
-                                    </div>
-                                </div>
-                                <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl flex items-center gap-3">
-                                    <Truck className="text-primary w-6 h-6" />
-                                    <div>
-                                        <span className="block text-xs text-gray-500 uppercase font-bold">Lead Time</span>
-                                        <span className="font-bold text-gray-900 dark:text-white">{specs['Lead Time'] || '45-60 Days'}</span>
-                                    </div>
-                                </div>
-                                <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl flex items-center gap-3">
-                                    <Factory className="text-primary w-6 h-6" />
-                                    <div>
-                                        <span className="block text-xs text-gray-500 uppercase font-bold">Capacity</span>
-                                        <span className="font-bold text-gray-900 dark:text-white">High Volume</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Detailed Specifications Table */}
-                            <div className="mb-10">
-                                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                                    <Info className="w-5 h-5 text-primary" /> Product Specifications
-                                </h3>
-                                <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm">
-                                    <table className="w-full text-sm text-left">
-                                        <tbody>
-                                            {Object.entries(specs).map(([key, value], idx) => (
-                                                <tr key={key} className={idx % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800/30' : 'bg-white dark:bg-transparent'}>
-                                                    <td className="px-6 py-4 font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-100 dark:border-gray-800 w-1/3 border-r">
-                                                        {key}
-                                                    </td>
-                                                    <td className="px-6 py-4 text-gray-600 dark:text-gray-400 border-b border-gray-100 dark:border-gray-800">
-                                                        {value as string}
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                            {Object.keys(specs).length === 0 && (
-                                                <tr>
-                                                    <td colSpan={2} className="px-6 py-4 text-center text-gray-400 italic">No specific specs listed.</td>
-                                                </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            {/* Contact/Quote CTA Block */}
-                            <div className="mt-auto bg-primary/5 dark:bg-primary/10 p-8 rounded-[2rem] border border-primary/20 flex flex-col gap-4 overflow-hidden relative">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -translate-y-16 translate-x-16 blur-3xl" />
-                                <div className="relative z-10">
-                                    <h4 className="font-bold text-gray-900 dark:text-white text-xl mb-1">Scale your production?</h4>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Request tech packs, custom samples, or direct factory pricing.</p>
-                                </div>
-                                <div className="relative z-10 flex flex-col sm:flex-row gap-3">
-                                    <Link
-                                        href={`/contact?product=${encodeURIComponent(product.name)}`}
-                                        className="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-secondary text-white px-8 py-4 rounded-2xl font-black transition-all shadow-xl hover:shadow-primary/20"
-                                    >
-                                        <Mail className="w-5 h-5" /> Request Quotation
-                                    </Link>
-                                    <DownloadCatalogButton
-                                        productId={product.id}
-                                        label="Download PDF"
-                                        variant="outline"
-                                        className="flex-1 justify-center py-4 rounded-2xl"
-                                    />
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    {/* Detailed Product Description Section */}
-                    <div className="mt-20 pt-20 border-t border-gray-100 dark:border-gray-800">
-                        <div className="max-w-4xl">
-                            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 font-heading">Product Overview & Manufacturing Details</h2>
-                            <div className="prose prose-lg dark:prose-invert max-w-none text-gray-600 dark:text-gray-300 leading-relaxed font-medium">
-                                {product.description.split('\n').map((paragraph: string, idx: number) => (
-                                    <p key={idx} className="mb-6">{paragraph}</p>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Cross-Sell Related Products */}
-                    <RelatedProducts categoryId={product.categoryId} excludeProductId={product.id} />
-
-                    {/* User Browsing History */}
-                    <RecentlyViewedProducts />
-
-                </div>
-            </div>
-        </div>
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+            />
+            <ProductDetail3DView
+                product={product}
+                relatedProducts={relatedProducts}
+                fallbackRecent={fallbackRecent}
+            />
+        </>
     );
 }

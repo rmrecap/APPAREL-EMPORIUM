@@ -2,15 +2,34 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { sendEmail, getTransporter } from '@/lib/email';
 import { logActivity } from '@/lib/activity-logger';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
+import { formSubmissionSchema } from '@/lib/validations/submissions';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
     try {
-        const { formId, data } = await req.json();
+        const clientIp = getClientIp(req);
+        const rateLimit = checkRateLimit(`form_submit:${clientIp}`, 10, 15 * 60 * 1000);
+        if (!rateLimit.allowed) {
+            return rateLimit.response;
+        }
 
-        if (!formId || !data) {
-            return NextResponse.json({ error: 'Form ID and data required' }, { status: 400 });
+        let body: any;
+        try {
+            body = await req.json();
+        } catch {
+            return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+        }
+
+        const parseResult = formSubmissionSchema.safeParse(body);
+        if (!parseResult.success) {
+            return NextResponse.json({ error: 'Valid formId and data required' }, { status: 400 });
+        }
+
+        const { formId, data } = parseResult.data;
+        if (!formId) {
+            return NextResponse.json({ error: 'Form ID required' }, { status: 400 });
         }
 
         // 1. Get Form Details
@@ -27,7 +46,7 @@ export async function POST(req: Request) {
             data: {
                 formId,
                 data: JSON.stringify(data),
-                ipAddress: req.headers.get('x-forwarded-for') || 'Unknown',
+                ipAddress: clientIp,
             }
         });
 

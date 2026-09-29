@@ -1,20 +1,13 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { requirePermission } from '@/lib/auth-guards';
 import { prisma } from '@/lib/prisma';
-import { hasPermission } from '@/lib/permissions';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
     try {
-        const session = await getServerSession(authOptions);
-        if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-
-        const role = (session.user as any).role;
-        if (!hasPermission(role, 'products.view')) {
-            return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
-        }
+        const guard = await requirePermission('products.view');
+        if (!guard.ok) return guard.response;
 
         const products = await prisma.product.findMany({
             include: { category: true },

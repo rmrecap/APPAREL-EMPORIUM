@@ -25,9 +25,11 @@ import {
 interface ProductionProcessProps {
     headings?: Record<string, string>;
     data?: any;
+    showDecor?: boolean;
+    showIcons?: boolean;
 }
 
-export default function ProductionProcess3D({ headings, data }: ProductionProcessProps) {
+export default function ProductionProcess3D({ headings, data, showDecor = false, showIcons = false }: ProductionProcessProps) {
     const { theme } = useTheme();
     const cardRef = useRef<HTMLDivElement>(null);
 
@@ -45,7 +47,7 @@ export default function ProductionProcess3D({ headings, data }: ProductionProces
     const p2 = headings?.production_process_p2 || parsedData.p2 || 'Our vertically integrated production process ensures strict quality control and timely delivery, while our experienced team of designers and craftsmen bring creativity and expertise to every product we produce. We are your trusted partner in the global apparel industry.';
     const btnText = headings?.production_process_btn_text || parsedData.btnText || 'VIEW PRODUCTION DETAILS';
     const btnUrl = headings?.production_process_btn_url || parsedData.btnUrl || '';
-    const showDecor = parsedData.showDecor !== false;
+    const isDecorVisible = showDecor && parsedData.showDecor !== false;
 
     const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
         if (!cardRef.current) return;
@@ -88,7 +90,7 @@ export default function ProductionProcess3D({ headings, data }: ProductionProces
         { num: '02', title: 'Certified Yarn & Fabric Sourcing', desc: 'Procurement of OEKO-TEX Standard 100, GOTS certified organic cotton, and BCI combed yarns from green-rated partner mills.', icon: Layers },
         { num: '03', title: 'Spectrophotometer Lab Dip Matching', desc: 'Pantone-accurate color formulations with 4-5 grade wash & rub fastness tests and pre-shrunk dimensional stabilization.', icon: FileCheck2 },
         { num: '04', title: 'Automated Cutting & Precision Stitching', desc: 'Gerber computerized laser cutting lines followed by high-speed Juki sewing assembly with automated tension regulation.', icon: Scissors },
-        { num: '05', title: 'In-line QA & AQL 1.5/2.5 Multi-Stage Audit', desc: 'Rigorous checks at 20% and 50% production milestones, needle/metal detection, and complete statistical AQL reporting.', icon: ShieldCheck },
+        { num: '05', title: 'In-line QA & Multi-Stage Inspection', desc: 'Rigorous checks at 20% and 50% production milestones, needle/metal detection, and complete statistical quality reporting as per buyer manual.', icon: ShieldCheck },
         { num: '06', title: 'Pressing, Poly Packaging & Port Logistics', desc: 'Tunnel steam finishing, barcode tagging, moisture-barrier poly packing, and prompt customs dispatch to Chittagong Port.', icon: Globe }
     ];
 
@@ -96,7 +98,7 @@ export default function ProductionProcess3D({ headings, data }: ProductionProces
         <section 
             id="production-process"
             aria-labelledby="production-process-heading"
-            className="relative py-16 sm:py-24 bg-[#EAE7E0] dark:bg-[#060B16] transition-colors duration-500 overflow-hidden"
+            className="relative py-16 sm:py-24 bg-[#DDD8CF] dark:bg-[#080D1A] transition-colors duration-500 overflow-hidden"
         >
             {/* Top Organic Wave Accent matching mockup */}
             <div className="absolute top-0 left-0 right-0 h-16 overflow-hidden pointer-events-none opacity-50 dark:opacity-30">
@@ -110,7 +112,7 @@ export default function ProductionProcess3D({ headings, data }: ProductionProces
             <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-amber-400/5 dark:bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
             {/* ── FLOATING 3D CRAFT ELEMENTS (Matching User Reference Mockup) ── */}
-            {showDecor && (
+            {isDecorVisible && (
                 <div className="pointer-events-none absolute inset-0 overflow-hidden z-0 hidden md:block">
                     {/* Top Right Scissors */}
                     <div className="absolute top-8 right-[32%] animate-[bounce_8s_infinite_ease-in-out]">
@@ -333,7 +335,7 @@ export default function ProductionProcess3D({ headings, data }: ProductionProces
                                                     </span>
                                                 </div>
                                                 <h4 className="text-base font-bold text-slate-900 dark:text-white mb-1.5 flex items-center gap-2">
-                                                    <IconComponent className="w-4 h-4 text-primary dark:text-blue-400 shrink-0" />
+                                                    {showIcons && <IconComponent className="w-4 h-4 text-primary dark:text-blue-400 shrink-0" />}
                                                     {st.title}
                                                 </h4>
                                                 <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
@@ -348,7 +350,7 @@ export default function ProductionProcess3D({ headings, data }: ProductionProces
                             {/* Benchmark metrics */}
                             <div className="p-5 rounded-2xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/60 dark:border-blue-500/20 flex flex-wrap items-center justify-around gap-4 text-center">
                                 <div>
-                                    <div className="text-xl sm:text-2xl font-black text-primary dark:text-blue-400">AQL 1.5 / 2.5</div>
+                                    <div className="text-xl sm:text-2xl font-black text-primary dark:text-blue-400">Buyer Quality</div>
                                     <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Strict Quality Benchmark</div>
                                 </div>
                                 <div className="h-8 w-px bg-blue-200 dark:bg-blue-800 hidden sm:block" />

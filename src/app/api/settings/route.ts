@@ -1,18 +1,38 @@
 import { NextResponse } from 'next/server';
+import { requirePermission, requireAuth } from '@/lib/auth-guards';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logActivity } from '@/lib/activity-logger';
-import { hasPermission } from '@/lib/permissions';
 
 export const dynamic = 'force-dynamic';
+
+const SENSITIVE_KEYS = new Set([
+    'api_external_key',
+    'smtp_password',
+    'smtp_user',
+    'smtp_host',
+    'smtp_port',
+    'telegram_bot_token',
+    'telegram_api_hash',
+    'jwt_secret',
+]);
+
+function isSensitiveKey(key: string): boolean {
+    const lower = key.toLowerCase();
+    return SENSITIVE_KEYS.has(lower) || lower.includes('secret') || lower.includes('password') || lower.includes('token');
+}
 
 export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
         const group = searchParams.get('group');
 
-        // Allow public read access to settings for branding/ui
+        // Check if caller is authenticated admin
+        const session = await getServerSession(authOptions);
+        const userRole = (session?.user as any)?.role;
+        const isAdmin = session && ['DEVELOPER', 'SUPER_ADMIN', 'ADMIN'].includes(userRole);
+
         const whereClause: any = {};
         if (group === 'homepage') {
             whereClause.OR = [{ group: 'homepage' }, { key: { startsWith: 'homepage_' } }];
@@ -25,6 +45,10 @@ export async function GET(req: Request) {
         );
 
         const cfg = settings.reduce((acc, curr) => {
+            // Block sensitive administrative keys from public unauthenticated responses
+            if (!isAdmin && isSensitiveKey(curr.key)) {
+                return acc;
+            }
             acc[curr.key] = curr.value;
             return acc;
         }, {} as Record<string, string>);
@@ -37,13 +61,20 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
     try {
-        const session = await getServerSession(authOptions);
-        const role = (session?.user as any)?.role;
-
-        if (!session || (!hasPermission(role, 'settings.update') && !['SUPER_ADMIN', 'DEVELOPER'].includes(role))) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+        // Enforce in-handler authorization guard
+        const guard = await requirePermission('settings.update');
+        let allowed = guard.ok;
+        if (!allowed) {
+            // Check fallback for super admin / developer
+            const adminGuard = await requireAuth();
+            if (adminGuard.ok && ['SUPER_ADMIN', 'DEVELOPER'].includes(adminGuard.user.role)) {
+                allowed = true;
+            } else {
+                return guard.response;
+            }
         }
 
+        const session = (guard.ok ? guard.session : await getServerSession(authOptions)) as any;
         const data = await req.json();
         const { searchParams } = new URL(req.url);
         const group = searchParams.get('group') || 'general';
@@ -67,7 +98,7 @@ export async function POST(req: Request) {
         }
 
         await logActivity({
-            userId: (session.user as any).id,
+            userId: session.user.id,
             action: 'UPDATE',
             entity: 'SiteSetting',
             details: `Updated ${group} settings`,

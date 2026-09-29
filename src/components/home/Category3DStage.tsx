@@ -88,7 +88,13 @@ const PILLARS: PillarItem[] = [
     }
 ];
 
-export default function Category3DStage() {
+interface Category3DStageProps {
+    headings?: Record<string, string>;
+    showDecor?: boolean;
+    showIcons?: boolean;
+}
+
+export default function Category3DStage({ headings, showDecor = false, showIcons = false }: Category3DStageProps = {}) {
     // Start with index 1 (KNIT FASHION) as center, matching reference image
     const [activeIndex, setActiveIndex] = useState(1);
     const [tilt, setTilt] = useState({ x: 0, y: 0 });
@@ -159,7 +165,7 @@ export default function Category3DStage() {
     const activePillar = PILLARS[activeIndex];
 
     return (
-        <section className="relative w-full pt-20 pb-16 sm:pt-28 sm:pb-24 overflow-hidden bg-[#F6F2EC] dark:bg-[#0B0F19] transition-colors duration-500">
+        <section className="relative w-full pt-20 pb-16 sm:pt-28 sm:pb-24 overflow-hidden bg-[#DDD8CF] dark:bg-[#080D1A] transition-colors duration-500">
             {/* Ambient luxury radial glow behind center stage */}
             <div
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] sm:w-[850px] h-[500px] sm:h-[650px] rounded-full blur-[130px] pointer-events-none transition-all duration-1000 opacity-60 dark:opacity-30"
@@ -172,48 +178,50 @@ export default function Category3DStage() {
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000006_1px,transparent_1px),linear-gradient(to_bottom,#00000006_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#ffffff04_1px,transparent_1px),linear-gradient(to_bottom,#ffffff04_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none" />
 
             {/* ── FLOATING 3D DECORATIVE ELEMENTS (Export Garments Sourcing) ── */}
-            <div className="pointer-events-none absolute inset-0 overflow-hidden z-0 hidden lg:block">
-                {/* Needle & Thread (Top Left) */}
-                <div className="absolute top-12 left-[5%] animate-[bounce_8s_infinite_ease-in-out]">
-                    <NeedleWithThread3D size={84} rotation={-35} />
-                </div>
+            {showDecor && (
+                <div className="pointer-events-none absolute inset-0 overflow-hidden z-0 hidden lg:block">
+                    {/* Needle & Thread (Top Left) */}
+                    <div className="absolute top-12 left-[5%] animate-[bounce_8s_infinite_ease-in-out]">
+                        <NeedleWithThread3D size={84} rotation={-35} />
+                    </div>
 
-                {/* Garment Button (Top Right) */}
-                <div className="absolute top-16 right-[6%] animate-[bounce_7.5s_infinite_ease-in-out_1s]">
-                    <GarmentButton3D size={52} rotation={20} />
-                </div>
+                    {/* Garment Button (Top Right) */}
+                    <div className="absolute top-16 right-[6%] animate-[bounce_7.5s_infinite_ease-in-out_1s]">
+                        <GarmentButton3D size={52} rotation={20} />
+                    </div>
 
-                {/* Clothes Hanger (Center Left) */}
-                <div className="absolute top-[45%] left-[3%] animate-[bounce_9s_infinite_ease-in-out_0.5s]">
-                    <Hanger3D size={72} rotation={-15} />
-                </div>
+                    {/* Clothes Hanger (Center Left) */}
+                    <div className="absolute top-[45%] left-[3%] animate-[bounce_9s_infinite_ease-in-out_0.5s]">
+                        <Hanger3D size={72} rotation={-15} />
+                    </div>
 
-                {/* Thread Spool (Bottom Right) */}
-                <div className="absolute bottom-12 right-[5%] animate-[bounce_8.5s_infinite_ease-in-out_1.5s]">
-                    <ThreadSpool3D size={56} rotation={15} threadColor="#D97706" />
-                </div>
+                    {/* Thread Spool (Bottom Right) */}
+                    <div className="absolute bottom-12 right-[5%] animate-[bounce_8.5s_infinite_ease-in-out_1.5s]">
+                        <ThreadSpool3D size={56} rotation={15} threadColor="#D97706" />
+                    </div>
 
-                {/* Scissors (Bottom Left) */}
-                <div className="absolute bottom-10 left-[6%] animate-[bounce_9.5s_infinite_ease-in-out_2s]">
-                    <Scissors3D size={70} rotation={25} />
-                </div>
+                    {/* Scissors (Bottom Left) */}
+                    <div className="absolute bottom-10 left-[6%] animate-[bounce_9.5s_infinite_ease-in-out_2s]">
+                        <Scissors3D size={70} rotation={25} />
+                    </div>
 
-                {/* Male Silhouette (Center Right) */}
-                <div className="absolute top-[48%] right-[4%] animate-[bounce_8s_infinite_ease-in-out_1.2s]">
-                    <GenderSilhouette3D gender="male" size={32} />
+                    {/* Male Silhouette (Center Right) */}
+                    <div className="absolute top-[48%] right-[4%] animate-[bounce_8s_infinite_ease-in-out_1.2s]">
+                        <GenderSilhouette3D gender="male" size={32} />
+                    </div>
                 </div>
-            </div>
+            )}
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
                 {/* Header Title */}
                 <div className="text-center mb-10 sm:mb-14">
                     <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[11px] font-black uppercase tracking-widest bg-stone-900/5 dark:bg-white/10 text-stone-700 dark:text-stone-300 border border-stone-900/10 dark:border-white/10 mb-3 shadow-xs">
-                        <Sparkles size={12} className="text-amber-600 dark:text-amber-400" />
+                        {showIcons && <Sparkles size={12} className="text-amber-600 dark:text-amber-400" />}
                         Core Manufacturing Divisions
                     </span>
-                    <h1 className="text-3xl sm:text-5xl font-black text-[#1A1A1A] dark:text-white uppercase tracking-tight font-heading">
+                    <h2 className="text-3xl sm:text-5xl font-black text-[#1A1A1A] dark:text-white uppercase tracking-tight font-heading">
                         Export Garments Sourcing
-                    </h1>
+                    </h2>
                 </div>
 
                 {/* 3D Perspective Stage Area */}

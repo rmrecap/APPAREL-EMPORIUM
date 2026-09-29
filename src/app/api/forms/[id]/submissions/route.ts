@@ -1,19 +1,15 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { requireSuperAdmin } from '@/lib/auth-guards';
 import { prisma } from '@/lib/prisma';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
+import { formSubmissionSchema } from '@/lib/validations/submissions';
 
 export const dynamic = 'force-dynamic';
 
-
 export async function GET(req: Request, { params }: { params: { id: string } }) {
     try {
-        const session = await getServerSession(authOptions);
-        const currentUserRole = (session?.user as any)?.role;
-
-        if (!session || (!['SUPER_ADMIN', 'DEVELOPER'].includes(currentUserRole))) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-        }
+        const guard = await requireSuperAdmin();
+        if (!guard.ok) return guard.response;
 
         const submissions = await prisma.formSubmission.findMany({
             where: { formId: params.id },
@@ -28,7 +24,30 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
     try {
-        const data = await req.json();
+        const clientIp = getClientIp(req);
+        const rateLimit = checkRateLimit(`form:${clientIp}`, 10, 15 * 60 * 1000);
+        if (!rateLimit.allowed) {
+            return rateLimit.response;
+        }
+
+        let body: any;
+        try {
+            body = await req.json();
+        } catch {
+            return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+        }
+
+        // Support either direct form data map or wrapped { data: { ... } }
+        const submissionPayload = (body && typeof body.data === 'object' && body.data !== null)
+            ? body.data
+            : body;
+
+        const parseResult = formSubmissionSchema.safeParse({ data: submissionPayload });
+        if (!parseResult.success) {
+            return NextResponse.json({ error: "Invalid form submission payload" }, { status: 400 });
+        }
+
+        const data = parseResult.data.data;
 
         const form = await prisma.customForm.findUnique({ where: { id: params.id } });
         if (!form || !form.isActive) {
@@ -43,7 +62,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 
         const missingFields = [];
         for (const field of fields) {
-            if (field.required && (!data[field.label] || data[field.label].trim() === '')) {
+            if (field.required && (!data[field.label] || String(data[field.label]).trim() === '')) {
                 missingFields.push(field.label);
             }
         }
@@ -52,13 +71,11 @@ export async function POST(req: Request, { params }: { params: { id: string } })
             return NextResponse.json({ error: `Missing required fields: ${missingFields.join(', ')}` }, { status: 400 });
         }
 
-        const ipAddress = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'Unknown';
-
         const submission = await prisma.formSubmission.create({
             data: {
                 formId: form.id,
                 data: JSON.stringify(data),
-                ipAddress,
+                ipAddress: clientIp,
             }
         });
 
@@ -90,12 +107,8 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 
 export async function DELETE(req: Request, { params }: { params: { id: string } }) {
     try {
-        const session = await getServerSession(authOptions);
-        const currentUserRole = (session?.user as any)?.role;
-
-        if (!session || (!['SUPER_ADMIN', 'DEVELOPER'].includes(currentUserRole))) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-        }
+        const guard = await requireSuperAdmin();
+        if (!guard.ok) return guard.response;
 
         const url = new URL(req.url);
         const subId = url.searchParams.get('submissionId');

@@ -1,17 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireSuperAdmin } from '@/lib/auth-guards';
 import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
 
 export const dynamic = 'force-dynamic';
-
-
-// Helper to check role
-async function isAuthorized() {
-    const session = await getServerSession();
-    if (!session || !session.user || !session.user.email) return false;
-    const user = await prisma.user.findUnique({ where: { email: session.user.email } });
-    return user && ['DEVELOPER', 'SUPER_ADMIN'].includes(user.role);
-}
 
 export async function GET(req: NextRequest) {
     try {
@@ -20,7 +11,8 @@ export async function GET(req: NextRequest) {
 
         if (adminMode) {
             // Admin gets all popups
-            if (!(await isAuthorized())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            const guard = await requireSuperAdmin();
+            if (!guard.ok) return guard.response;
 
             const popups = await prisma.popupBanner.findMany({
                 orderBy: { createdAt: 'desc' }
@@ -48,7 +40,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-    if (!(await isAuthorized())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const guard = await requireSuperAdmin();
+    if (!guard.ok) return guard.response;
 
     try {
         const body = await req.json();
@@ -75,7 +68,8 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-    if (!(await isAuthorized())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const guard = await requireSuperAdmin();
+    if (!guard.ok) return guard.response;
 
     try {
         const body = await req.json();
@@ -95,7 +89,8 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-    if (!(await isAuthorized())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const guard = await requireSuperAdmin();
+    if (!guard.ok) return guard.response;
 
     try {
         const { searchParams } = new URL(req.url);

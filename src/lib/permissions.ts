@@ -45,6 +45,8 @@ export const ROUTE_PERMISSIONS: Record<string, string | string[]> = {
     '/executive-portal-aelbd/menus': ['menus.*'],
     '/executive-portal-aelbd/pages': ['pages.*'],
     '/executive-portal-aelbd/homepage': ['homepage.*'],
+    '/executive-portal-aelbd/about': ['pages.*', 'homepage.*'],
+    '/executive-portal-aelbd/contact': ['pages.*', 'homepage.*'],
     '/executive-portal-aelbd/deliveries': ['deliveries.*', 'homepage.*'],
     '/executive-portal-aelbd/theme': ['theme.*'],
     '/executive-portal-aelbd/forms': ['forms.*'],
@@ -58,6 +60,7 @@ export const ROUTE_PERMISSIONS: Record<string, string | string[]> = {
     '/buyer-portal/inquiries': ['buyer_dashboard.view'],
 
     // Developer only routes (checked explicitly)
+    '/executive-portal-aelbd/developer-options': ['*'],
     '/executive-portal-aelbd/api-manager': ['*'],
     '/executive-portal-aelbd/tracking': ['*'],
     '/executive-portal-aelbd/maintenance': ['*'],
@@ -144,6 +147,8 @@ export function getAccessibleSidebarItems(role: Role | undefined | null): Sideba
     if (hasPermission(role, 'menus.*')) items.push({ label: 'Menus', icon: 'MenuIcon', href: '/executive-portal-aelbd/menus' });
     if (hasPermission(role, 'pages.*')) items.push({ label: 'Pages', icon: 'FileCode', href: '/executive-portal-aelbd/pages' });
     if (hasPermission(role, 'homepage.*')) items.push({ label: 'Homepage Builder', icon: 'LayoutTemplate', href: '/executive-portal-aelbd/homepage' });
+    if (hasPermission(role, 'pages.*') || hasPermission(role, 'homepage.*')) items.push({ label: 'About Page Builder', icon: 'Info', href: '/executive-portal-aelbd/about' });
+    if (hasPermission(role, 'pages.*') || hasPermission(role, 'homepage.*')) items.push({ label: 'Contact Page Builder', icon: 'PhoneCall', href: '/executive-portal-aelbd/contact' });
     if (hasPermission(role, 'deliveries.*') || hasPermission(role, 'homepage.*')) items.push({ label: 'Live Deliveries', icon: 'Truck', href: '/executive-portal-aelbd/deliveries' });
     if (hasPermission(role, 'theme.*')) items.push({ label: 'Theme Settings', icon: 'Paintbrush', href: '/executive-portal-aelbd/theme' });
     if (hasPermission(role, 'popups.*')) items.push({ label: 'Pop-ups', icon: 'Megaphone', href: '/executive-portal-aelbd/popups' });
@@ -153,10 +158,13 @@ export function getAccessibleSidebarItems(role: Role | undefined | null): Sideba
     if (hasPermission(role, 'settings.*')) items.push({ label: 'General Settings', icon: 'Settings', href: '/executive-portal-aelbd/settings' });
 
     if (hasPermission(role, '*')) {
+        items.push({ label: 'Developer Options', icon: 'Sliders', href: '/executive-portal-aelbd/developer-options' });
         items.push({ label: 'Developer API', icon: 'KeyRound', href: '/executive-portal-aelbd/api-manager' });
         items.push({ label: 'Tracking Scripts', icon: 'BarChart3', href: '/executive-portal-aelbd/tracking' });
         items.push({ label: 'Activity Logs', icon: 'Activity', href: '/executive-portal-aelbd/activity-log' });
         items.push({ label: 'Maintenance', icon: 'ShieldAlert', href: '/executive-portal-aelbd/maintenance' });
+    } else if (hasPermission(role, 'settings.*')) {
+        items.push({ label: 'Developer Options', icon: 'Sliders', href: '/executive-portal-aelbd/developer-options' });
     } else if (hasPermission(role, 'activity_log.view')) {
         items.push({ label: 'Activity Logs', icon: 'Activity', href: '/executive-portal-aelbd/activity-log' });
     }

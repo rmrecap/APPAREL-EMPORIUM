@@ -26,48 +26,48 @@ export default function Testimonials() {
         },
         {
             step: '04',
-            title: 'Final AQL Inspection & Export',
-            desc: 'Comprehensive final inspection based on AQL 1.5/2.5 with photographic reports. Seamless export documentation and FOB / CIF shipment.',
+            title: 'Final Pre-Shipment Inspection & Export',
+            desc: 'Comprehensive final inspection based on buyer-designated standards with photographic reports. Seamless export documentation and FOB / CIF shipment.',
             icon: <Truck className="w-6 h-6 text-primary" />,
         },
     ];
 
     return (
-        <section className="py-20 bg-slate-900 text-white relative overflow-hidden" id="workflow">
+        <section className="py-20 bg-[#DDD8CF] dark:bg-[#080D1A] transition-colors duration-500 relative overflow-hidden" id="workflow">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
 
                 <div className="text-center max-w-3xl mx-auto mb-14">
-                    <span className="text-primary font-bold tracking-widest uppercase text-xs mb-2 block">
+                    <span className="text-cyan-700 dark:text-cyan-400 font-extrabold tracking-widest uppercase text-xs mb-2 block">
                         Transparent Sourcing Workflow
                     </span>
-                    <h2 className="text-3xl md:text-5xl font-black font-heading tracking-tight text-white">
+                    <h2 className="text-3xl md:text-5xl font-black font-heading tracking-tight text-[#1A1D20] dark:text-white">
                         Our 4-Step Sourcing & Delivery Process
                     </h2>
-                    <p className="text-slate-400 text-xs md:text-sm mt-3">
+                    <p className="text-[#4B5563] dark:text-slate-300 text-xs md:text-sm mt-3 font-medium">
                         From initial design consultation to container departure at Chittagong Port, we ensure zero-defect quality and on-time delivery.
                     </p>
-                    <div className="w-16 h-1 bg-primary mx-auto mt-4 rounded-full"></div>
+                    <div className="w-16 h-1 bg-cyan-600 mx-auto mt-4 rounded-full"></div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {steps.map((item, idx) => (
                         <div
                             key={idx}
-                            className="bg-slate-800/80 border border-slate-700/80 hover:border-primary/50 p-6 rounded-2xl transition-all duration-300 flex flex-col justify-between"
+                            className="bg-[#EDE9E1] dark:bg-[#0C1628] border border-white/70 dark:border-white/10 shadow-[8px_8px_18px_rgba(160,155,145,0.4),-6px_-6px_14px_rgba(255,255,255,0.9)] dark:shadow-[0_15px_30px_rgba(0,0,0,0.6)] p-6 rounded-[28px] transition-all duration-300 flex flex-col justify-between hover:-translate-y-1.5"
                         >
                             <div>
                                 <div className="flex items-center justify-between mb-4">
-                                    <div className="w-12 h-12 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center">
+                                    <div className="w-12 h-12 rounded-xl bg-[#E2DDD4] dark:bg-[#121E36] border border-white/60 dark:border-white/10 flex items-center justify-center text-cyan-700 dark:text-cyan-400 shadow-[inset_1px_1px_3px_rgba(160,155,145,0.35)]">
                                         {item.icon}
                                     </div>
-                                    <span className="text-2xl font-black text-slate-600 select-none">
+                                    <span className="text-2xl font-black text-slate-400 dark:text-slate-600 select-none">
                                         {item.step}
                                     </span>
                                 </div>
-                                <h3 className="text-base font-bold text-white mb-2">
+                                <h3 className="text-base font-bold text-[#1A1D20] dark:text-white mb-2">
                                     {item.title}
                                 </h3>
-                                <p className="text-slate-400 text-xs leading-relaxed">
+                                <p className="text-[#4B5563] dark:text-slate-300 text-xs leading-relaxed font-medium">
                                     {item.desc}
                                 </p>
                             </div>
@@ -77,8 +77,8 @@ export default function Testimonials() {
 
                 <div className="mt-12 text-center">
                     <Link
-                        href="/request-quote"
-                        className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary hover:bg-primary/90 text-white font-bold text-xs sm:text-sm rounded-xl shadow-lg transition-all"
+                        href="/contact"
+                        className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#151D2A] hover:bg-[#0E141E] text-white font-bold text-xs sm:text-sm rounded-full shadow-lg transition-all"
                     >
                         <span>Request Sourcing Costing & Sampling</span>
                         <ArrowRight size={16} />

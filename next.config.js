@@ -10,6 +10,10 @@ const nextConfig = {
     },
     output: 'standalone', // Required for Hostinger Node.js hosting
     images: {
+        unoptimized: false, // Re-enable Next.js image optimization
+        formats: ['image/avif', 'image/webp'],
+        deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+        imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
         remotePatterns: [
             {
                 protocol: 'https',
@@ -20,7 +24,6 @@ const nextConfig = {
                 hostname: '**',
             }
         ],
-        unoptimized: true, // often needed on Hostinger if sharp is not installed
     },
     async headers() {
         return [
@@ -53,7 +56,7 @@ const nextConfig = {
             },
         ];
     },
-    webpack: (config, { isServer }) => {
+    webpack: (config, { isServer, dev }) => {
         if (!isServer) {
             // Needed if using prisma/sqlite on frontend/browser components
             config.resolve.fallback = {
@@ -62,6 +65,16 @@ const nextConfig = {
                 path: false,
             };
         }
+
+        // ── Fix: OOM crash prevention ────────────────────────────────────────
+        // OneDrive sync + large webpack filesystem cache causes:
+        //   "RangeError: Array buffer allocation failed"
+        //   "Fatal process out of memory: Zone"
+        // Solution: use in-memory cache in dev (no disk writes, no file locks).
+        if (dev) {
+            config.cache = { type: 'memory' };
+        }
+
         return config;
     },
 }

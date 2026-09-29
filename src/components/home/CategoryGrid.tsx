@@ -52,15 +52,15 @@ export default function CategoryGrid({ headings }: { headings?: { category_grid_
 
     if (loading) {
         return (
-            <section className="py-24 bg-gray-50 dark:bg-dark-bg transition-colors duration-300">
+            <section className="py-24 bg-[#DDD8CF] dark:bg-[#080D1A] transition-colors duration-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center mb-12">
-                    <div className="w-12 h-1 bg-primary mx-auto mb-4 rounded-full" />
-                    <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white font-heading mb-12">
+                    <div className="w-12 h-1 bg-stone-400 dark:bg-cyan-500 mx-auto mb-4 rounded-full" />
+                    <h2 className="text-3xl md:text-5xl font-extrabold text-[#1A1D20] dark:text-white font-heading mb-12">
                         {headings?.category_grid_heading || 'Shop By Category'}
                     </h2>
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                         {[...Array(4)].map((_, i) => (
-                            <div key={i} className="aspect-[4/5] rounded-[2rem] bg-gray-200 dark:bg-gray-800 animate-pulse" />
+                            <div key={i} className="aspect-[4/5] rounded-[2rem] bg-stone-300/60 dark:bg-gray-800 animate-pulse" />
                         ))}
                     </div>
                 </div>
@@ -71,20 +71,20 @@ export default function CategoryGrid({ headings }: { headings?: { category_grid_
     if (categories.length === 0) return null;
 
     return (
-        <section className="py-16 md:py-20 bg-white dark:bg-dark-bg transition-colors duration-300 border-t border-gray-100 dark:border-gray-900" id="capabilities">
+        <section className="py-16 md:py-20 bg-[#DDD8CF] dark:bg-[#080D1A] transition-colors duration-300 border-t border-stone-300/60 dark:border-white/5" id="capabilities">
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
                 <div className="text-center mb-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-                    <span className="text-primary font-bold tracking-widest uppercase text-xs mb-2 block">
+                    <span className="text-stone-600 dark:text-cyan-400 font-bold tracking-widest uppercase text-xs mb-2 block">
                         {headings?.category_grid_eyebrow || 'Apparel Sourcing & Manufacturing Lines'}
                     </span>
-                    <h2 className="text-3xl md:text-5xl font-black text-gray-900 dark:text-white font-heading tracking-tight">
+                    <h2 className="text-3xl md:text-5xl font-black text-[#1A1D20] dark:text-white font-heading tracking-tight">
                         {headings?.category_grid_heading || 'Our Manufacturing Capabilities'}
                     </h2>
-                    <p className="text-gray-500 dark:text-gray-400 text-xs md:text-sm mt-3 max-w-2xl mx-auto">
+                    <p className="text-stone-600 dark:text-slate-400 text-xs md:text-sm mt-3 max-w-2xl mx-auto font-medium">
                         Explore our core garment sourcing and manufacturing capabilities across circular knit, woven, and denim factories in Bangladesh.
                     </p>
-                    <div className="w-16 h-1 bg-primary mx-auto mt-4 rounded-full"></div>
+                    <div className="w-16 h-1 bg-stone-400 dark:bg-cyan-500 mx-auto mt-4 rounded-full"></div>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">

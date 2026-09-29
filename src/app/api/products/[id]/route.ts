@@ -1,7 +1,17 @@
 import { NextResponse } from 'next/server';
+import { requirePermission } from '@/lib/auth-guards';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
+
+const SAFE_CATEGORY_SELECT = {
+    id: true,
+    name: true,
+    slug: true,
+    image: true,
+} as const;
 
 export async function GET(
     req: Request,
@@ -10,11 +20,21 @@ export async function GET(
     try {
         const product = await prisma.product.findUnique({
             where: { id: params.id },
-            include: { category: true },
+            include: { category: { select: SAFE_CATEGORY_SELECT } },
         });
         if (!product) {
             return NextResponse.json({ error: 'Product not found' }, { status: 404 });
         }
+
+        // If inactive, only staff can view
+        if (!product.isActive) {
+            const session = await getServerSession(authOptions);
+            const userRole = (session?.user as any)?.role;
+            if (!['DEVELOPER', 'SUPER_ADMIN', 'ADMIN', 'EDITOR'].includes(userRole)) {
+                return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+            }
+        }
+
         return NextResponse.json({ success: true, product });
     } catch (error: any) {
         console.error('Product GET Error:', error?.message || error);
@@ -27,6 +47,9 @@ export async function PUT(
     { params }: { params: { id: string } }
 ) {
     try {
+        const guard = await requirePermission('products.edit');
+        if (!guard.ok) return guard.response;
+
         const body = await req.json();
 
         if (!body.name || !body.categoryId) {
@@ -77,6 +100,9 @@ export async function DELETE(
     { params }: { params: { id: string } }
 ) {
     try {
+        const guard = await requirePermission('products.delete');
+        if (!guard.ok) return guard.response;
+
         await prisma.product.delete({ where: { id: params.id } });
         return NextResponse.json({ success: true });
     } catch (error: any) {

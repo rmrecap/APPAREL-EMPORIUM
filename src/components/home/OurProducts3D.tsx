@@ -14,9 +14,11 @@ import {
 interface OurProductsProps {
     headings?: Record<string, string>;
     data?: any;
+    showDecor?: boolean;
+    showIcons?: boolean;
 }
 
-export default function OurProducts3D({ headings, data }: OurProductsProps) {
+export default function OurProducts3D({ headings, data, showDecor = false, showIcons = false }: OurProductsProps) {
     // Dynamic settings from Admin or defaults
     const parsedData = typeof data === 'string' ? (() => { try { return JSON.parse(data); } catch { return []; } })() : (data || []);
     
@@ -85,7 +87,8 @@ export default function OurProducts3D({ headings, data }: OurProductsProps) {
             <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-blue-500/10 dark:bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
 
             {/* ── FLOATING 3D DECORATIVE ELEMENTS (Matching Mockup) ── */}
-            <div className="pointer-events-none absolute inset-0 overflow-hidden z-0 hidden lg:block">
+            {showDecor && (
+                <div className="pointer-events-none absolute inset-0 overflow-hidden z-0 hidden lg:block">
                 {/* Needle & Thread (Top Left) */}
                 <div className="absolute top-8 left-[6%] animate-[bounce_8s_infinite_ease-in-out]">
                     <NeedleWithThread3D size={84} rotation={-45} />
@@ -130,10 +133,11 @@ export default function OurProducts3D({ headings, data }: OurProductsProps) {
                 <div className="absolute bottom-6 left-[8%] animate-[bounce_6s_infinite_ease-in-out_1.8s]">
                     <GarmentButton3D size={52} rotation={45} />
                 </div>
-                <div className="absolute bottom-8 right-[26%] animate-[bounce_7s_infinite_ease-in-out_0.3s]">
-                    <GarmentButton3D size={38} rotation={-30} />
+                    <div className="absolute bottom-8 right-[26%] animate-[bounce_7s_infinite_ease-in-out_0.3s]">
+                        <GarmentButton3D size={38} rotation={-30} />
+                    </div>
                 </div>
-            </div>
+            )}
 
             <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
 

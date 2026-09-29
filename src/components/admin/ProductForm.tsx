@@ -333,7 +333,7 @@ export default function ProductForm({
                 { key: 'Fabric', value: '100% Cotton' },
                 { key: 'GSM', value: '140' },
                 { key: 'MOQ', value: '500 pcs' },
-                { key: 'Lead Time', value: '45-60 Days' },
+                { key: 'Lead Time', value: 'Mutually Agreed' },
                 { key: 'Colors', value: 'Multiple' },
                 { key: 'Sizes', value: 'S, M, L, XL' },
             ]
