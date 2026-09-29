@@ -3,6 +3,7 @@ import { requirePermission } from '@/lib/auth-guards';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { extractApiKey, verifyApiKey } from '@/lib/api-auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,9 +44,10 @@ export async function GET(
 }
 
 const CORS_HEADERS = {
+    'Access-Control-Allow-Credentials': 'true',
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key',
+    'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, x-api-key, x-secret-key, secret-key, api-key, authorization, Authorization, ngrok-skip-browser-warning',
 };
 
 export async function OPTIONS() {
@@ -60,12 +62,10 @@ export async function PUT(
     { params }: { params: { id: string } }
 ) {
     try {
-        const authHeader = req.headers.get('authorization');
-        const apiKey = req.headers.get('x-api-key');
-        const expectedSecret = process.env.AEL_API_SECRET || process.env.API_SECRET_KEY;
-        const token = authHeader?.replace('Bearer ', '').trim() || apiKey?.trim();
+        const incomingKey = extractApiKey(req as any);
+        const isApiKeyValid = incomingKey ? await verifyApiKey(incomingKey) : false;
 
-        if (!expectedSecret || token !== expectedSecret) {
+        if (!isApiKeyValid) {
             const guard = await requirePermission('products.edit');
             if (!guard.ok) return guard.response;
         }
@@ -140,12 +140,10 @@ export async function DELETE(
     { params }: { params: { id: string } }
 ) {
     try {
-        const authHeader = req.headers.get('authorization');
-        const apiKey = req.headers.get('x-api-key');
-        const expectedSecret = process.env.AEL_API_SECRET || process.env.API_SECRET_KEY;
-        const token = authHeader?.replace('Bearer ', '').trim() || apiKey?.trim();
+        const incomingKey = extractApiKey(req as any);
+        const isApiKeyValid = incomingKey ? await verifyApiKey(incomingKey) : false;
 
-        if (!expectedSecret || token !== expectedSecret) {
+        if (!isApiKeyValid) {
             const guard = await requirePermission('products.delete');
             if (!guard.ok) return guard.response;
         }
