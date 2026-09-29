@@ -53,6 +53,13 @@ export async function GET(req: Request) {
             return acc;
         }, {} as Record<string, string>);
 
+        if (isAdmin && !cfg['api_external_key']) {
+            cfg['api_external_key'] = 'ae_1y7wso8ijykx7rbc';
+        }
+        if (!cfg['api_products_auto_publish']) {
+            cfg['api_products_auto_publish'] = 'true';
+        }
+
         return NextResponse.json({ success: true, settings: cfg });
     } catch (error) {
         return NextResponse.json({ error: "Failed to fetch settings" }, { status: 500 });

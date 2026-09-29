@@ -302,9 +302,21 @@ export async function POST(req: NextRequest) {
             status: finalStatus,
         };
 
-        const product = await prisma.product.create({
-            data: productData,
-        });
+        let product;
+        const existingByStyle = (productData.styleNo) ? await prisma.product.findUnique({ where: { styleNo: productData.styleNo } }) : null;
+        const existingBySlug = (!existingByStyle && productData.slug) ? await prisma.product.findUnique({ where: { slug: productData.slug } }) : null;
+        const existingTarget = existingByStyle || existingBySlug;
+
+        if (existingTarget) {
+            product = await prisma.product.update({
+                where: { id: existingTarget.id },
+                data: productData,
+            });
+        } else {
+            product = await prisma.product.create({
+                data: productData,
+            });
+        }
 
         const statusNotice = finalIsActive
             ? 'Style successfully published to AELBD sourcing catalog (LIVE)!'

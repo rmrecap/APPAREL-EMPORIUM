@@ -137,8 +137,8 @@ export async function POST(req: NextRequest) {
             .replace(/(^-|-$)/g, '');
 
         // 6. Check if slug already exists; append timestamp if so
-        const existing = await prisma.product.findUnique({ where: { slug: finalSlug } });
-        if (existing) {
+        const slugConflict = await prisma.product.findUnique({ where: { slug: finalSlug } });
+        if (slugConflict) {
             finalSlug = `${finalSlug}-${Date.now()}`;
         }
 
@@ -162,38 +162,78 @@ export async function POST(req: NextRequest) {
         }
 
         const finalSku = sku || styleNo || `AE-EXT-${Date.now()}`;
+        const finalStyleNo = styleNo || finalSku;
 
-        // 9. Create Product
-        const product = await prisma.product.create({
-            data: {
-                name: productName,
-                title: productName,
-                styleNo: styleNo || finalSku,
-                slug: finalSlug,
-                description: productDescription,
-                shortDescription: shortDescription || productDescription.substring(0, 150),
-                categoryId: resolvedCategoryId,
-                images: Array.isArray(images) ? JSON.stringify(images) : (images || '[]'),
-                specifications: typeof specifications === 'object' && specifications !== null
-                    ? JSON.stringify(specifications)
-                    : (specifications || '{}'),
-                isFeatured,
-                isActive: finalIsActive,
-                status: finalStatus,
-                sku: finalSku,
-                tags: Array.isArray(tags) ? tags.join(', ') : (tags || ''),
-                priceDisplay,
-                minOrder: minOrder || '',
-                priceRange: finalPriceRange,
-                tieredPricing: tieredPricingStr,
-                seoTitle: seoTitle || productName,
-                seoDescription: seoDescription || (shortDescription || '').substring(0, 160),
-                seoKeywords: seoKeywords || (Array.isArray(tags) ? tags.join(', ') : (tags || ''))
-            },
-            include: {
-                category: { select: { name: true, slug: true } }
-            }
-        });
+        const stringifyVal = (val: any) => {
+            if (Array.isArray(val)) return JSON.stringify(val);
+            if (typeof val === 'string') return val;
+            return null;
+        };
+
+        const productData = {
+            name: productName,
+            title: productName,
+            styleNo: finalStyleNo,
+            slug: finalSlug,
+            description: productDescription,
+            shortDescription: shortDescription || productDescription.substring(0, 150),
+            categoryId: resolvedCategoryId,
+            department: body.department || 'Menswear',
+            subCategory: subCategory || (typeof category === 'string' ? category : 'General'),
+            divisionType: divisionType || 'Knit',
+            brand: body.brand || 'Apparel Emporium',
+            fabricComposition: body.fabricComposition || body.fabric || null,
+            fabricConstruction: body.fabricConstruction || null,
+            yarnCount: body.yarnCount || null,
+            gsm: body.gsm ? String(body.gsm) : null,
+            gauge: body.gauge || null,
+            fit: body.fit || null,
+            dyeingFinishing: body.dyeingFinishing || null,
+            certifications: stringifyVal(body.certifications),
+            sizes: stringifyVal(body.sizes),
+            colors: stringifyVal(body.colors),
+            samplingLeadTime: body.samplingLeadTime || null,
+            productionLeadTime: body.productionLeadTime || null,
+            images: Array.isArray(images) ? JSON.stringify(images) : (images || '[]'),
+            specifications: typeof specifications === 'object' && specifications !== null
+                ? JSON.stringify(specifications)
+                : (specifications || '{}'),
+            isFeatured,
+            isActive: finalIsActive,
+            status: finalStatus,
+            sku: finalSku,
+            tags: Array.isArray(tags) ? tags.join(', ') : (tags || ''),
+            priceDisplay,
+            minOrder: minOrder || '',
+            priceRange: finalPriceRange,
+            tieredPricing: tieredPricingStr,
+            seoTitle: seoTitle || productName,
+            seoDescription: seoDescription || (shortDescription || '').substring(0, 160),
+            seoKeywords: seoKeywords || (Array.isArray(tags) ? tags.join(', ') : (tags || ''))
+        };
+
+        // 9. Safe Upsert Product (Prevent duplicate styleNo or slug failure)
+        let product;
+        const existingByStyle = finalStyleNo ? await prisma.product.findUnique({ where: { styleNo: finalStyleNo } }) : null;
+        const existingBySlug = (!existingByStyle && finalSlug) ? await prisma.product.findUnique({ where: { slug: finalSlug } }) : null;
+        const existing = existingByStyle || existingBySlug;
+
+        if (existing) {
+            product = await prisma.product.update({
+                where: { id: existing.id },
+                data: productData,
+                include: {
+                    category: { select: { name: true, slug: true } }
+                }
+            });
+        } else {
+            product = await prisma.product.create({
+                data: productData,
+                include: {
+                    category: { select: { name: true, slug: true } }
+                }
+            });
+        }
 
         const statusMessage = finalIsActive
             ? `✅ Product "${product.name}" published LIVE successfully to website!`
