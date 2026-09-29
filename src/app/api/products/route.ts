@@ -4,6 +4,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { extractApiKey, verifyApiKey } from '@/lib/api-auth';
+import { normalizeIncomingImages } from '@/lib/image-parser';
+import { resolveOrCreateCategory } from '@/lib/category-resolver';
 
 export const dynamic = 'force-dynamic';
 
@@ -179,44 +181,21 @@ export async function POST(req: NextRequest) {
             priceDisplay,
         } = body;
 
-        const productTitle = title || name || (styleNo ? `Style ${styleNo}` : 'New Product');
+        const productTitle = title || name || body.productName || (styleNo ? `Style ${styleNo}` : 'New Product');
 
         // ৩. ক্যাটাগরি রেজোলিউশন (ক্যাটাগরি আইডি না থাকলে নাম বা স্লাগ দিয়ে স্বয়ংক্রিয় তৈরি বা ম্যাচ)
-        let resolvedCategoryId = categoryId;
-        if (!resolvedCategoryId) {
-            const categoryName = category || subCategory || divisionType || 'Apparel';
-            const catSlug = categoryName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'apparel';
-
-            const matchedCategory = await prisma.category.findFirst({
-                where: { OR: [{ slug: catSlug }, { name: categoryName }] }
-            });
-
-            if (matchedCategory) {
-                resolvedCategoryId = matchedCategory.id;
-            } else {
-                const createdCategory = await prisma.category.create({
-                    data: {
-                        name: categoryName,
-                        slug: catSlug,
-                        description: `Sourcing and manufacturing category for ${categoryName}`,
-                    }
-                });
-                resolvedCategoryId = createdCategory.id;
-            }
-        }
+        const requestedCat = categoryId || category || subCategory || divisionType || 'Apparel';
+        const resolvedCategory = await resolveOrCreateCategory(requestedCat);
+        const resolvedCategoryId = resolvedCategory.id;
 
         // ৪. স্লাগ ও এসকেইউ ফরম্যাটিং
-        const baseSlug = slug || productTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        const baseSlug = slug || productTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'product';
         const finalSlug = `${baseSlug}-${Date.now().toString().slice(-4)}`;
         const finalSku = styleNo || sku || `AEL-${Date.now().toString().slice(-6)}`;
 
-        // ৫. ইমেজ ও স্পেসিফিকেশন সিরিয়ালাইজেশন (SQLite এবং MySQL ডেটাবেস সামঞ্জস্য)
-        let imagesJson = '[]';
-        if (Array.isArray(images)) {
-            imagesJson = JSON.stringify(images);
-        } else if (typeof images === 'string') {
-            imagesJson = images.startsWith('[') ? images : JSON.stringify([images]);
-        }
+        // ৫. ইমেজ ও স্পেসিফিকেশন সিরিয়ালাইজেশন
+        const finalImageUrls = normalizeIncomingImages(body);
+        const imagesJson = JSON.stringify(finalImageUrls);
 
         let specsJson = '{}';
         if (typeof specifications === 'object' && specifications !== null) {

@@ -2,16 +2,56 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { extractApiKey, verifyApiKey } from '@/lib/api-auth';
 import { corsHeaders, handlePreflight, withCors } from '../cors';
+import { normalizeIncomingImages } from '@/lib/image-parser';
+import { resolveOrCreateCategory } from '@/lib/category-resolver';
+import fs from 'fs';
+import path from 'path';
+
+export const dynamic = 'force-dynamic';
 
 // ─── PREFLIGHT (required for browser CORS) ───────────────────────────────────
 export async function OPTIONS(req: NextRequest) {
     return handlePreflight(req);
 }
 
-// ─── POST: Create a new product ──────────────────────────────────────────────
+// ─── POST: Create or Update a product from External API ───────────────────────
 export async function POST(req: NextRequest) {
     try {
-        const body = await req.json().catch(() => ({}));
+        let body: any = {};
+        const uploadedFiles: string[] = [];
+        const contentType = req.headers.get('content-type') || '';
+
+        // Support both application/json and multipart/form-data
+        if (contentType.includes('multipart/form-data')) {
+            try {
+                const formData = await req.formData();
+                for (const [key, value] of formData.entries()) {
+                    if (value instanceof File) {
+                        const bytes = await value.arrayBuffer();
+                        const buffer = Buffer.from(bytes);
+                        const ext = path.extname(value.name || '').toLowerCase() || '.jpg';
+                        const safeBase = (value.name || 'product').replace(/[^a-zA-Z0-9-]/g, '-').substring(0, 30);
+                        const fileName = `${safeBase}-${Date.now()}-${Math.random().toString(36).substring(2, 6)}${ext}`;
+                        const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'products');
+                        if (!fs.existsSync(uploadDir)) {
+                            fs.mkdirSync(uploadDir, { recursive: true });
+                        }
+                        fs.writeFileSync(path.join(uploadDir, fileName), buffer);
+                        uploadedFiles.push(`/uploads/products/${fileName}`);
+                    } else if (typeof value === 'string') {
+                        try {
+                            body[key] = JSON.parse(value);
+                        } catch {
+                            body[key] = value;
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error('[External API] formData parse error:', err);
+            }
+        } else {
+            body = await req.json().catch(() => ({}));
+        }
 
         // 1. Extract and Authenticate API Key
         const incomingKey = extractApiKey(req, body);
@@ -47,113 +87,39 @@ export async function POST(req: NextRequest) {
             }, { status: 200 }));
         }
 
-        const {
-            name,
-            title,
-            styleNo,
-            category,
-            subCategory,
-            divisionType,
-            slug,
-            description,
-            shortDescription,
-            categorySlug,
-            categoryId,
-            images,
-            specifications,
-            isFeatured = false,
-            isActive,
-            status,
-            sku,
-            tags,
-            priceDisplay = true,
-            minOrder,
-            priceRange,
-            tieredPricing,
-            seoTitle,
-            seoDescription,
-            seoKeywords
-        } = body;
+        // 2. Field Extraction & Fallbacks
+        const productName = body.name || body.title || body.productName || body.product_name || (body.styleNo ? `Style ${body.styleNo}` : 'New Apparel Product');
+        const productDescription = body.description || body.shortDescription || body.desc || body.details || body.content || `${productName} manufactured for global B2B export by Apparel Emporium.`;
+        const shortDescription = body.shortDescription || productDescription.substring(0, 160);
 
-        // Check Dashboard Auto-Publish Setting
+        // 3. Category Resolution (guaranteed never to crash)
+        const requestedCat = body.categoryId || body.categorySlug || body.category || body.subCategory || body.divisionType || 'Apparel';
+        const resolvedCategory = await resolveOrCreateCategory(requestedCat);
+        const resolvedCategoryId = resolvedCategory.id;
+
+        // 4. Image Extraction (handles images, imageUrl, photo, gallery, coverImage, base64, etc.)
+        const finalImageUrls = normalizeIncomingImages(body, uploadedFiles);
+        const imagesJson = JSON.stringify(finalImageUrls);
+
+        // 5. Auto-publish status check
         const autoPublishSetting = await prisma.siteSetting.findUnique({
             where: { key: 'api_products_auto_publish' }
         });
-        // Default to true if not configured; if set to 'false', products are saved as DRAFT
         const defaultAutoPublish = autoPublishSetting ? autoPublishSetting.value !== 'false' : true;
-        const finalIsActive = isActive !== undefined ? Boolean(isActive) : defaultAutoPublish;
-        const finalStatus = status || (finalIsActive ? 'PUBLISHED' : 'DRAFT');
+        const finalIsActive = body.isActive !== undefined ? Boolean(body.isActive) : defaultAutoPublish;
+        const finalStatus = body.status || (finalIsActive ? 'PUBLISHED' : 'DRAFT');
 
-        const productName = name || title || (styleNo ? `Style ${styleNo}` : '');
-        const productDescription = description || shortDescription || productName;
-        const requestedCat = categorySlug || category || subCategory || divisionType;
-
-        // 3. Validate required fields
-        if (!productName || !productDescription) {
-            return withCors(req, NextResponse.json({
-                success: false,
-                error: 'Missing required fields. Need: name/title and description.'
-            }, { status: 400 }));
-        }
-
-        // 4. Resolve Category by slug or name (with auto fallback)
-        let resolvedCategoryId = categoryId;
-        if (!resolvedCategoryId && requestedCat) {
-            const catSlug = String(requestedCat).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-            const categoryMatch = await prisma.category.findFirst({
-                where: { OR: [{ slug: catSlug }, { name: String(requestedCat) }] }
-            });
-            if (categoryMatch) {
-                resolvedCategoryId = categoryMatch.id;
-            } else {
-                const createdCat = await prisma.category.create({
-                    data: {
-                        name: String(requestedCat),
-                        slug: catSlug || `cat-${Date.now()}`,
-                        description: `Sourcing category for ${requestedCat}`
-                    }
-                });
-                resolvedCategoryId = createdCat.id;
-            }
-        } else if (!resolvedCategoryId) {
-            const defaultCat = await prisma.category.findFirst();
-            if (defaultCat) {
-                resolvedCategoryId = defaultCat.id;
-            } else {
-                const apparelCat = await prisma.category.create({
-                    data: {
-                        name: 'Apparel',
-                        slug: 'apparel',
-                        description: 'General Apparel Category'
-                    }
-                });
-                resolvedCategoryId = apparelCat.id;
-            }
-        }
-
-        // 5. Auto-generate slug from name if not provided
-        let finalSlug = slug || productName.toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/(^-|-$)/g, '');
-
-        // 6. Check if slug already exists; append timestamp if so
-        const slugConflict = await prisma.product.findUnique({ where: { slug: finalSlug } });
-        if (slugConflict) {
-            finalSlug = `${finalSlug}-${Date.now()}`;
-        }
-
-        // 7. Build tiered pricing string
+        // 6. Pricing & Tiers
         let tieredPricingStr = '[]';
-        if (tieredPricing) {
-            tieredPricingStr = typeof tieredPricing === 'string'
-                ? tieredPricing
-                : JSON.stringify(tieredPricing);
+        if (body.tieredPricing) {
+            tieredPricingStr = typeof body.tieredPricing === 'string'
+                ? body.tieredPricing
+                : JSON.stringify(body.tieredPricing);
         }
 
-        // 8. Build auto price range from tiers if priceRange is not given
-        let finalPriceRange = priceRange || '';
-        if (!finalPriceRange && tieredPricing && Array.isArray(tieredPricing) && tieredPricing.length > 0) {
-            const prices = tieredPricing.map((t: any) => parseFloat(t.price)).filter(p => !isNaN(p));
+        let finalPriceRange = body.priceRange || '';
+        if (!finalPriceRange && body.tieredPricing && Array.isArray(body.tieredPricing) && body.tieredPricing.length > 0) {
+            const prices = body.tieredPricing.map((t: any) => parseFloat(t.price)).filter((p: number) => !isNaN(p));
             if (prices.length > 0) {
                 const minP = Math.min(...prices);
                 const maxP = Math.max(...prices);
@@ -161,8 +127,8 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        const finalSku = sku || styleNo || `AE-EXT-${Date.now()}`;
-        const finalStyleNo = styleNo || finalSku;
+        const finalSku = body.sku || body.styleNo || `AE-EXT-${Date.now().toString().slice(-6)}`;
+        const finalStyleNo = body.styleNo || finalSku;
 
         const stringifyVal = (val: any) => {
             if (Array.isArray(val)) return JSON.stringify(val);
@@ -170,17 +136,34 @@ export async function POST(req: NextRequest) {
             return null;
         };
 
+        // Specifications
+        let specsJson = '{}';
+        if (typeof body.specifications === 'object' && body.specifications !== null) {
+            specsJson = JSON.stringify(body.specifications);
+        } else if (typeof body.specifications === 'string') {
+            specsJson = body.specifications;
+        } else {
+            specsJson = JSON.stringify({
+                Fabric: body.fabricComposition || body.fabric || '100% Cotton',
+                GSM: body.gsm ? String(body.gsm) : '180 GSM',
+                MOQ: body.minOrder || '500 pcs',
+                Fit: body.fit || 'Regular Fit'
+            });
+        }
+
+        const tags = body.tags;
+        const tagsString = Array.isArray(tags) ? tags.join(', ') : (tags || '');
+
         const productData = {
             name: productName,
             title: productName,
             styleNo: finalStyleNo,
-            slug: finalSlug,
             description: productDescription,
-            shortDescription: shortDescription || productDescription.substring(0, 150),
+            shortDescription: shortDescription,
             categoryId: resolvedCategoryId,
             department: body.department || 'Menswear',
-            subCategory: subCategory || (typeof category === 'string' ? category : 'General'),
-            divisionType: divisionType || 'Knit',
+            subCategory: body.subCategory || resolvedCategory.name || 'General',
+            divisionType: body.divisionType || 'Knit',
             brand: body.brand || 'Apparel Emporium',
             fabricComposition: body.fabricComposition || body.fabric || null,
             fabricConstruction: body.fabricConstruction || null,
@@ -194,41 +177,56 @@ export async function POST(req: NextRequest) {
             colors: stringifyVal(body.colors),
             samplingLeadTime: body.samplingLeadTime || null,
             productionLeadTime: body.productionLeadTime || null,
-            images: Array.isArray(images) ? JSON.stringify(images) : (images || '[]'),
-            specifications: typeof specifications === 'object' && specifications !== null
-                ? JSON.stringify(specifications)
-                : (specifications || '{}'),
-            isFeatured,
+            images: imagesJson,
+            specifications: specsJson,
+            isFeatured: body.isFeatured ?? false,
             isActive: finalIsActive,
             status: finalStatus,
             sku: finalSku,
-            tags: Array.isArray(tags) ? tags.join(', ') : (tags || ''),
-            priceDisplay,
-            minOrder: minOrder || '',
+            tags: tagsString,
+            priceDisplay: body.priceDisplay ?? true,
+            minOrder: body.minOrder || '',
             priceRange: finalPriceRange,
             tieredPricing: tieredPricingStr,
-            seoTitle: seoTitle || productName,
-            seoDescription: seoDescription || (shortDescription || '').substring(0, 160),
-            seoKeywords: seoKeywords || (Array.isArray(tags) ? tags.join(', ') : (tags || ''))
+            seoTitle: body.seoTitle || productName,
+            seoDescription: body.seoDescription || shortDescription.substring(0, 160),
+            seoKeywords: body.seoKeywords || tagsString
         };
 
-        // 9. Safe Upsert Product (Prevent duplicate styleNo or slug failure)
-        let product;
+        // 7. Safe Upsert Product (Prevent duplicate styleNo or slug failure)
+        let product: any;
         const existingByStyle = finalStyleNo ? await prisma.product.findUnique({ where: { styleNo: finalStyleNo } }) : null;
-        const existingBySlug = (!existingByStyle && finalSlug) ? await prisma.product.findUnique({ where: { slug: finalSlug } }) : null;
+        
+        // Base slug
+        const rawSlug = body.slug || productName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'product';
+        const existingBySlug = (!existingByStyle) ? await prisma.product.findUnique({ where: { slug: rawSlug } }) : null;
+
         const existing = existingByStyle || existingBySlug;
 
         if (existing) {
             product = await prisma.product.update({
                 where: { id: existing.id },
-                data: productData,
+                data: {
+                    ...productData,
+                    slug: existing.slug // Keep existing slug on update
+                },
                 include: {
                     category: { select: { name: true, slug: true } }
                 }
             });
         } else {
+            // Guarantee unique slug on insert
+            let finalSlug = rawSlug;
+            const slugCheck = await prisma.product.findUnique({ where: { slug: finalSlug } });
+            if (slugCheck) {
+                finalSlug = `${rawSlug}-${Date.now().toString().slice(-4)}`;
+            }
+
             product = await prisma.product.create({
-                data: productData,
+                data: {
+                    ...productData,
+                    slug: finalSlug
+                },
                 include: {
                     category: { select: { name: true, slug: true } }
                 }
@@ -248,8 +246,11 @@ export async function POST(req: NextRequest) {
                 name: product.name,
                 slug: product.slug,
                 sku: product.sku,
-                category: product.category.name,
-                categorySlug: product.category.slug,
+                styleNo: product.styleNo,
+                category: product.category?.name || resolvedCategory.name,
+                categorySlug: product.category?.slug || resolvedCategory.slug,
+                images: finalImageUrls,
+                imageCount: finalImageUrls.length,
                 priceRange: product.priceRange,
                 isActive: product.isActive,
                 status: product.status,
@@ -297,6 +298,8 @@ export async function GET(req: NextRequest) {
             name: true,
             slug: true,
             sku: true,
+            styleNo: true,
+            images: true,
             priceRange: true,
             isFeatured: true,
             isActive: true,

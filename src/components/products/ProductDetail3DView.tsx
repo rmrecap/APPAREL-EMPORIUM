@@ -8,6 +8,7 @@ import {
 import RecordProductVisit from './RecordProductVisit';
 import Coded3DGlobe from './Coded3DGlobe';
 import { useSettings } from '@/context/SettingsContext';
+import { extractProductImages, DEFAULT_PRODUCT_IMAGE } from '@/lib/utils';
 
 interface ProductDetail3DViewProps {
     product: any;
@@ -245,23 +246,15 @@ export default function ProductDetail3DView({
     let specs: Record<string, string> = {};
     try {
         if (typeof product.specifications === 'string') {
-            specs = JSON.parse(product.specifications);
+            const p = JSON.parse(product.specifications);
+            if (p && typeof p === 'object') specs = p;
+        } else if (product.specifications && typeof product.specifications === 'object') {
+            specs = product.specifications;
         }
     } catch { }
 
-    // Parse image list
-    let images: string[] = [];
-    try {
-        if (typeof product.images === 'string') {
-            const parsed = JSON.parse(product.images);
-            if (Array.isArray(parsed)) {
-                images = parsed.map((item: any) => typeof item === 'object' ? item.url : item).filter(Boolean);
-            }
-        }
-    } catch { }
-    if (images.length === 0) {
-        images = [product.images || '/images/3d/white_tshirt.jpg'];
-    }
+    // Parse image list safely
+    const images = extractProductImages(product.images, DEFAULT_PRODUCT_IMAGE);
 
     const { settings } = useSettings();
     const showB2bBanner = settings['product_detail_show_b2b_banner'] !== 'false';
@@ -270,7 +263,13 @@ export default function ProductDetail3DView({
     const showGlobe = settings['product_detail_show_globe'] !== 'false';
     const showFlowchart = settings['product_detail_show_flowchart'] !== 'false';
 
-    const [activeImage, setActiveImage] = useState(images[0]);
+    const [activeImage, setActiveImage] = useState<string>(images[0] || DEFAULT_PRODUCT_IMAGE);
+
+    React.useEffect(() => {
+        if (images.length > 0 && !images.includes(activeImage)) {
+            setActiveImage(images[0]);
+        }
+    }, [product.images]);
     const [isQuoteOpen, setIsQuoteOpen] = useState(false);
     const [formLoading, setFormLoading] = useState(false);
     const [formSuccess, setFormSuccess] = useState(false);
@@ -654,13 +653,8 @@ export default function ProductDetail3DView({
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                         {relatedProducts.slice(0, 3).map((rel) => {
-                            let relImg = '/images/3d/white_tshirt.jpg';
-                            try {
-                                if (typeof rel.images === 'string') {
-                                    const p = JSON.parse(rel.images);
-                                    if (Array.isArray(p) && p.length > 0) relImg = p[0];
-                                }
-                            } catch { }
+                            const relImgs = extractProductImages(rel.images, DEFAULT_PRODUCT_IMAGE);
+                            const relImg = relImgs[0] || DEFAULT_PRODUCT_IMAGE;
 
                             return (
                                 <div
@@ -719,13 +713,8 @@ export default function ProductDetail3DView({
                         {/* Left: Compact Horizontal Product Pill Card */}
                         <div className="md:col-span-5">
                             {fallbackRecent.slice(0, 1).map((item) => {
-                                let itemImg = '/images/3d/white_tshirt.jpg';
-                                try {
-                                    if (typeof item.images === 'string') {
-                                        const p = JSON.parse(item.images);
-                                        if (Array.isArray(p) && p.length > 0) itemImg = p[0];
-                                    }
-                                } catch { }
+                                const itemImgs = extractProductImages(item.images, DEFAULT_PRODUCT_IMAGE);
+                                const itemImg = itemImgs[0] || DEFAULT_PRODUCT_IMAGE;
 
                                 return (
                                     <div

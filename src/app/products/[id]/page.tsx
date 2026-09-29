@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { notFound, redirect } from 'next/navigation';
 import ProductDetail3DView from '@/components/products/ProductDetail3DView';
 import { Metadata } from 'next';
+import { extractProductImages, extractFeaturedImage } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,24 +34,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         };
     }
 
-    let firstImg = '/logo.jpg';
-    try {
-        const parsedImgs = JSON.parse(product.images);
-        if (Array.isArray(parsedImgs) && parsedImgs.length > 0) firstImg = parsedImgs[0];
-    } catch { }
-
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
+    const firstImgRel = extractFeaturedImage(product.images, '/images/3d/white_tshirt.jpg');
+    const firstImg = firstImgRel.startsWith('http') ? firstImgRel : `${baseUrl}${firstImgRel.startsWith('/') ? '' : '/'}${firstImgRel}`;
 
     return {
         title: `${product.name} Wholesale Manufacturing & Sourcing | AELBD`,
         description: product.shortDescription || `Explore specifications, MOQ, and wholesale production details for ${product.name}.`,
         alternates: {
-            canonical: `/products/${product.slug}`,
+            canonical: `/products/${encodeURIComponent(product.slug)}`,
         },
         openGraph: {
             title: `${product.name} | Apparel Emporium B2B Sourcing`,
             description: product.shortDescription || `Explore specifications, MOQ, and wholesale production details for ${product.name}.`,
-            url: `${baseUrl}/products/${product.slug}`,
+            url: `${baseUrl}/products/${encodeURIComponent(product.slug)}`,
             images: [{ url: firstImg, alt: product.name }],
             type: 'website',
         },
@@ -90,15 +87,18 @@ export default async function ProductDetailPage({ params }: PageProps) {
     }
 
     // Query related products in same category (or fallback to active products)
-    let relatedProducts = await prisma.product.findMany({
-        where: {
-            categoryId: product.categoryId,
-            id: { not: product.id },
-            isActive: true
-        },
-        take: 3,
-        include: { category: true }
-    });
+    let relatedProducts: any[] = [];
+    if (product.categoryId) {
+        relatedProducts = await prisma.product.findMany({
+            where: {
+                categoryId: product.categoryId,
+                id: { not: product.id },
+                isActive: true
+            },
+            take: 3,
+            include: { category: true }
+        });
+    }
 
     // Ensure we always have 3 related cards if category has fewer products
     if (relatedProducts.length < 3) {
@@ -127,19 +127,14 @@ export default async function ProductDetailPage({ params }: PageProps) {
     });
 
     // ── Schema.org Product & BreadcrumbList JSON-LD ─────────────────────────
-    let productImages: string[] = [];
-    try {
-        const parsed = JSON.parse(product.images);
-        if (Array.isArray(parsed)) productImages = parsed;
-    } catch { }
-
+    const productImages = extractProductImages(product.images, '/images/3d/white_tshirt.jpg');
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
 
     const productSchema = {
         '@context': 'https://schema.org',
         '@type': 'Product',
         'name': product.name,
-        'image': productImages.map(img => img.startsWith('http') ? img : `${baseUrl}${img}`),
+        'image': productImages.map(img => img.startsWith('http') ? img : `${baseUrl}${img.startsWith('/') ? '' : '/'}${img}`),
         'description': product.shortDescription || product.description,
         'brand': {
             '@type': 'Brand',
@@ -164,7 +159,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
             { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': baseUrl },
             { '@type': 'ListItem', 'position': 2, 'name': 'Catalog', 'item': `${baseUrl}/products` },
             { '@type': 'ListItem', 'position': 3, 'name': product.category?.name || 'Category', 'item': `${baseUrl}/products?category=${encodeURIComponent(product.category?.slug || '')}` },
-            { '@type': 'ListItem', 'position': 4, 'name': product.name, 'item': `${baseUrl}/products/${encodeURIComponent(product.slug)}` }
+            { '@type': 'ListItem', 'position': 4, 'name': product.name, 'item': `${baseUrl}/products/${encodeURIComponent(product.slug || product.id)}` }
         ]
     };
 
