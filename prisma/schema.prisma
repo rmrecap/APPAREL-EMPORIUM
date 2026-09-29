@@ -67,6 +67,35 @@ model Product {
   additionalCategories String?
   category             Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   rfqs                 RFQ[]
+
+  // Technical Product DNA (AI Studio Integration)
+  styleNo              String?   @unique
+  title                String?
+  department           String?   // Menswear, Womenswear, Kidswear, etc.
+  subCategory          String?   // Polo Shirt, Chino, Cardigan, Espadrille
+  divisionType         String?   // Knit, Woven, Sweater, Footwear, Accessories
+  brand                String?   @default("Apparel Emporium")
+  fabricComposition    String?
+  fabricConstruction   String?
+  yarnCount            String?
+  gsm                  String?
+  gauge                String?
+  fit                  String?
+  dyeingFinishing      String?
+  certifications       String?   // JSON Array String
+  samplingLeadTime     String?
+  productionLeadTime   String?
+  sizes                String?   // JSON Array String
+  colors               String?   // JSON Array String
+  targetSeason         String?
+  packaging            String?
+  exportMarkets        String?   // JSON Array String
+  features             String?   // JSON Array String
+  isHumanVerified      Boolean   @default(false)
+  verifiedBy           String?
+  status               String    @default("PUBLISHED")
+
+  @@index([styleNo])
 }
 
 model BlogPost {

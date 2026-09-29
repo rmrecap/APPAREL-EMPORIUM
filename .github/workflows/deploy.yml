@@ -54,32 +54,54 @@ jobs:
             
             if [ ! -d ".git" ]; then
               git init
-              git remote add origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
             fi
+            git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git 2>/dev/null || git remote add origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
             
             # Fetch safely with fallbacks
             git fetch origin main || git fetch origin main --depth=1
             git reset --hard origin/main
             
             # Ensure .env is created for production with robust fallbacks
-            echo "DATABASE_URL=\"mysql://u808072502_aelbd:bnij%3F8nL%2F@srv2112.hstgr.io:3306/u808072502_Aelbd\"" > .env
-            
+            if [ ! -f .env ]; then
+              touch .env
+            fi
+
+            # Database URL: use SQLite database URL as defined in prisma/schema.prisma
+            if ! grep -q "DATABASE_URL" .env || grep -q "mysql:" .env; then
+              sed -i '/DATABASE_URL/d' .env 2>/dev/null || true
+              echo 'DATABASE_URL="file:./dev.db"' >> .env
+            fi
+
             # Use fallback secrets if GitHub secrets are missing to prevent next-auth crashes
-            SECRET_VAL="${{ secrets.NEXTAUTH_SECRET }}"
-            if [ -z "$SECRET_VAL" ]; then
-              SECRET_VAL="super-secure-generated-random-character-secret-key-for-prod-$(date +%s)"
+            if ! grep -q "NEXTAUTH_SECRET" .env; then
+              SECRET_VAL="${{ secrets.NEXTAUTH_SECRET }}"
+              if [ -z "$SECRET_VAL" ]; then
+                SECRET_VAL="super-secure-generated-random-character-secret-key-for-prod-$(date +%s)"
+              fi
+              echo "NEXTAUTH_SECRET=\"$SECRET_VAL\"" >> .env
             fi
-            echo "NEXTAUTH_SECRET=\"$SECRET_VAL\"" >> .env
-            
-            URL_VAL="${{ secrets.NEXTAUTH_URL }}"
-            if [ -z "$URL_VAL" ]; then
-              URL_VAL="https://aelbd.net"
+
+            if ! grep -q "NEXTAUTH_URL" .env; then
+              URL_VAL="${{ secrets.NEXTAUTH_URL }}"
+              if [ -z "$URL_VAL" ]; then
+                URL_VAL="https://aelbd.net"
+              fi
+              echo "NEXTAUTH_URL=\"$URL_VAL\"" >> .env
             fi
-            echo "NEXTAUTH_URL=\"$URL_VAL\"" >> .env
-            
+
             # System variables
-            echo "PRISMA_CLIENT_ENGINE_TYPE=\"library\"" >> .env
-            echo "NEXT_PUBLIC_APP_URL=\"https://aelbd.net\"" >> .env
+            if ! grep -q "PRISMA_CLIENT_ENGINE_TYPE" .env; then
+              echo 'PRISMA_CLIENT_ENGINE_TYPE="library"' >> .env
+            fi
+            if ! grep -q "NEXT_PUBLIC_APP_URL" .env; then
+              echo 'NEXT_PUBLIC_APP_URL="https://aelbd.net"' >> .env
+            fi
+            if ! grep -q "AEL_API_SECRET" .env; then
+              echo 'AEL_API_SECRET="ael_secret_key_2026_xyz"' >> .env
+            fi
+            if ! grep -q "API_SECRET_KEY" .env; then
+              echo 'API_SECRET_KEY="ael_secret_key_2026_xyz"' >> .env
+            fi
             
             # Export node paths and local node_modules bin
             export PATH="./node_modules/.bin:$PATH:/usr/local/bin:/opt/alt/alt-nodejs22/root/usr/bin:/opt/alt/alt-nodejs20/root/usr/bin"
@@ -93,9 +115,6 @@ jobs:
             
             echo "Updating database schema..."
             npx prisma db push --accept-data-loss
-            
-            echo "Running database seed..."
-            npm run seed || true
             
             echo "Building Next.js application..."
             npm run build
