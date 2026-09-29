@@ -8,18 +8,16 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to Hostinger via SSH
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.HOSTINGER_HOST }}
-          username: ${{ secrets.HOSTINGER_USERNAME }}
-          key: ${{ secrets.HOSTINGER_SSH_KEY }}
-          password: ${{ secrets.HOSTINGER_PASSWORD }}
-          port: ${{ secrets.HOSTINGER_PORT }}
-          request_pty: true
-          timeout: 120s
-          command_timeout: 30m
-          script: |
+      - name: Deploy to Hostinger via Native OpenSSH
+        env:
+          SSH_HOST: ${{ secrets.HOSTINGER_HOST }}
+          SSH_USER: ${{ secrets.HOSTINGER_USERNAME }}
+          SSH_PASS: ${{ secrets.HOSTINGER_PASSWORD }}
+          SSH_PORT: ${{ secrets.HOSTINGER_PORT }}
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq sshpass
+          export SSHPASS="$SSH_PASS"
+          sshpass -e ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" "bash -s" << 'EOF'
             source ~/.bashrc || true
             source ~/.bash_profile || true
             export PATH=$PATH:/usr/local/bin:/opt/alt/alt-nodejs22/root/usr/bin:/opt/alt/alt-nodejs20/root/usr/bin
@@ -28,11 +26,11 @@ jobs:
             # Determine directory automatically
             DEPLOY_DIR=""
             for CANDIDATE in \
-              "/home/${{ secrets.HOSTINGER_USERNAME }}/domains/aelbd.net/nodejs" \
-              "/home/${{ secrets.HOSTINGER_USERNAME }}/domains/aelbd.net/public_html" \
-              "/home/${{ secrets.HOSTINGER_USERNAME }}/domains/aelbd.net" \
-              "/home/${{ secrets.HOSTINGER_USERNAME }}/domains/mediumblue-wildcat-188317.hostingersite.com/nodejs" \
-              "/home/${{ secrets.HOSTINGER_USERNAME }}/public_html"
+              "/home/$USER/domains/aelbd.net/nodejs" \
+              "/home/$USER/domains/aelbd.net/public_html" \
+              "/home/$USER/domains/aelbd.net" \
+              "/home/$USER/domains/mediumblue-wildcat-188317.hostingersite.com/nodejs" \
+              "/home/$USER/public_html"
             do
               if [ -d "$CANDIDATE" ]; then
                 DEPLOY_DIR="$CANDIDATE"
@@ -41,7 +39,7 @@ jobs:
             done
 
             if [ -z "$DEPLOY_DIR" ]; then
-              DEPLOY_DIR="/home/${{ secrets.HOSTINGER_USERNAME }}/domains/aelbd.net/nodejs"
+              DEPLOY_DIR="/home/$USER/domains/aelbd.net/nodejs"
               mkdir -p "$DEPLOY_DIR"
             fi
             
@@ -56,7 +54,7 @@ jobs:
             if [ ! -d ".git" ]; then
               git init
             fi
-            git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git 2>/dev/null || git remote add origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+            git remote set-url origin https://github.com/rmrecap/APPAREL-EMPORIUM.git 2>/dev/null || git remote add origin https://github.com/rmrecap/APPAREL-EMPORIUM.git
             
             # Fetch safely with fallbacks
             git fetch origin main || git fetch origin main --depth=1
@@ -73,21 +71,13 @@ jobs:
               echo 'DATABASE_URL="file:./dev.db"' >> .env
             fi
 
-            # Use fallback secrets if GitHub secrets are missing to prevent next-auth crashes
+            # NextAuth configuration
             if ! grep -q "NEXTAUTH_SECRET" .env; then
-              SECRET_VAL="${{ secrets.NEXTAUTH_SECRET }}"
-              if [ -z "$SECRET_VAL" ]; then
-                SECRET_VAL="super-secure-generated-random-character-secret-key-for-prod-$(date +%s)"
-              fi
-              echo "NEXTAUTH_SECRET=\"$SECRET_VAL\"" >> .env
+              echo 'NEXTAUTH_SECRET="super-secure-generated-random-character-secret-key-prod"' >> .env
             fi
 
             if ! grep -q "NEXTAUTH_URL" .env; then
-              URL_VAL="${{ secrets.NEXTAUTH_URL }}"
-              if [ -z "$URL_VAL" ]; then
-                URL_VAL="https://aelbd.net"
-              fi
-              echo "NEXTAUTH_URL=\"$URL_VAL\"" >> .env
+              echo 'NEXTAUTH_URL="https://aelbd.net"' >> .env
             fi
 
             # System variables
@@ -126,3 +116,4 @@ jobs:
             npx -y pm2 save
             npx -y pm2 list
             echo "✅ Deployment complete!"
+          EOF
