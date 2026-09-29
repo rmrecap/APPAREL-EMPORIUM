@@ -46,3 +46,11 @@ Thumbs.db
 
 # Prisma binary cache (regenerated on deploy)
 node_modules/.prisma/
+
+# Large binary assets (deploy separately via SSH/FTP)
+public/company-profile.pdf
+public/images/about/
+public/images/contact/
+
+# Scratch & debug files
+scratch/
