@@ -88,7 +88,7 @@ export async function middleware(req: NextRequest) {
                                  path.includes('/api/products') || 
                                  path.includes('/api/proxy') || 
                                  path.includes('/api/external');
-        const isExempt = (isExemptEndpoint || hasApiToken) && (req.method === 'POST' || req.method === 'OPTIONS');
+        const isExempt = (isExemptEndpoint && (req.method === 'POST' || req.method === 'OPTIONS')) || (hasApiToken && ['POST', 'PUT', 'DELETE', 'OPTIONS'].includes(req.method));
 
         // Block non-GET requests if not authenticated (except exempt endpoints which handle their own token auth)
         if (req.method !== 'GET' && !isExempt) {
