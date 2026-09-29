@@ -113,7 +113,7 @@ jobs:
             
             # Gracefully restart application utilizing pm2
             echo "Restarting PM2 process..."
-            npx -y pm2 restart garments-website --update-env || npx -y pm2 start ecosystem.config.js
+            npx -y pm2 reload ecosystem.config.js --env production || npx -y pm2 restart aelbd-production --update-env || npx -y pm2 restart garments-website --update-env || npx -y pm2 start ecosystem.config.js
             npx -y pm2 save
             npx -y pm2 list
             echo "✅ Deployment complete!"
