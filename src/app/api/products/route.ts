@@ -98,10 +98,18 @@ export async function POST(req: NextRequest) {
             if (token === expectedSecret) {
                 isExternalAuthorized = true;
             } else {
-                return NextResponse.json(
-                    { success: false, error: 'Unauthorized access: Invalid Secret Key' },
-                    { status: 401, headers: CORS_HEADERS }
-                );
+                // Check if it matches dynamic api_external_key from dashboard API Manager
+                const validKeySetting = await prisma.siteSetting.findUnique({
+                    where: { key: 'api_external_key' }
+                });
+                if (validKeySetting && token === validKeySetting.value) {
+                    isExternalAuthorized = true;
+                } else {
+                    return NextResponse.json(
+                        { success: false, error: 'Unauthorized access: Invalid Secret Key' },
+                        { status: 401, headers: CORS_HEADERS }
+                    );
+                }
             }
         }
 

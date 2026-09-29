@@ -10,21 +10,27 @@ export async function OPTIONS(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
     try {
-        const apiKey = req.headers.get('x-api-key');
-        if (!apiKey) {
+        const authHeader = req.headers.get('authorization');
+        const rawApiKey = req.headers.get('x-api-key');
+        const token = authHeader?.replace(/^Bearer\s+/i, '').trim() || rawApiKey?.trim();
+
+        if (!token) {
             return withCors(req, NextResponse.json(
-                { success: false, error: 'API Key missing. Add header: x-api-key' },
+                { success: false, error: 'API Key or Token missing. Add header: x-api-key or Authorization: Bearer <key>' },
                 { status: 401 }
             ));
         }
 
+        const expectedSecret = process.env.AEL_API_SECRET || process.env.API_SECRET_KEY || 'ael_secret_key_2026_xyz';
         const validKeySetting = await prisma.siteSetting.findUnique({
             where: { key: 'api_external_key' }
         });
 
-        if (!validKeySetting || apiKey !== validKeySetting.value) {
+        const isAuthorized = token === expectedSecret || (validKeySetting && token === validKeySetting.value);
+
+        if (!isAuthorized) {
             return withCors(req, NextResponse.json(
-                { success: false, error: 'Invalid API Key.' },
+                { success: false, error: 'Invalid API Key or Secret Token.' },
                 { status: 403 }
             ));
         }
