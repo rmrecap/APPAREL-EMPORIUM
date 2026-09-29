@@ -16,6 +16,7 @@ jobs:
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           password: ${{ secrets.HOSTINGER_PASSWORD }}
           port: ${{ secrets.HOSTINGER_PORT }}
+          request_pty: true
           timeout: 120s
           command_timeout: 30m
           script: |
