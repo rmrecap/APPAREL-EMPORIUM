@@ -26,6 +26,18 @@ export async function middleware(req: NextRequest) {
         return NextResponse.next();
     }
 
+    // ── PRIORITY 2.5: Auto-route Misdirected External AI/API Requests ──────────
+    // If external tools or clients mistakenly POST to '/' or '/products' or '/product' 
+    // with JSON or API key, rewrite internally to /api/external/products so they get
+    // valid JSON responses instead of receiving the website homepage HTML!
+    const isRootOrProductPage = path === '/' || path === '' || path === '/api' || path === '/api/' || path === '/products' || path === '/product' || path === '/api/product';
+    const hasApiIdentifier = req.headers.get('x-api-key') || req.headers.get('x-secret-key') || req.headers.get('api-key') || req.headers.get('authorization');
+    const isJsonPost = method === 'POST' && (req.headers.get('content-type')?.includes('application/json') || req.headers.get('content-type')?.includes('multipart/form-data'));
+
+    if (method === 'POST' && isRootOrProductPage && (hasApiIdentifier || isJsonPost)) {
+        return NextResponse.rewrite(new URL('/api/external/products', req.url));
+    }
+
     // Core routes definition
     const isAdminRoute = path.startsWith('/executive-portal-aelbd');
     const isApiRoute = path.startsWith('/api/');
