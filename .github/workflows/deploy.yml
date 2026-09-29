@@ -17,9 +17,10 @@ jobs:
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq sshpass
           export SSHPASS="$SSH_PASS"
+          # Reset any stuck processes from prior timed-out jobs
+          sshpass -e ssh -o StrictHostKeyChecking=no -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" "killall -9 node npm ts-node prisma 2>/dev/null || true" || true
+          sleep 3
           sshpass -e ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" "bash -s" << 'EOF'
-            source ~/.bashrc || true
-            source ~/.bash_profile || true
             export PATH=$PATH:/usr/local/bin:/opt/alt/alt-nodejs22/root/usr/bin:/opt/alt/alt-nodejs20/root/usr/bin
             if [ -s "$HOME/.nvm/nvm.sh" ]; then source "$HOME/.nvm/nvm.sh"; fi
 
