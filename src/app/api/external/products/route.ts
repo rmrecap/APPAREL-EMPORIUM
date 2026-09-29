@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { extractApiKey, verifyApiKey } from '@/lib/api-auth';
 import { corsHeaders, handlePreflight, withCors } from '../cors';
 
 // ─── PREFLIGHT (required for browser CORS) ───────────────────────────────────
@@ -10,37 +11,36 @@ export async function OPTIONS(req: NextRequest) {
 // ─── POST: Create a new product ──────────────────────────────────────────────
 export async function POST(req: NextRequest) {
     try {
-        // 1. Authenticate via API Key or Bearer Token
-        const authHeader = req.headers.get('authorization');
-        const rawApiKey = req.headers.get('x-api-key');
-        const token = authHeader?.replace(/^Bearer\s+/i, '').trim() || rawApiKey?.trim();
+        const body = await req.json().catch(() => ({}));
 
-        if (!token) {
+        // 1. Extract and Authenticate API Key
+        const incomingKey = extractApiKey(req, body);
+
+        if (!incomingKey) {
             return withCors(req, NextResponse.json(
-                { success: false, error: 'API Key or Token is missing. Add header: x-api-key or Authorization: Bearer <key>' },
+                {
+                    success: false,
+                    error: 'Unauthorized access: API Key missing. Send via header (x-api-key, x-secret-key, or Authorization) or request body.',
+                    receivedKey: 'none'
+                },
                 { status: 401 }
             ));
         }
 
-        const expectedSecret = process.env.AEL_API_SECRET || process.env.API_SECRET_KEY || 'ael_secret_key_2026_xyz';
-        const validKeySetting = await prisma.siteSetting.findUnique({
-            where: { key: 'api_external_key' }
-        });
-
-        const isAuthorized = token === expectedSecret || (validKeySetting && token === validKeySetting.value);
-
+        const isAuthorized = await verifyApiKey(incomingKey);
         if (!isAuthorized) {
             return withCors(req, NextResponse.json(
-                { success: false, error: 'Invalid API Key or Secret Token.' },
-                { status: 403 }
+                {
+                    success: false,
+                    error: 'Unauthorized access: Invalid Secret Key',
+                    receivedKey: incomingKey ? `${incomingKey.substring(0, 4)}...` : 'none'
+                },
+                { status: 401 }
             ));
         }
 
-        // 2. Parse Body
-        const body = await req.json().catch(() => ({}));
-
         // Handle connection test
-        if (body.test === true || body.ping === true || Object.keys(body).length === 0) {
+        if (body.test === true || body.ping === true || Object.keys(body).length === 0 || (Object.keys(body).length === 1 && (body.apiKey || body.secretKey || body['x-api-key']))) {
             return withCors(req, NextResponse.json({
                 success: true,
                 message: 'Connected Successfully to AELBD API!'
@@ -228,14 +228,12 @@ export async function POST(req: NextRequest) {
 
 // ─── GET: List recent products ────────────────────────────────────────────────
 export async function GET(req: NextRequest) {
-    const apiKey = req.headers.get('x-api-key');
-    const validKeySetting = await prisma.siteSetting.findUnique({
-        where: { key: 'api_external_key' }
-    });
+    const incomingKey = extractApiKey(req);
+    const isAuthorized = await verifyApiKey(incomingKey);
 
-    if (!apiKey || !validKeySetting || apiKey !== validKeySetting.value) {
+    if (!isAuthorized) {
         return withCors(req, NextResponse.json(
-            { success: false, error: 'Unauthorized. Provide a valid x-api-key header.' },
+            { success: false, error: 'Unauthorized. Provide a valid API key header (x-api-key or Authorization).' },
             { status: 401 }
         ));
     }

@@ -14,7 +14,7 @@ export async function middleware(req: NextRequest) {
         const preflightResponse = new NextResponse(null, { status: 204 });
         preflightResponse.headers.set('Access-Control-Allow-Origin', '*');
         preflightResponse.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        preflightResponse.headers.set('Access-Control-Allow-Headers', 'Content-Type, x-api-key, Authorization, ngrok-skip-browser-warning');
+        preflightResponse.headers.set('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, x-api-key, x-secret-key, secret-key, api-key, authorization, Authorization, ngrok-skip-browser-warning');
         preflightResponse.headers.set('Access-Control-Max-Age', '86400');
         return preflightResponse;
     }

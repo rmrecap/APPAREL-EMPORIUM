@@ -3,13 +3,15 @@ import { requirePermission } from '@/lib/auth-guards';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { extractApiKey, verifyApiKey } from '@/lib/api-auth';
 
 export const dynamic = 'force-dynamic';
 
 const CORS_HEADERS = {
+    'Access-Control-Allow-Credentials': 'true',
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key',
+    'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, x-api-key, x-secret-key, secret-key, api-key, authorization, Authorization, ngrok-skip-browser-warning',
 };
 
 const SAFE_CATEGORY_SELECT = {
@@ -86,30 +88,25 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
     try {
-        // ১. সিকিউরিটি চেক (API Secret Token অথবা স্টাফ সেশন ভেরিফিকেশন)
-        const authHeader = req.headers.get('authorization');
-        const apiKey = req.headers.get('x-api-key');
-        const expectedSecret = process.env.AEL_API_SECRET || process.env.API_SECRET_KEY || 'ael_secret_key_2026_xyz';
+        // ১. রিকোয়েস্ট বডি এবং এপিআই কী রিড করা
+        const body = await req.json().catch(() => ({}));
+        const incomingKey = extractApiKey(req, body);
 
         let isExternalAuthorized = false;
 
-        if (authHeader || apiKey) {
-            const token = authHeader?.replace(/^Bearer\s+/i, '').trim() || apiKey?.trim();
-            if (token === expectedSecret) {
+        if (incomingKey) {
+            const isValid = await verifyApiKey(incomingKey);
+            if (isValid) {
                 isExternalAuthorized = true;
             } else {
-                // Check if it matches dynamic api_external_key from dashboard API Manager
-                const validKeySetting = await prisma.siteSetting.findUnique({
-                    where: { key: 'api_external_key' }
-                });
-                if (validKeySetting && token === validKeySetting.value) {
-                    isExternalAuthorized = true;
-                } else {
-                    return NextResponse.json(
-                        { success: false, error: 'Unauthorized access: Invalid Secret Key' },
-                        { status: 401, headers: CORS_HEADERS }
-                    );
-                }
+                return NextResponse.json(
+                    {
+                        success: false,
+                        error: 'Unauthorized access: Invalid Secret Key',
+                        receivedKey: incomingKey ? `${incomingKey.substring(0, 4)}...` : 'none'
+                    },
+                    { status: 401, headers: CORS_HEADERS }
+                );
             }
         }
 
@@ -126,11 +123,8 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        // ২. AI Studio অথবা অ্যাডমিন প্যানেল থেকে পাঠানো রিকোয়েস্ট বডি রিসিভ করা
-        const body = await req.json().catch(() => ({}));
-
         // টেস্ট কানেকশন রিকোয়েস্ট হ্যান্ডলিং (AI Tool "Test API Connection" চেক)
-        if (body.test === true || body.ping === true || Object.keys(body).length === 0) {
+        if (body.test === true || body.ping === true || Object.keys(body).length === 0 || (Object.keys(body).length === 1 && (body.apiKey || body.secretKey || body['x-api-key']))) {
             return NextResponse.json(
                 { success: true, message: 'Connected Successfully to AELBD API!' },
                 { status: 200, headers: CORS_HEADERS }

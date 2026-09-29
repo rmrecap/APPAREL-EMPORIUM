@@ -94,6 +94,16 @@ jobs:
             if ! grep -q "API_SECRET_KEY" .env; then
               echo 'API_SECRET_KEY="ael_secret_key_2026_xyz"' >> .env
             fi
+            if ! grep -q "EXTERNAL_API_KEY" .env; then
+              echo 'EXTERNAL_API_KEY="ae_1y7wso8ijykx7rbc"' >> .env
+            else
+              sed -i 's/EXTERNAL_API_KEY=.*/EXTERNAL_API_KEY="ae_1y7wso8ijykx7rbc"/' .env
+            fi
+            if ! grep -q "AELBD_API_KEY" .env; then
+              echo 'AELBD_API_KEY="ae_1y7wso8ijykx7rbc"' >> .env
+            else
+              sed -i 's/AELBD_API_KEY=.*/AELBD_API_KEY="ae_1y7wso8ijykx7rbc"/' .env
+            fi
             
             # Export node paths and local node_modules bin
             export PATH="./node_modules/.bin:$PATH:/usr/local/bin:/opt/alt/alt-nodejs22/root/usr/bin:/opt/alt/alt-nodejs20/root/usr/bin"

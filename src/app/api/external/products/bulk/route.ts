@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { extractApiKey, verifyApiKey } from '@/lib/api-auth';
 import { handlePreflight, withCors } from '../../cors';
 
 export const dynamic = 'force-dynamic';
@@ -10,32 +11,27 @@ export async function OPTIONS(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
     try {
-        const authHeader = req.headers.get('authorization');
-        const rawApiKey = req.headers.get('x-api-key');
-        const token = authHeader?.replace(/^Bearer\s+/i, '').trim() || rawApiKey?.trim();
+        const body = await req.json().catch(() => ({}));
+        const incomingKey = extractApiKey(req, body);
 
-        if (!token) {
+        if (!incomingKey) {
             return withCors(req, NextResponse.json(
-                { success: false, error: 'API Key or Token missing. Add header: x-api-key or Authorization: Bearer <key>' },
+                { success: false, error: 'Unauthorized access: API Key missing.', receivedKey: 'none' },
                 { status: 401 }
             ));
         }
 
-        const expectedSecret = process.env.AEL_API_SECRET || process.env.API_SECRET_KEY || 'ael_secret_key_2026_xyz';
-        const validKeySetting = await prisma.siteSetting.findUnique({
-            where: { key: 'api_external_key' }
-        });
-
-        const isAuthorized = token === expectedSecret || (validKeySetting && token === validKeySetting.value);
-
+        const isAuthorized = await verifyApiKey(incomingKey);
         if (!isAuthorized) {
             return withCors(req, NextResponse.json(
-                { success: false, error: 'Invalid API Key or Secret Token.' },
-                { status: 403 }
+                {
+                    success: false,
+                    error: 'Unauthorized access: Invalid Secret Key',
+                    receivedKey: incomingKey ? `${incomingKey.substring(0, 4)}...` : 'none'
+                },
+                { status: 401 }
             ));
         }
-
-        const body = await req.json();
         const items = Array.isArray(body) ? body : body.products;
 
         if (!Array.isArray(items) || items.length === 0) {
