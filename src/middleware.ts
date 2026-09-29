@@ -81,11 +81,17 @@ export async function middleware(req: NextRequest) {
     // 4. API Endpoints Safety Wall
     // Protect standard API routes from unauthorized POST/PUT/DELETE
     if (isApiRoute && !isAdminApiRoute) {
-        // Allow public POST only for contact forms and RFQs
-        const isPublicFormSubmission = (path.includes('/api/contact') || path.includes('/api/rfq')) && req.method === 'POST';
+        // Allow public POST/OPTIONS for contact forms, RFQs, products DNA sync, external APIs, or requests with API tokens
+        const hasApiToken = req.headers.get('authorization') || req.headers.get('x-api-key');
+        const isExemptEndpoint = path.includes('/api/contact') || 
+                                 path.includes('/api/rfq') || 
+                                 path.includes('/api/products') || 
+                                 path.includes('/api/proxy') || 
+                                 path.includes('/api/external');
+        const isExempt = (isExemptEndpoint || hasApiToken) && (req.method === 'POST' || req.method === 'OPTIONS');
 
-        // Block all non-GET requests if not authenticated (except forms)
-        if (req.method !== 'GET' && !isPublicFormSubmission) {
+        // Block non-GET requests if not authenticated (except exempt endpoints which handle their own token auth)
+        if (req.method !== 'GET' && !isExempt) {
             if (!nextAuthSecret) {
                 return NextResponse.json({ error: "Server misconfiguration: missing auth secret" }, { status: 500 });
             }
