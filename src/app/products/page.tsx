@@ -3,7 +3,7 @@ import ProductGrid from '@/components/products/ProductGrid';
 import ProductFilter from '@/components/products/ProductFilter';
 import AtelierDecorations3D from '@/components/products/AtelierDecorations3D';
 import CatalogTaxonomyDirectory from '@/components/products/CatalogTaxonomyDirectory';
-import { DEFAULT_CATALOG_TAXONOMY, TaxonomyDivision } from '@/lib/catalog-taxonomy';
+import { DEFAULT_CATALOG_TAXONOMY, TaxonomyDivision, getAllDescendantSlugs } from '@/lib/catalog-taxonomy';
 import { X } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -94,39 +94,48 @@ export default async function ProductsPage({
 
     // Build the query object
     const where: any = { isActive: true };
+    const filters: any[] = [];
 
     if (category) {
-        // Match category directly or descendant subcategories
-        const collectDescendantSlugs = (slugToFind: string): string[] => {
-            const target = categories.find(c => c.slug === slugToFind || c.slug.includes(slugToFind));
-            if (!target) return [slugToFind];
-            const directChildSlugs = categories
-                .filter(c => c.parentId === target.id)
-                .map(c => c.slug);
-            const nestedSlugs = directChildSlugs.flatMap(s => collectDescendantSlugs(s));
-            return [slugToFind, target.slug, ...directChildSlugs, ...nestedSlugs];
-        };
+        // Collect all descendant slugs from both the taxonomy hierarchy and DB categories
+        const taxonomySlugs = getAllDescendantSlugs(category);
 
-        const allMatchedSlugs = Array.from(new Set(collectDescendantSlugs(category)));
-        where.OR = [
-            { category: { slug: { in: allMatchedSlugs } } },
-            { tags: { contains: category } },
-            { name: { contains: category } }
-        ];
+        const targetCat = categories.find(c => c.slug === category);
+        const dbSlugs: string[] = [];
+        if (targetCat) {
+            const collectDbChildren = (catId: string) => {
+                const children = categories.filter(c => c.parentId === catId);
+                for (const ch of children) {
+                    dbSlugs.push(ch.slug);
+                    collectDbChildren(ch.id);
+                }
+            };
+            collectDbChildren(targetCat.id);
+        }
+
+        const allMatchedSlugs = Array.from(new Set([...taxonomySlugs, ...dbSlugs, category]));
+
+        filters.push({
+            OR: [
+                { category: { slug: { in: allMatchedSlugs } } },
+                { tags: { contains: category } },
+                { name: { contains: category } }
+            ]
+        });
     }
 
     if (q) {
-        where.OR = [
-            { name: { contains: q } },
-            { description: { contains: q } },
-            { tags: { contains: q } },
-            { slug: { contains: q } }
-        ];
+        filters.push({
+            OR: [
+                { name: { contains: q } },
+                { description: { contains: q } },
+                { tags: { contains: q } },
+                { slug: { contains: q } }
+            ]
+        });
     }
 
     // Fabric and MOQ filters
-    const filters: any[] = [];
-
     if (fabric) {
         const fabrics = fabric.split(',');
         filters.push({

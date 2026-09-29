@@ -96,7 +96,8 @@ function filterAndCleanUrls(items: any[]): string[] {
                 const match = trimmed.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
                 if (match) {
                     const ext = match[1] === 'jpeg' ? '.jpg' : `.${match[1]}`;
-                    const buffer = Buffer.from(match[2], 'base64');
+                    const cleanBase64 = match[2].replace(/\s/g, '');
+                    const buffer = Buffer.from(cleanBase64, 'base64');
                     const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'products');
                     if (!fs.existsSync(uploadDir)) {
                         fs.mkdirSync(uploadDir, { recursive: true });

@@ -181,7 +181,7 @@ export default function CatalogTaxonomyDirectory({ initialTaxonomy }: Props) {
                 {searchResults.map(({ divisionName, departmentName, groupName, item }) => (
                   <Link
                     key={`${divisionName}-${item.id}`}
-                    href={`/products?q=${encodeURIComponent(item.name)}`}
+                    href={`/products?category=${encodeURIComponent(item.slug)}`}
                     className="p-3.5 rounded-2xl bg-white/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-blue-500/60 dark:hover:border-blue-400 transition-all hover:scale-[1.02] shadow-sm flex items-center justify-between group"
                   >
                     <div className="min-w-0 pr-2">
@@ -261,9 +261,12 @@ export default function CatalogTaxonomyDirectory({ initialTaxonomy }: Props) {
                       {/* Group Header */}
                       <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-slate-200/80 dark:border-slate-800">
                         <div>
-                          <h3 className="text-sm font-black text-slate-900 dark:text-white tracking-wide uppercase font-heading">
+                          <Link 
+                            href={`/products?category=${encodeURIComponent(group.slug)}`}
+                            className="text-sm font-black text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors tracking-wide uppercase font-heading block"
+                          >
                             {group.name}
-                          </h3>
+                          </Link>
                           {group.badge && (
                             <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400">
                               {group.badge}
@@ -283,7 +286,7 @@ export default function CatalogTaxonomyDirectory({ initialTaxonomy }: Props) {
                             className="group/item flex items-center justify-between p-2 sm:p-2.5 rounded-xl hover:bg-blue-50 dark:hover:bg-slate-800/80 transition-colors duration-150"
                           >
                             <Link
-                              href={`/products?q=${encodeURIComponent(item.name)}`}
+                              href={`/products?category=${encodeURIComponent(item.slug)}`}
                               className="flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-200 group-hover/item:text-blue-600 dark:group-hover/item:text-blue-400 transition-colors flex-1 min-w-0"
                             >
                               <span className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 group-hover/item:bg-blue-500 transition-colors shrink-0" />
@@ -293,7 +296,7 @@ export default function CatalogTaxonomyDirectory({ initialTaxonomy }: Props) {
                             <div className="flex items-center gap-1.5 shrink-0 ml-2">
                               {item.productCount && item.productCount > 0 ? (
                                 <Link
-                                  href={`/products?q=${encodeURIComponent(item.name)}`}
+                                  href={`/products?category=${encodeURIComponent(item.slug)}`}
                                   className="text-[10px] font-black px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 hover:bg-blue-600 hover:text-white transition-all"
                                   title="View available products"
                                 >
