@@ -4,6 +4,12 @@ import { getToken } from 'next-auth/jwt';
 import { canAccessRoute, Role } from '@/lib/permissions';
 
 export async function middleware(req: NextRequest) {
+    // ── PRIORITY 0: Block CVE-2025-29927 (Next.js Middleware Auth Bypass) ───────
+    // Prevent spoofed internal subrequest headers from bypassing middleware authentication.
+    if (req.headers.has('x-middleware-subrequest')) {
+        return new NextResponse('Access Denied: Malformed Subrequest Header', { status: 403 });
+    }
+
     const path = req.nextUrl.pathname;
     const method = req.method;
 

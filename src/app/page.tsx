@@ -9,13 +9,13 @@ import OurProducts3D from '@/components/home/OurProducts3D';
 import CoreValues3D from '@/components/home/CoreValues3D';
 import TelegramVideoGallery from '@/components/home/TelegramVideoGallery';
 
-const HeroSlider = nextDynamic(() => import('@/components/home/HeroSlider'), { ssr: false });
-const StatsCounter = nextDynamic(() => import('@/components/home/StatsCounter'), { ssr: false });
+const HeroSlider = nextDynamic(() => import('@/components/home/HeroSlider'));
+const StatsCounter = nextDynamic(() => import('@/components/home/StatsCounter'));
 const CategoryGrid = nextDynamic(() => import('@/components/home/CategoryGrid'));
 const WhyChooseUs = nextDynamic(() => import('@/components/home/WhyChooseUs'));
 const Certifications = nextDynamic(() => import('@/components/home/Certifications'));
-const Testimonials = nextDynamic(() => import('@/components/home/Testimonials'), { ssr: false });
-const DeliveryFeed = nextDynamic(() => import('@/components/home/DeliveryFeed'), { ssr: false });
+const Testimonials = nextDynamic(() => import('@/components/home/Testimonials'));
+const DeliveryFeed = nextDynamic(() => import('@/components/home/DeliveryFeed'));
 const CTASection = nextDynamic(() => import('@/components/home/CTASection'));
 
 export const dynamic = 'force-dynamic';

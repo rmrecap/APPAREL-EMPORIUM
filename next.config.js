@@ -1,6 +1,9 @@
+const path = require('path');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: true,
+    outputFileTracingRoot: path.join(__dirname),
 
     eslint: {
         ignoreDuringBuilds: true,
@@ -10,8 +13,9 @@ const nextConfig = {
     },
     output: 'standalone', // Required for Hostinger Node.js hosting
     images: {
-        unoptimized: false, // Re-enable Next.js image optimization
-        formats: ['image/avif', 'image/webp'],
+        unoptimized: false, // Next.js image optimization
+        // AVIF optimization disabled due to libheif/sharp remote code execution vulnerability (CVE-2026-75604 / GHSA-2xp9-vwfh-vxw4)
+        formats: ['image/webp'],
         deviceSizes: [640, 750, 828, 1080, 1200, 1920],
         imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
         remotePatterns: [

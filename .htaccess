@@ -9,6 +9,11 @@ DirectoryIndex ""
     # RewriteCond %{HTTPS} off
     # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
     
+    # Mitigate CVE-2025-29927: prevent external spoofing of internal Next.js middleware header
+    <IfModule mod_headers.c>
+        RequestHeader unset x-middleware-subrequest
+    </IfModule>
+
     # Forward all requests to the running Node.js server (e.g., PM2 on port 3000)
     # Make sure the port here matches the port PM2 or npm start is running on
     RewriteCond %{REQUEST_FILENAME} !-f
