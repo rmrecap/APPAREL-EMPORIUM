@@ -52,7 +52,7 @@ export async function exportDatabaseUsingPrisma(outputPath: string): Promise<{
 
     const write = async (chunk: string) => {
         if (!writeStream.write(chunk)) {
-            await new Promise((resolve) => writeStream.once('drain', resolve));
+            await new Promise<void>((resolve) => writeStream.once('drain', () => resolve()));
         }
     };
 

@@ -42,10 +42,28 @@ export default function ProductionProcess3D({ headings, data, showDecor = false,
     // Content from Admin Dashboard or Defaults
     const parsedData = typeof data === 'string' ? (() => { try { return JSON.parse(data); } catch { return {}; } })() : (data || {});
     
-    const heading = headings?.production_process_heading || parsedData.heading || 'Our Premium Production Process';
-    const p1 = headings?.production_process_p1 || parsedData.p1 || 'Apparel Emporium is a leading apparel sourcing and manufacturing partner based in Bangladesh. With a commitment to quality, innovation, and ethical practices, we specialize in producing a wide range of high-quality garments for discerning buyers worldwide.';
-    const p2 = headings?.production_process_p2 || parsedData.p2 || 'Our vertically integrated production process ensures strict quality control and timely delivery, while our experienced team of designers and craftsmen bring creativity and expertise to every product we produce. We are your trusted partner in the global apparel industry.';
-    const btnText = headings?.production_process_btn_text || parsedData.btnText || 'VIEW PRODUCTION DETAILS';
+    const defaultHeading = 'Introducing Apparel Emporium';
+    const defaultP1 = 'Apparel Emporium is a Bangladesh-based apparel sourcing partner, exporter, and small-scale manufacturer.';
+    const defaultP2 = "With an integrated production and sourcing network, we maintain close attention to quality, workmanship, and timely delivery at every stage. Whether you’re looking stylish casual wear and sophisticated formalwear to customized design, we offer flexible solutions tailored to each client's unique requirements.";
+    const defaultP3 = 'At Apparel Emporium, we believe successful partnerships are built on quality, transparency, ethical practices, and trust. Our commitment is not simply to supply garments, but to build long-term relationships by delivering dependable service in the global apparel industry.';
+
+    const heading = (headings?.production_process_heading && headings.production_process_heading !== 'Our Premium Production Process') 
+        ? headings.production_process_heading 
+        : (parsedData.heading && parsedData.heading !== 'Our Premium Production Process' ? parsedData.heading : defaultHeading);
+
+    const p1 = (headings?.production_process_p1 && !headings.production_process_p1.includes('leading apparel sourcing and manufacturing partner based in Bangladesh'))
+        ? headings.production_process_p1
+        : (parsedData.p1 && !parsedData.p1.includes('leading apparel sourcing and manufacturing partner') ? parsedData.p1 : defaultP1);
+
+    const p2 = (headings?.production_process_p2 && !headings.production_process_p2.includes('vertically integrated production process ensures strict quality control'))
+        ? headings.production_process_p2
+        : (parsedData.p2 && !parsedData.p2.includes('vertically integrated production process') ? parsedData.p2 : defaultP2);
+
+    const p3 = defaultP3;
+
+    const btnText = (headings?.production_process_btn_text && headings.production_process_btn_text !== 'VIEW PRODUCTION DETAILS')
+        ? headings.production_process_btn_text
+        : (parsedData.btnText && parsedData.btnText !== 'VIEW PRODUCTION DETAILS' ? parsedData.btnText : 'EXPLORE SOURCING CAPABILITIES');
     const btnUrl = headings?.production_process_btn_url || parsedData.btnUrl || '';
     const isDecorVisible = showDecor && parsedData.showDecor !== false;
 
@@ -85,13 +103,43 @@ export default function ProductionProcess3D({ headings, data, showDecor = false,
         };
     }, [isModalOpen]);
 
-    const steps = [
-        { num: '01', title: 'Tech Pack Analysis & 3D CAD Drape', desc: 'Precision digital pattern grading, 3D virtual draping, and rapid proto sample creation within 72 hours for buyer fit signoff.', icon: Cpu },
-        { num: '02', title: 'Certified Yarn & Fabric Sourcing', desc: 'Procurement of OEKO-TEX Standard 100, GOTS certified organic cotton, and BCI combed yarns from green-rated partner mills.', icon: Layers },
-        { num: '03', title: 'Spectrophotometer Lab Dip Matching', desc: 'Pantone-accurate color formulations with 4-5 grade wash & rub fastness tests and pre-shrunk dimensional stabilization.', icon: FileCheck2 },
-        { num: '04', title: 'Automated Cutting & Precision Stitching', desc: 'Gerber computerized laser cutting lines followed by high-speed Juki sewing assembly with automated tension regulation.', icon: Scissors },
-        { num: '05', title: 'In-line QA & Multi-Stage Inspection', desc: 'Rigorous checks at 20% and 50% production milestones, needle/metal detection, and complete statistical quality reporting as per buyer manual.', icon: ShieldCheck },
-        { num: '06', title: 'Pressing, Poly Packaging & Port Logistics', desc: 'Tunnel steam finishing, barcode tagging, moisture-barrier poly packing, and prompt customs dispatch to Chittagong Port.', icon: Globe }
+    const categories = [
+        { 
+            num: '01', 
+            title: 'Knitwear (নিট আইটেম)', 
+            desc: 'T-shirts, polo shirts, tank tops, hoodies, sweatshirts, and joggers tailored with premium single jersey, pique, interlock, and rib fabrics with custom washes.', 
+            icon: Layers 
+        },
+        { 
+            num: '02', 
+            title: 'Woven Garments (ওভেন আইটেম)', 
+            desc: 'Casual & formal shirts, denim jeans, twill chinos, cargo trousers, and light jackets with precision stitching and tailored buyer fits.', 
+            icon: Scissors 
+        },
+        { 
+            num: '03', 
+            title: 'Sweaters & Knitcraft (সোয়েটার)', 
+            desc: '3GG to 12GG gauge flat-knit pullovers, cardigans, and knitwear crafted from soft cotton, acrylic, cashmere-touch, and blended yarns.', 
+            icon: Cpu 
+        },
+        { 
+            num: '04', 
+            title: 'Fashion & Activewear (ফ্যাশন ও অ্যাক্টিভওয়্যার)', 
+            desc: 'Contemporary casual dresses, performance sportswear, gym apparel, and custom-styled fashion wear developed directly from buyer tech packs.', 
+            icon: FileCheck2 
+        },
+        { 
+            num: '05', 
+            title: 'Home Textiles (হোম টেক্সটাইল)', 
+            desc: 'High-absorbency terry towels, bathrobes, bed sheets, duvet covers, pillowcases, and kitchen linen crafted for lasting softness and durability.', 
+            icon: ShieldCheck 
+        },
+        { 
+            num: '06', 
+            title: 'Accessories & Footwear (এক্সেসরিজ ও ফুটওয়্যার)', 
+            desc: 'Knitted socks, caps, canvas/casual shoes, woven belts, shopping tote bags, and custom trims tailored to client specifications.', 
+            icon: Globe 
+        }
     ];
 
     return (
@@ -235,7 +283,7 @@ export default function ProductionProcess3D({ headings, data, showDecor = false,
 
                                 {/* Paragraph 1 (Editable from Admin) */}
                                 {p1 && (
-                                    <p className="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+                                    <p className="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
                                         {p1}
                                     </p>
                                 )}
@@ -244,6 +292,13 @@ export default function ProductionProcess3D({ headings, data, showDecor = false,
                                 {p2 && (
                                     <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
                                         {p2}
+                                    </p>
+                                )}
+
+                                {/* Paragraph 3 (Editable from Admin) */}
+                                {p3 && (
+                                    <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
+                                        {p3}
                                     </p>
                                 )}
 
@@ -281,7 +336,7 @@ export default function ProductionProcess3D({ headings, data, showDecor = false,
 
             </div>
 
-            {/* ── MODAL: 6-STEP PRODUCTION SPECIFICATIONS ── */}
+            {/* ── MODAL: APPAREL EMPORIUM SOURCING CAPABILITIES ── */}
             {isModalOpen && (
                 <div 
                     role="dialog"
@@ -300,13 +355,13 @@ export default function ProductionProcess3D({ headings, data, showDecor = false,
                         <div className="p-6 sm:p-8 border-b border-slate-200 dark:border-white/10 flex items-start justify-between bg-gradient-to-r from-slate-50 to-white dark:from-[#0F1420] dark:to-[#121826]">
                             <div>
                                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-blue-500/10 text-primary dark:text-blue-400 border border-blue-500/20 mb-2">
-                                    Quality Assurance & Compliance
+                                    Apparel Sourcing & Manufacturing
                                 </span>
                                 <h3 id="proc-modal-title" className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-heading">
-                                    {heading} — Detailed Manufacturing Workflow
+                                    Apparel Emporium — Sourcing & Manufacturing Scope
                                 </h3>
                                 <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-                                    From initial design tech pack review to Chittagong Port export clearance.
+                                    Integrated apparel solutions tailored to buyers across Europe, North America, and global markets.
                                 </p>
                             </div>
                             <button
@@ -318,11 +373,11 @@ export default function ProductionProcess3D({ headings, data, showDecor = false,
                             </button>
                         </div>
 
-                        {/* Steps Grid */}
+                        {/* Product Categories Grid */}
                         <div className="p-6 sm:p-8 overflow-y-auto space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {steps.map((st, i) => {
-                                    const IconComponent = st.icon;
+                                {categories.map((cat, i) => {
+                                    const IconComponent = cat.icon;
                                     return (
                                         <div 
                                             key={i}
@@ -331,15 +386,15 @@ export default function ProductionProcess3D({ headings, data, showDecor = false,
                                             <div>
                                                 <div className="flex items-center justify-between mb-2">
                                                     <span className="text-xs font-black tracking-widest text-primary dark:text-blue-400 uppercase">
-                                                        Phase {st.num}
+                                                        Category {cat.num}
                                                     </span>
                                                 </div>
                                                 <h4 className="text-base font-bold text-slate-900 dark:text-white mb-1.5 flex items-center gap-2">
                                                     {showIcons && <IconComponent className="w-4 h-4 text-primary dark:text-blue-400 shrink-0" />}
-                                                    {st.title}
+                                                    {cat.title}
                                                 </h4>
                                                 <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                                                    {st.desc}
+                                                    {cat.desc}
                                                 </p>
                                             </div>
                                         </div>
@@ -347,21 +402,21 @@ export default function ProductionProcess3D({ headings, data, showDecor = false,
                                 })}
                             </div>
 
-                            {/* Benchmark metrics */}
+                            {/* Authentic Sourcing Standards */}
                             <div className="p-5 rounded-2xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/60 dark:border-blue-500/20 flex flex-wrap items-center justify-around gap-4 text-center">
-                                <div>
-                                    <div className="text-xl sm:text-2xl font-black text-primary dark:text-blue-400">Buyer Quality</div>
-                                    <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Strict Quality Benchmark</div>
+                                <div className="max-w-[200px]">
+                                    <div className="text-base sm:text-lg font-black text-primary dark:text-blue-400">Flexible Production</div>
+                                    <div className="text-[11px] font-medium text-slate-600 dark:text-slate-400 mt-0.5">Small to custom volume orders adapted to client needs</div>
                                 </div>
                                 <div className="h-8 w-px bg-blue-200 dark:bg-blue-800 hidden sm:block" />
-                                <div>
-                                    <div className="text-xl sm:text-2xl font-black text-primary dark:text-blue-400">99.4%</div>
-                                    <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">On-Time Shipment Rate</div>
+                                <div className="max-w-[200px]">
+                                    <div className="text-base sm:text-lg font-black text-primary dark:text-blue-400">Quality Workmanship</div>
+                                    <div className="text-[11px] font-medium text-slate-600 dark:text-slate-400 mt-0.5">Continuous attention to detail, fabric, and finishing</div>
                                 </div>
                                 <div className="h-8 w-px bg-blue-200 dark:bg-blue-800 hidden sm:block" />
-                                <div>
-                                    <div className="text-xl sm:text-2xl font-black text-primary dark:text-blue-400">100%</div>
-                                    <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Socially Compliant Mills</div>
+                                <div className="max-w-[200px]">
+                                    <div className="text-base sm:text-lg font-black text-primary dark:text-blue-400">Ethical & Transparent</div>
+                                    <div className="text-[11px] font-medium text-slate-600 dark:text-slate-400 mt-0.5">Building dependable, long-term B2B partnerships</div>
                                 </div>
                             </div>
                         </div>

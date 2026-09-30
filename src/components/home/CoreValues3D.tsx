@@ -1,15 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { 
-    X, 
     ShieldCheck, 
     Award, 
-    Leaf, 
-    CheckCircle2, 
-    ArrowRight
+    Leaf 
 } from 'lucide-react';
 import { 
     GarmentButton3D, 
@@ -29,14 +25,21 @@ interface CoreValuesProps {
 export default function CoreValues3D({ headings, data, showDecor = false, showIcons = false }: CoreValuesProps) {
     const parsedData = typeof data === 'string' ? (() => { try { return JSON.parse(data); } catch { return []; } })() : (data || []);
 
-    const sectionHeading = headings?.core_values_heading || 'OUR CORE VALUES';
-    const sectionSubheading = headings?.core_values_subheading || 'We offer great quality, value, and an inspiring trading experience. Our relationships are built on trust and exceptional service.';
+    const sectionHeading = (headings?.core_values_heading && headings.core_values_heading !== 'OUR CORE VALUES') 
+        ? headings.core_values_heading 
+        : 'Values of Apparel Emporium';
+
+    const defaultSubheading = "We are able to offer customers great quality and value, an easy and inspirational trading experience.\nWe are passionate about serving our customers and getting better every day. The relationships we build with our customers are an important part of why they keep coming back to us and we believe a good reputation is an impression.";
+
+    const sectionSubheading = (headings?.core_values_subheading && !headings.core_values_subheading.includes('inspiring trading experience. Our relationships are built on trust'))
+        ? headings.core_values_subheading
+        : defaultSubheading;
 
     const defaultValues = [
         {
             id: 'ownership',
             title: 'Ownership',
-            desc: 'We believe in ownership and mutual growth across every partnership.',
+            desc: 'We believe in ownership. We are all owners in the business and think of our employment at the company as a two-way street.',
             emblemLight: '/images/3d/emblem_ownership_light.png',
             emblemDark: '/images/3d/emblem_ownership_dark.png',
             glowColor: 'dark:border-blue-400/60 dark:shadow-[0_0_30px_rgba(59,130,246,0.35),inset_0_0_15px_rgba(59,130,246,0.1)]',
@@ -45,7 +48,7 @@ export default function CoreValues3D({ headings, data, showDecor = false, showIc
         {
             id: 'excellence',
             title: 'Excellence',
-            desc: 'We go all-out to excel in every aspect of garment manufacturing.',
+            desc: 'We go all-out to excel in every aspect of our business and approach every challenge with a determination to succeed.',
             emblemLight: '/images/3d/emblem_excellence_light.png',
             emblemDark: '/images/3d/emblem_excellence_dark.png',
             glowColor: 'dark:border-cyan-400/60 dark:shadow-[0_0_30px_rgba(6,182,212,0.35),inset_0_0_15px_rgba(6,182,212,0.1)]',
@@ -54,7 +57,7 @@ export default function CoreValues3D({ headings, data, showDecor = false, showIc
         {
             id: 'social',
             title: 'Social Responsibility',
-            desc: 'Ensuring a sustainable future through green technology and ethical practices.',
+            desc: 'We care for the future generation of our beloved country. Our Environment care is always ensured by green technology and management.',
             emblemLight: '/images/3d/emblem_social_light.png',
             emblemDark: '/images/3d/emblem_social_dark.png',
             glowColor: 'dark:border-emerald-400/60 dark:shadow-[0_0_30px_rgba(16,185,129,0.35),inset_0_0_15px_rgba(16,185,129,0.1)]',
@@ -62,19 +65,18 @@ export default function CoreValues3D({ headings, data, showDecor = false, showIc
         }
     ];
 
-    const values = Array.isArray(parsedData) && parsedData.length > 0 ? parsedData : defaultValues;
+    const values = defaultValues;
 
     // Track active tilt per card
     const [cardTilts, setCardTilts] = useState<Record<string, { x: number; y: number }>>({});
-    const [activeModalValue, setActiveModalValue] = useState<string | null>(null);
 
     const handleMouseMove = (id: string, e: React.MouseEvent<HTMLDivElement>) => {
         const rect = e.currentTarget.getBoundingClientRect();
         const x = (e.clientX - rect.left) / rect.width;
         const y = (e.clientY - rect.top) / rect.height;
 
-        const rotateY = (x - 0.5) * 10;
-        const rotateX = -(y - 0.5) * 10;
+        const rotateY = (x - 0.5) * 8;
+        const rotateX = -(y - 0.5) * 8;
 
         setCardTilts(prev => ({ ...prev, [id]: { x: rotateX, y: rotateY } }));
     };
@@ -82,23 +84,6 @@ export default function CoreValues3D({ headings, data, showDecor = false, showIc
     const handleMouseLeave = (id: string) => {
         setCardTilts(prev => ({ ...prev, [id]: { x: 0, y: 0 } }));
     };
-
-    // Close modal on Escape
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') setActiveModalValue(null);
-        };
-        if (activeModalValue) {
-            window.addEventListener('keydown', handleKeyDown);
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = '';
-        }
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-            document.body.style.overflow = '';
-        };
-    }, [activeModalValue]);
 
     return (
         <section 
@@ -163,7 +148,7 @@ export default function CoreValues3D({ headings, data, showDecor = false, showIc
             <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
 
                 {/* Section Header matching Mockup */}
-                <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+                <div className="text-center max-w-4xl mx-auto mb-12 sm:mb-16">
                     {sectionHeading && (
                         <h2 
                             id="core-values-heading"
@@ -174,9 +159,11 @@ export default function CoreValues3D({ headings, data, showDecor = false, showIc
                         </h2>
                     )}
                     {sectionSubheading && (
-                        <p className="mt-3 text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed max-w-2xl mx-auto">
-                            {sectionSubheading}
-                        </p>
+                        <div className="mt-4 text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed max-w-3xl mx-auto space-y-2">
+                            {sectionSubheading.split('\n').map((line, idx) => (
+                                <p key={idx}>{line}</p>
+                            ))}
+                        </div>
                     )}
                 </div>
 
@@ -193,14 +180,13 @@ export default function CoreValues3D({ headings, data, showDecor = false, showIc
                                 className="w-full"
                             >
                                 <div
-                                    onClick={() => setActiveModalValue(val.id)}
                                     onMouseMove={(e) => handleMouseMove(val.id, e)}
                                     onMouseLeave={() => handleMouseLeave(val.id)}
-                                    className={`relative rounded-[32px] p-8 sm:p-9 transition-all duration-300 flex flex-col items-center justify-between text-center cursor-pointer min-h-[380px]
+                                    className={`relative rounded-[32px] p-8 sm:p-9 transition-all duration-300 flex flex-col items-center justify-start text-center min-h-[380px]
                                         bg-[#F3EFE8]/95 dark:bg-[#0A1222]/95
                                         border-4 border-[#FAF7F2] ${val.glowColor || 'dark:border-cyan-400/50'}
                                         shadow-[0_15px_35px_rgba(0,0,0,0.1),inset_0_2px_4px_rgba(255,255,255,0.8)]
-                                        hover:border-primary/40 dark:hover:scale-102`}
+                                        hover:border-primary/40`}
                                     style={{
                                         transform: isHovered 
                                             ? `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale3d(1.02, 1.02, 1.02)` 
@@ -251,25 +237,19 @@ export default function CoreValues3D({ headings, data, showDecor = false, showIc
                                         </div>
                                     </div>
 
-                                    {/* Title matching Mockup (100% Coded & Editable from Admin) */}
+                                    {/* Title matching Mockup (100% Coded & Authentic) */}
                                     {val.title && (
                                         <h3 className="text-xl sm:text-2xl font-bold font-heading text-slate-900 dark:text-white mb-3">
                                             {val.title}
                                         </h3>
                                     )}
 
-                                    {/* Description matching Mockup (100% Coded & Editable from Admin) */}
+                                    {/* Description matching Mockup (100% Coded & Authentic) */}
                                     {val.desc && (
-                                        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-[260px]">
+                                        <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium max-w-[280px]">
                                             {val.desc}
                                         </p>
                                     )}
-
-                                    {/* Click Indicator */}
-                                    <div className="mt-5 text-[11px] font-bold text-primary dark:text-cyan-400 flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
-                                        <span>Learn more</span>
-                                        <ArrowRight size={12} />
-                                    </div>
                                 </div>
                             </div>
                         );
@@ -277,89 +257,6 @@ export default function CoreValues3D({ headings, data, showDecor = false, showIc
                 </div>
 
             </div>
-
-            {/* ── MODAL: VALUE COMMITMENTS ── */}
-            {activeModalValue && (
-                <div 
-                    role="dialog"
-                    aria-modal="true"
-                    aria-labelledby="value-modal-title"
-                    className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200"
-                >
-                    <div 
-                        className="fixed inset-0 bg-slate-950/75 backdrop-blur-md transition-opacity"
-                        onClick={() => setActiveModalValue(null)}
-                    />
-
-                    <div className="relative w-full max-w-lg bg-white dark:bg-[#121826] border border-slate-200 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col z-10 animate-in zoom-in-95 duration-200">
-                        {(() => {
-                            const val = values.find((v: any) => v.id === activeModalValue) || values[0];
-                            return (
-                                <>
-                                    <div className="p-6 border-b border-slate-200 dark:border-white/10 flex items-start justify-between bg-gradient-to-r from-slate-50 to-white dark:from-[#0F1420] dark:to-[#121826]">
-                                        <div>
-                                            <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary dark:text-cyan-400">
-                                                Core Value Commitment
-                                            </span>
-                                            <h3 id="value-modal-title" className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-heading mt-0.5">
-                                                {val.title}
-                                            </h3>
-                                        </div>
-                                        <button
-                                            type="button"
-                                            onClick={() => setActiveModalValue(null)}
-                                            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
-                                        >
-                                            <X size={20} />
-                                        </button>
-                                    </div>
-
-                                    <div className="p-6 space-y-4">
-                                        <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
-                                            {val.desc}
-                                        </p>
-                                        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-white/5 space-y-2.5">
-                                            <span className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider block">
-                                                Operational Practice:
-                                            </span>
-                                            <div className="flex items-start gap-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-                                                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                                                <span>100% compliant export apparel sourcing aligned with international buyer codes of conduct.</span>
-                                            </div>
-                                            <div className="flex items-start gap-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-                                                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                                                <span>Customized final inspection benchmarks tailored to buyer specifications with comprehensive audit reports.</span>
-                                            </div>
-                                            <div className="flex items-start gap-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-                                                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                                                <span>Long-term strategic partnership model focusing on transparent costing and timely shipment.</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="p-5 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0F1420] flex items-center justify-between">
-                                        <button
-                                            type="button"
-                                            onClick={() => setActiveModalValue(null)}
-                                            className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/5 transition-colors"
-                                        >
-                                            Close
-                                        </button>
-                                        <Link
-                                            href="/about"
-                                            onClick={() => setActiveModalValue(null)}
-                                            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-primary hover:bg-blue-900 text-white dark:bg-cyan-600 dark:hover:bg-cyan-500 transition-colors shadow-sm"
-                                        >
-                                            <span>About Company</span>
-                                            <ArrowRight size={13} />
-                                        </Link>
-                                    </div>
-                                </>
-                            );
-                        })()}
-                    </div>
-                </div>
-            )}
         </section>
     );
 }

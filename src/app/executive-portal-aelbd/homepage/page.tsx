@@ -20,9 +20,9 @@ const SECTION_NAMES: Record<SectionID, string> = {
     stats_counter: 'Stats Counter (কোয়ালিটি ও মেট্রিক কাউন্টার)',
     category_grid: 'Our Manufacturing Capabilities (ক্যাটাগরি গ্রিড)',
     featured_products: 'Featured Products (ফিচার্ড প্রোডাক্টস)',
-    production_process: 'Our Premium Production Process (প্রোডাকশন প্রসেস থ্রিডি শোকেস)',
+    production_process: 'Introducing Apparel Emporium (পরিচিতি ও সোর্সিং সুবিধা)',
     our_products_3d: 'Our Products Categories (আওয়ার প্রোডাক্টস থ্রিডি শোকেস)',
-    core_values_3d: 'Our Core Values (আওয়ার কোর ভ্যালুজ থ্রিডি শোকেস)',
+    core_values_3d: 'Values of Apparel Emporium (ভ্যালুজ অব অ্যাপারেল এম্পোরিয়াম)',
     telegram_video_gallery: 'Telegram Video Gallery (ভিডিও গ্যালারি)',
     delivery_feed: 'Recent Deliveries & Production (লাইভ ডেলিভারি ফিড)',
     why_choose_us: 'Why Partner With Us (কর্পোরেট সুবিধা)',
@@ -60,18 +60,18 @@ const HEADING_FIELDS: HeadingField[] = [
     // Featured Products
     { key: 'featured_products_eyebrow', label: 'Featured Products — Eyebrow Tag', placeholder: 'Premium Quality', hint: 'Appears next to the star icon above the heading.' },
     { key: 'featured_products_heading', label: 'Featured Products — Section Heading', placeholder: 'Featured Products' },
-    // Production Process 3D
-    { key: 'production_process_heading', label: 'Production Process — Heading', placeholder: 'Our Premium Production Process' },
-    { key: 'production_process_p1', label: 'Production Process — Paragraph 1', placeholder: 'Apparel Emporium is a leading apparel sourcing...' },
-    { key: 'production_process_p2', label: 'Production Process — Paragraph 2', placeholder: 'Our vertically integrated production process ensures...' },
-    { key: 'production_process_btn_text', label: 'Production Process — Button Label', placeholder: 'VIEW PRODUCTION DETAILS' },
+    // Introducing Apparel Emporium 3D
+    { key: 'production_process_heading', label: 'Introducing Section — Heading', placeholder: 'Introducing Apparel Emporium' },
+    { key: 'production_process_p1', label: 'Introducing Section — Paragraph 1', placeholder: 'Apparel Emporium is a Bangladesh-based apparel sourcing partner, exporter, and small-scale manufacturer.' },
+    { key: 'production_process_p2', label: 'Introducing Section — Paragraph 2', placeholder: 'With an integrated production and sourcing network, we maintain close attention to quality...' },
+    { key: 'production_process_btn_text', label: 'Introducing Section — Button Label', placeholder: 'EXPLORE SOURCING CAPABILITIES' },
     // Our Products 3D
     { key: 'our_products_heading', label: 'Our Products — Main Heading', placeholder: 'OUR PRODUCTS' },
     { key: 'our_products_btn_text', label: 'Our Products — Button Label', placeholder: 'VIEW ALL PRODUCTS' },
     { key: 'our_products_btn_url', label: 'Our Products — Button URL', placeholder: '/products' },
     // Core Values 3D
-    { key: 'core_values_heading', label: 'Core Values — Main Heading', placeholder: 'OUR CORE VALUES' },
-    { key: 'core_values_subheading', label: 'Core Values — Subheading Description', placeholder: 'We offer great quality, value, and an inspiring trading experience...' },
+    { key: 'core_values_heading', label: 'Core Values — Main Heading', placeholder: 'Values of Apparel Emporium' },
+    { key: 'core_values_subheading', label: 'Core Values — Subheading Description', placeholder: 'We are able to offer customers great quality and value, an easy and inspirational trading experience...' },
 ];
 
 /* ─────────────────────────────────────────────────────────────
@@ -221,16 +221,22 @@ export default function HomepageBuilderPage() {
             else if (id === 'testimonials') initialData = [];
             else if (id === 'cta_section') initialData = { heading: '', subheading: '', ctaText: '', ctaLink: '', image: '' };
             else if (id === 'announcement_bar') initialData = { text: '', link: '', bgColor: '#1B365D', textColor: '#ffffff' };
-            else if (id === 'production_process') initialData = { heading: 'Our Premium Production Process', p1: 'Apparel Emporium is a leading apparel sourcing and manufacturing partner based in Bangladesh...', p2: 'Our vertically integrated production process ensures strict quality control...', btnText: 'VIEW PRODUCTION DETAILS' };
+            else if (id === 'production_process') initialData = { 
+                heading: 'Introducing Apparel Emporium', 
+                p1: 'Apparel Emporium is a Bangladesh-based apparel sourcing partner, exporter, and small-scale manufacturer.', 
+                p2: "With an integrated production and sourcing network, we maintain close attention to quality, workmanship, and timely delivery at every stage. Whether you’re looking stylish casual wear and sophisticated formalwear to customized design, we offer flexible solutions tailored to each client's unique requirements.", 
+                p3: 'At Apparel Emporium, we believe successful partnerships are built on quality, transparency, ethical practices, and trust. Our commitment is not simply to supply garments, but to build long-term relationships by delivering dependable service in the global apparel industry.',
+                btnText: 'EXPLORE SOURCING CAPABILITIES' 
+            };
             else if (id === 'our_products_3d') initialData = [
                 { id: 'knit', title: 'KNIT', tag: 'MEN • WOMEN • KIDS', url: '/products?category=knitwear', imgLight: '/images/3d/cluster_knit_light.jpg', imgDark: '/images/3d/cluster_knit_dark.jpg' },
                 { id: 'woven', title: 'WOVEN', tag: 'MEN • WOMEN • KIDS', url: '/products?category=woven', imgLight: '/images/3d/cluster_woven_light.jpg', imgDark: '/images/3d/cluster_woven_dark.jpg' },
                 { id: 'sweater', title: 'SWEATER', tag: 'MEN • WOMEN • KIDS', url: '/products?category=sweater', imgLight: '/images/3d/cluster_sweater_light.jpg', imgDark: '/images/3d/cluster_sweater_dark.jpg' }
             ];
             else if (id === 'core_values_3d') initialData = [
-                { id: 'ownership', title: 'Ownership', desc: 'We believe in ownership and mutual growth across every partnership.' },
-                { id: 'excellence', title: 'Excellence', desc: 'We go all-out to excel in every aspect of garment manufacturing.' },
-                { id: 'social', title: 'Social Responsibility', desc: 'Ensuring a sustainable future through green technology and ethical practices.' }
+                { id: 'ownership', title: 'Ownership', desc: 'We believe in ownership. We are all owners in the business and think of our employment at the company as a two-way street.' },
+                { id: 'excellence', title: 'Excellence', desc: 'We go all-out to excel in every aspect of our business and approach every challenge with a determination to succeed.' },
+                { id: 'social', title: 'Social Responsibility', desc: 'We care for the future generation of our beloved country. Our Environment care is always ensured by green technology and management.' }
             ];
         }
         setEditorData(initialData); setEditingSection(id);
@@ -658,9 +664,9 @@ export default function HomepageBuilderPage() {
                     <div className="space-y-4">
                         {/* Group by section */}
                         {[
-                            { section: 'Our Premium Production Process (3D Showroom)', keys: ['production_process_heading', 'production_process_p1', 'production_process_p2', 'production_process_btn_text'] },
+                            { section: 'Introducing Apparel Emporium (3D Showroom)', keys: ['production_process_heading', 'production_process_p1', 'production_process_p2', 'production_process_btn_text'] },
                             { section: 'Our Products Categories (3D Showroom)', keys: ['our_products_heading', 'our_products_btn_text', 'our_products_btn_url'] },
-                            { section: 'Our Core Values (3D Showroom)', keys: ['core_values_heading', 'core_values_subheading'] },
+                            { section: 'Values of Apparel Emporium (3D Showroom)', keys: ['core_values_heading', 'core_values_subheading'] },
                             { section: 'Featured Products', keys: ['featured_products_eyebrow', 'featured_products_heading'] },
                             { section: 'Shop By Category', keys: ['category_grid_eyebrow', 'category_grid_heading'] },
                             { section: 'Why Choose Us / Partner Features', keys: ['why_choose_us_eyebrow', 'why_choose_us_heading', 'why_choose_us_subheading'] },

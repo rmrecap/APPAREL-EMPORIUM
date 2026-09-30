@@ -150,7 +150,7 @@ export async function executeGoogleDriveBackup(): Promise<BackupExecutionResult>
             });
 
             output.on('close', () => resolve());
-            archive.on('error', (err) => reject(err));
+            archive.on('error', (err: any) => reject(err));
 
             archive.pipe(output);
 

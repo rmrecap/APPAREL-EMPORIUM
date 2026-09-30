@@ -401,24 +401,24 @@ export default function ProductDetail3DView({
                 />
             </div>
 
-            <div className="container mx-auto max-w-4xl px-4 sm:px-6 pt-24 sm:pt-28 pb-24 relative z-10 space-y-12 sm:space-y-16">
+            <div className="container mx-auto max-w-6xl px-4 sm:px-6 pt-24 sm:pt-28 pb-24 relative z-10 space-y-12 sm:space-y-16">
 
                 {/* ═══════════════════════ TOP SECTION: PRODUCT SHOWCASE & PRIMARY INFO ═══════════════════════ */}
-                <section className="grid grid-cols-1 md:grid-cols-12 gap-8 sm:gap-10 items-start">
+                <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
 
-                    {/* Left Column: 3D Product Pedestal Stage with Amazon-Style Zoom & Coded 3D Globe */}
-                    <div className="md:col-span-5 flex flex-col items-center">
-                        <div className="relative w-full max-w-[340px]">
+                    {/* Left Column: Spacious Open Product Showcase & Horizontal Thumbnails Row (Matching Reference Layout) */}
+                    <div className="lg:col-span-7 flex flex-col w-full">
+                        <div className="relative w-full">
                             {/* Ambient Top Spotlight Beam in Dark Mode */}
-                            <div className="hidden dark:block pointer-events-none absolute -top-16 left-1/2 -translate-x-1/2 w-52 h-64 bg-gradient-to-b from-cyan-400/30 via-cyan-500/10 to-transparent blur-xl [clip-path:polygon(32%_0%,68%_0%,100%_100%,0%_100%)] z-0" />
+                            <div className="hidden dark:block pointer-events-none absolute -top-16 left-1/2 -translate-x-1/2 w-72 h-72 bg-gradient-to-b from-cyan-400/25 via-cyan-500/10 to-transparent blur-2xl [clip-path:polygon(25%_0%,75%_0%,100%_100%,0%_100%)] z-0" />
 
-                            {/* 3D Extruded Bezel Frame / Pedestal */}
-                            <div className="prod-stage-bezel rounded-[36px] sm:rounded-[42px] p-4 sm:p-5 relative z-10 flex flex-col items-center justify-center min-h-[350px] sm:min-h-[390px]">
+                            {/* Main Product Showcase Stage - Open, generous, unrestrained by cramped box */}
+                            <div className="prod-stage-bezel rounded-[28px] sm:rounded-[36px] p-3 sm:p-5 relative z-10 flex flex-col items-center justify-center min-h-[380px] sm:min-h-[460px] md:min-h-[500px]">
                                 
                                 {/* Amazon-Style Interactive Zoom Container */}
                                 <div 
                                     ref={imgContainerRef}
-                                    className="w-full h-full min-h-[280px] sm:min-h-[320px] flex items-center justify-center overflow-hidden rounded-[26px] sm:rounded-[32px] relative cursor-crosshair select-none p-3 group bg-black/[0.02] dark:bg-white/[0.02]"
+                                    className="w-full h-full min-h-[350px] sm:min-h-[430px] md:min-h-[470px] flex items-center justify-center overflow-hidden rounded-[20px] sm:rounded-[28px] relative cursor-crosshair select-none p-3 group bg-black/[0.02] dark:bg-white/[0.02]"
                                     onMouseEnter={() => setIsZooming(true)}
                                     onMouseLeave={() => setIsZooming(false)}
                                     onMouseMove={handleMouseMove}
@@ -429,14 +429,14 @@ export default function ProductDetail3DView({
                                     <img
                                         src={activeImage}
                                         alt={`${product.name} - B2B Export Garment Specification`}
-                                        width={600}
-                                        height={600}
+                                        width={800}
+                                        height={800}
                                         style={{
                                             transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
                                             transform: isZooming ? 'scale(2.8)' : 'scale(1)',
                                             transition: isZooming ? 'transform 0.08s ease-out' : 'transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1)',
                                         }}
-                                        className="w-full h-auto max-h-[290px] sm:max-h-[330px] object-contain select-none pointer-events-none drop-shadow-[0_16px_28px_rgba(150,145,135,0.35)] dark:drop-shadow-[0_0_26px_rgba(56,189,248,0.45)]"
+                                        className="w-full h-auto max-h-[340px] sm:max-h-[420px] md:max-h-[460px] object-contain select-none pointer-events-none drop-shadow-[0_16px_30px_rgba(150,145,135,0.35)] dark:drop-shadow-[0_0_28px_rgba(56,189,248,0.45)]"
                                     />
 
                                     {/* Optical Crosshair Reticle on Zoom */}
@@ -457,14 +457,14 @@ export default function ProductDetail3DView({
                                             e.stopPropagation();
                                             setIsFullscreenZoom(true);
                                         }}
-                                        className="absolute top-3 right-3 p-2 rounded-xl bg-slate-900/60 hover:bg-slate-900/90 text-white backdrop-blur-md transition-all opacity-0 group-hover:opacity-100 shadow-md cursor-pointer"
+                                        className="absolute top-3 right-3 p-2.5 rounded-xl bg-slate-900/60 hover:bg-slate-900/90 text-white backdrop-blur-md transition-all opacity-0 group-hover:opacity-100 shadow-md cursor-pointer"
                                         title="Inspect Fabric in Fullscreen"
                                     >
-                                        <Maximize2 size={14} />
+                                        <Maximize2 size={15} />
                                     </button>
 
                                     {/* Amazon-Style Tooltip Pill Badge */}
-                                    <div className={`absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase transition-all duration-300 pointer-events-none flex items-center gap-1.5 shadow-sm ${
+                                    <div className={`absolute bottom-3 left-1/2 -translate-x-1/2 px-3.5 py-1.5 rounded-full text-[10.5px] font-bold tracking-wider uppercase transition-all duration-300 pointer-events-none flex items-center gap-1.5 shadow-sm ${
                                         isZooming 
                                             ? 'bg-slate-900 text-white dark:bg-cyan-500 dark:text-slate-950 opacity-95 scale-95' 
                                             : 'bg-black/50 text-white/90 backdrop-blur-sm opacity-80 group-hover:opacity-100'
@@ -473,33 +473,37 @@ export default function ProductDetail3DView({
                                         <span>{isZooming ? 'Pan to inspect fabric (2.8x)' : 'Roll over image to zoom'}</span>
                                     </div>
                                 </div>
+                            </div>
 
-                                {/* Thumbnail Switcher (if multiple images) */}
-                                {images.length > 1 && (
-                                    <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-300/60 dark:border-white/10 w-full justify-center">
-                                        {images.map((img, idx) => (
+                            {/* Clean Horizontal Row of Rounded Thumbnail Cards Directly Underneath (Matching Reference Layout) */}
+                            {images.length > 1 && (
+                                <div className="flex items-center gap-2.5 sm:gap-3.5 mt-4 overflow-x-auto pb-2 scrollbar-none w-full">
+                                    {images.map((img, idx) => {
+                                        const isSelected = activeImage === img;
+                                        return (
                                             <button
                                                 key={idx}
                                                 type="button"
                                                 onClick={() => setActiveImage(img)}
-                                                className={`w-10 h-10 rounded-xl overflow-hidden p-1 transition-all ${
-                                                    activeImage === img
-                                                        ? 'ring-2 ring-primary dark:ring-cyan-400 scale-105 bg-white/80 dark:bg-white/10'
-                                                        : 'opacity-70 hover:opacity-100'
+                                                className={`relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden p-2 transition-all duration-300 shrink-0 cursor-pointer border ${
+                                                    isSelected
+                                                        ? 'border-primary dark:border-cyan-400 ring-2 ring-primary/50 dark:ring-cyan-400/50 scale-105 bg-white dark:bg-white/10 shadow-lg'
+                                                        : 'border-slate-300/70 dark:border-white/10 bg-white/60 dark:bg-white/[0.03] opacity-70 hover:opacity-100 hover:scale-102 hover:border-slate-400'
                                                 }`}
+                                                title={`View image ${idx + 1}`}
                                             >
                                                 <img
                                                     src={img}
-                                                    alt={`${product.name} view ${idx + 1}`}
-                                                    width={40}
-                                                    height={40}
-                                                    className="w-full h-full object-contain"
+                                                    alt={`${product.name} thumbnail ${idx + 1}`}
+                                                    width={112}
+                                                    height={112}
+                                                    className="w-full h-full object-contain pointer-events-none select-none"
                                                 />
                                             </button>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
 
                             {/* 100% CODED INTERACTIVE 3D GLOBE UNDERNEATH PRODUCT STAGE */}
                             {showGlobe && (
@@ -511,7 +515,7 @@ export default function ProductDetail3DView({
                     </div>
 
                     {/* Right Column: Product Title, Custom Sourcing Plaque, Flexible Metrics & Actions */}
-                    <div className="md:col-span-7 flex flex-col justify-start space-y-5 relative">
+                    <div className="lg:col-span-5 flex flex-col justify-start space-y-5 relative">
                         {/* Title & Short Tagline */}
                         <div className="relative z-10">
                             <h1 className="prod-title text-2xl sm:text-3xl md:text-4xl font-black tracking-tight uppercase font-heading">
