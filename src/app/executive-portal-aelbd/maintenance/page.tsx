@@ -28,6 +28,8 @@ import {
     Users,
     Package
 } from 'lucide-react';
+import BackupRestoreManager from '@/components/admin/BackupRestoreManager';
+import BackupButton from '@/components/admin/BackupButton';
 
 export default function MaintenancePage() {
     const { data: session } = useSession();
@@ -566,8 +568,11 @@ export default function MaintenancePage() {
                         </div>
                     </div>
                 </div>
+ 
+                {/* One-Click Automated Google Drive Cloud Vault Backup & Restore System */}
+                <BackupRestoreManager onBackupComplete={loadBackupStats} onRestoreComplete={loadBackupStats} />
 
-                {/* Primary Download Grid */}
+                {/* Primary Download Grid (Local Offline Backups) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {/* Full Backup ZIP */}
                     <a

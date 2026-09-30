@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/admin/backup/gdrive",
+      "schedule": "0 0 * * *"
+    }
+  ]
+}
