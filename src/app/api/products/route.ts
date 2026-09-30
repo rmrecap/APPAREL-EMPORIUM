@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma';
 import { extractApiKey, verifyApiKey } from '@/lib/api-auth';
 import { normalizeIncomingImages } from '@/lib/image-parser';
 import { resolveOrCreateCategory } from '@/lib/category-resolver';
+import { buildCategoryPrismaFilter } from '@/lib/catalog-taxonomy';
 
 export const dynamic = 'force-dynamic';
 
@@ -57,9 +58,17 @@ export async function GET(req: NextRequest) {
         const where: any = {};
         if (!allowInactive) where.isActive = true;
         if (featured === 'true') where.isFeatured = true;
-        if (category) where.category = { slug: category };
         if (categoryId) where.categoryId = categoryId;
         if (ids) where.id = { in: ids.split(',') };
+
+        if (category) {
+            const allCats = await prisma.category.findMany({
+                where: { isActive: true },
+                select: { id: true, name: true, slug: true, parentId: true }
+            });
+            const catFilter = buildCategoryPrismaFilter(category, allCats as any);
+            where.AND = [catFilter];
+        }
 
         if (q) {
             where.OR = [

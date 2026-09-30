@@ -3,7 +3,7 @@ import ProductGrid from '@/components/products/ProductGrid';
 import ProductFilter from '@/components/products/ProductFilter';
 import AtelierDecorations3D from '@/components/products/AtelierDecorations3D';
 import CatalogTaxonomyDirectory from '@/components/products/CatalogTaxonomyDirectory';
-import { DEFAULT_CATALOG_TAXONOMY, TaxonomyDivision, getAllDescendantSlugs } from '@/lib/catalog-taxonomy';
+import { DEFAULT_CATALOG_TAXONOMY, TaxonomyDivision, getAllDescendantSlugs, buildCategoryPrismaFilter } from '@/lib/catalog-taxonomy';
 import { X } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -97,31 +97,8 @@ export default async function ProductsPage({
     const filters: any[] = [];
 
     if (category) {
-        // Collect all descendant slugs from both the taxonomy hierarchy and DB categories
-        const taxonomySlugs = getAllDescendantSlugs(category);
-
-        const targetCat = categories.find(c => c.slug === category);
-        const dbSlugs: string[] = [];
-        if (targetCat) {
-            const collectDbChildren = (catId: string) => {
-                const children = categories.filter(c => c.parentId === catId);
-                for (const ch of children) {
-                    dbSlugs.push(ch.slug);
-                    collectDbChildren(ch.id);
-                }
-            };
-            collectDbChildren(targetCat.id);
-        }
-
-        const allMatchedSlugs = Array.from(new Set([...taxonomySlugs, ...dbSlugs, category]));
-
-        filters.push({
-            OR: [
-                { category: { slug: { in: allMatchedSlugs } } },
-                { tags: { contains: category } },
-                { name: { contains: category } }
-            ]
-        });
+        const categoryFilter = buildCategoryPrismaFilter(category, categories as any);
+        filters.push(categoryFilter);
     }
 
     if (q) {

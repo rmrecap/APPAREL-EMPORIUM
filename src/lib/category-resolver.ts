@@ -58,13 +58,29 @@ export async function resolveOrCreateCategory(rawCat: any, fallbackName = 'Appar
             return { id: matched.id, name: matched.name, slug: matched.slug };
         }
 
+        // Determine parent category based on slug / name
+        let parentId: string | null = null;
+        const s = (catSlug + ' ' + catName).toLowerCase();
+        let parentSlug = 'fashion';
+        if (s.includes('women')) parentSlug = 'women-knit-fashion';
+        else if (s.includes('men')) parentSlug = 'men-knit-fashion';
+        else if (s.includes('kid') || s.includes('baby')) parentSlug = 'kids-knit-fashion';
+        else if (s.includes('towel') || s.includes('home')) parentSlug = 'hometextiles';
+        else if (s.includes('shoe') || s.includes('footwear')) parentSlug = 'footwear';
+
+        const parentCat = await prisma.category.findFirst({
+            where: { OR: [{ slug: parentSlug }, { slug: 'fashion' }] }
+        });
+        if (parentCat) parentId = parentCat.id;
+
         // Create new category with guaranteed unique slug
         const uniqueSlug = `${catSlug}-${Date.now().toString().slice(-4)}`;
         const created = await prisma.category.create({
             data: {
                 name: catName,
                 slug: uniqueSlug,
-                description: `Manufacturing and export category for ${catName}`
+                description: `Manufacturing and export category for ${catName}`,
+                parentId: parentId
             }
         });
 

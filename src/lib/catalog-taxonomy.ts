@@ -551,3 +551,200 @@ export function getAllDescendantSlugs(targetSlug: string): string[] {
 
   return Array.from(results);
 }
+
+export interface CategoryFilterCandidate {
+  id: string;
+  name: string;
+  slug: string;
+  parentId?: string | null;
+}
+
+/**
+ * Builds a robust Prisma filter object for category matching.
+ * Handles:
+ * - Umbrella categories (Fashion, Home Textiles, Footwear, Accessories)
+ * - Canonical & descendant slugs from taxonomy and database tree
+ * - Suffix-tolerant slugs (e.g. `womens-sweatshirt-9635` matches `womens-sweatshirt`)
+ * - Product subCategory, department, and divisionType fields
+ * - Gender exclusivity (Men's vs Women's)
+ */
+export function buildCategoryPrismaFilter(
+  targetSlug: string,
+  categories: CategoryFilterCandidate[]
+): any {
+  const norm = targetSlug.toLowerCase().trim();
+  const taxonomySlugs = getAllDescendantSlugs(norm);
+
+  // Collect DB descendant slugs
+  const targetCat = categories.find(c => c.slug.toLowerCase() === norm);
+  const dbSlugs: string[] = [];
+  if (targetCat) {
+    const collect = (id: string) => {
+      categories.filter(c => c.parentId === id).forEach(child => {
+        dbSlugs.push(child.slug);
+        collect(child.id);
+      });
+    };
+    collect(targetCat.id);
+  }
+
+  // Suffix-agnostic slug matching (e.g. womens-sweatshirt-9635 -> womens-sweatshirt)
+  const suffixMatches = categories
+    .filter(c => {
+      const base = c.slug.toLowerCase().replace(/-\d+$/, '');
+      return base === norm || taxonomySlugs.includes(base) || c.slug.toLowerCase().startsWith(norm);
+    })
+    .map(c => c.slug);
+
+  const allSlugs = Array.from(new Set([...taxonomySlugs, ...dbSlugs, ...suffixMatches, norm]));
+  const matchedCategoryIds = categories.filter(c => allSlugs.includes(c.slug)).map(c => c.id);
+
+  const orConditions: any[] = [
+    { category: { slug: { in: allSlugs } } },
+    { categoryId: { in: matchedCategoryIds } },
+    { subCategory: { contains: norm } },
+    { tags: { contains: norm } },
+  ];
+
+  // 1. Fashion Umbrella
+  if (norm === 'fashion' || norm === 'apparel' || norm === 'garments') {
+    orConditions.push(
+      { divisionType: { in: ['Knit', 'Woven', 'Sweater', 'knit', 'woven', 'sweater'] } },
+      { department: { in: ['Menswear', 'Womenswear', 'Kidswear', 'Men', 'Women', 'Kids'] } },
+      { category: { name: { contains: 'shirt' } } },
+      { category: { name: { contains: 'sweat' } } },
+      { category: { name: { contains: 'knit' } } },
+      { category: { name: { contains: 'woven' } } },
+      { category: { name: { contains: 'polo' } } },
+      { category: { name: { contains: 'dress' } } },
+      { category: { name: { contains: 'fashion' } } },
+      { category: { name: { contains: 'apparel' } } }
+    );
+    return { OR: orConditions };
+  }
+
+  // 2. Sweatshirt / Hoodie matching
+  if (norm.includes('sweatshirt') || norm.includes('hoodie')) {
+    orConditions.push(
+      { name: { contains: 'Sweatshirt' } },
+      { name: { contains: 'sweatshirt' } },
+      { name: { contains: 'Hoodie' } },
+      { name: { contains: 'hoodie' } },
+      { subCategory: { contains: 'sweatshirt' } },
+      { subCategory: { contains: 'hoodie' } },
+      { category: { name: { contains: 'sweatshirt' } } },
+      { category: { slug: { contains: 'sweatshirt' } } },
+      { category: { name: { contains: 'hoodie' } } },
+      { category: { slug: { contains: 'hoodie' } } }
+    );
+  }
+
+  // 3. T-Shirt / Tee matching (exclude 'sweat' since 'sweatshirt' contains 'tshirt')
+  const isTshirtQuery = !norm.includes('sweat') && (norm.includes('t-shirt') || norm.includes('tshirt') || norm.endsWith('tee') || norm.includes('tee-') || norm.includes('t-shirts'));
+  if (isTshirtQuery) {
+    orConditions.push(
+      { name: { contains: 'T-Shirt' } },
+      { name: { contains: 't-shirt' } },
+      { name: { contains: 'Tee' } },
+      { name: { contains: 'tee' } },
+      { subCategory: { contains: 't-shirt' } },
+      { category: { name: { contains: 't-shirt' } } },
+      { category: { slug: { contains: 't-shirt' } } },
+      { category: { slug: { contains: 'tshirt' } } }
+    );
+  }
+
+  // 4. Polo
+  if (norm.includes('polo')) {
+    orConditions.push(
+      { name: { contains: 'Polo' } },
+      { name: { contains: 'polo' } },
+      { subCategory: { contains: 'polo' } },
+      { category: { name: { contains: 'polo' } } },
+      { category: { slug: { contains: 'polo' } } }
+    );
+  }
+
+  // 5. Dress
+  if (norm.includes('dress')) {
+    orConditions.push(
+      { name: { contains: 'Dress' } },
+      { name: { contains: 'dress' } },
+      { subCategory: { contains: 'dress' } },
+      { category: { name: { contains: 'dress' } } }
+    );
+  }
+
+  // 6. Towel / Home Textiles
+  if (norm.includes('towel') || norm.includes('hometextiles')) {
+    orConditions.push(
+      { name: { contains: 'Towel' } },
+      { name: { contains: 'towel' } },
+      { category: { name: { contains: 'towel' } } },
+      { category: { slug: { contains: 'towel' } } },
+      { divisionType: 'Home Textiles' }
+    );
+  }
+
+  // 7. Footwear / Espadrille
+  if (norm.includes('footwear') || norm.includes('espadrille') || norm.includes('shoes')) {
+    orConditions.push(
+      { name: { contains: 'Espadrille' } },
+      { name: { contains: 'espadrille' } },
+      { category: { name: { contains: 'espadrille' } } },
+      { category: { slug: { contains: 'espadrille' } } },
+      { divisionType: 'Footwear' }
+    );
+  }
+
+  // 8. Accessories
+  if (norm.includes('accessories') || norm.includes('scarf') || norm.includes('hat') || norm.includes('glove') || norm.includes('socks')) {
+    orConditions.push(
+      { divisionType: 'Accessories' },
+      { category: { name: { contains: 'accessories' } } },
+      { category: { slug: { contains: 'accessories' } } }
+    );
+  }
+
+  const isExplicitWomen = norm.includes('women');
+  const isExplicitMen = norm.includes('men') && !norm.includes('women');
+
+  const baseFilter = { OR: orConditions };
+
+  if (isExplicitWomen) {
+    return {
+      AND: [
+        baseFilter,
+        {
+          OR: [
+            { name: { contains: 'Women' } },
+            { name: { contains: 'women' } },
+            { category: { name: { contains: 'women' } } },
+            { category: { slug: { contains: 'women' } } },
+            { subCategory: { contains: 'women' } },
+          ]
+        }
+      ]
+    };
+  }
+
+  if (isExplicitMen) {
+    return {
+      AND: [
+        baseFilter,
+        {
+          NOT: [
+            { name: { contains: 'Women' } },
+            { name: { contains: 'women' } },
+            { category: { name: { contains: 'women' } } },
+            { category: { slug: { contains: 'women' } } },
+            { subCategory: { contains: 'women' } },
+          ]
+        }
+      ]
+    };
+  }
+
+  return baseFilter;
+}
+

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import {
     Settings,
@@ -16,16 +16,37 @@ import {
     GitPullRequest,
     ExternalLink,
     Zap,
-    DownloadCloud
+    DownloadCloud,
+    Archive,
+    FolderArchive,
+    FileSpreadsheet,
+    HardDrive,
+    Upload,
+    Wrench,
+    FileJson,
+    Layers,
+    Users,
+    Package
 } from 'lucide-react';
 
 export default function MaintenancePage() {
     const { data: session } = useSession();
     const userRole = (session?.user as any)?.role;
-    const canManage = userRole === 'DEVELOPER' || userRole === 'SUPER_ADMIN';
+    const canManage = userRole === 'DEVELOPER' || userRole === 'SUPER_ADMIN' || userRole === 'ADMIN';
 
     const [loading, setLoading] = useState(false);
     const [logs, setLogs] = useState<string[]>([]);
+    const [backupStats, setBackupStats] = useState<{
+        productCount: number;
+        userCount: number;
+        rfqCount: number;
+        inquiryCount: number;
+        imageCount: number;
+        mediaSizeBytes: number;
+        dbSizeBytes: number;
+        dbLastModified: string | null;
+    } | null>(null);
+
     const [versionInfo, setVersionInfo] = useState<{
         currentVersion: string;
         latestVersion: string;
@@ -36,6 +57,67 @@ export default function MaintenancePage() {
         updateAvailable: boolean;
         changelog: string;
     } | null>(null);
+
+    const loadBackupStats = async () => {
+        try {
+            const res = await fetch('/api/backup?type=stats');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.stats) setBackupStats(data.stats);
+            }
+        } catch { }
+    };
+
+    useEffect(() => {
+        loadBackupStats();
+    }, []);
+
+    const runCategoryRepair = async () => {
+        if (!confirm('Run Automated Category Taxonomy & Relation Repair? This will verify all 231 manufacturing categories and ensure all products are properly linked to their parent hierarchy.')) return;
+        setLoading(true);
+        setLogs(prev => [...prev, '🔄 Starting Automated Category & Taxonomy Relation Repair...']);
+        try {
+            const res = await fetch('/api/categories/repair', { method: 'POST' });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                setLogs(prev => [...prev, `✅ Category Repair Complete: ${data.message}`]);
+                await loadBackupStats();
+            } else {
+                setLogs(prev => [...prev, `❌ Category Repair Failed: ${data.error || 'Unknown error'}`]);
+            }
+        } catch (e: any) {
+            setLogs(prev => [...prev, `❌ Network Exception: ${String(e)}`]);
+        }
+        setLoading(false);
+    };
+
+    const handleRestoreDatabase = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (!confirm(`⚠️ DANGER: Are you sure you want to restore database from "${file.name}"? A safety backup of the current database will be saved first.`)) {
+            e.target.value = '';
+            return;
+        }
+
+        setLoading(true);
+        setLogs(prev => [...prev, `📦 Uploading and restoring database ledger from "${file.name}"...`]);
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const res = await fetch('/api/backup', { method: 'POST', body: formData });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                setLogs(prev => [...prev, `✅ Database Restored Successfully: ${data.message}`]);
+                await loadBackupStats();
+            } else {
+                setLogs(prev => [...prev, `❌ Restore Failed: ${data.error || 'Unknown error'}`]);
+            }
+        } catch (e: any) {
+            setLogs(prev => [...prev, `❌ Network Exception: ${String(e)}`]);
+        }
+        setLoading(false);
+        e.target.value = '';
+    };
 
     const checkUpdates = async () => {
         setLoading(true);
@@ -402,6 +484,245 @@ export default function MaintenancePage() {
                                 </button>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Database & Media Backup Vault */}
+            <div className="bg-white dark:bg-[#151D2C] p-6 sm:p-8 rounded-2xl border border-slate-200 dark:border-white/10 shadow-sm space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-100 dark:border-white/10 pb-5">
+                    <div>
+                        <h2 className="text-xl font-black flex items-center gap-3 text-slate-900 dark:text-white">
+                            <span className="p-2 bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-xl">
+                                <Archive className="w-6 h-6" />
+                            </span>
+                            Database & Media Backup Vault
+                        </h2>
+                        <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-1">
+                            Disaster Recovery & Offline Backup: Export live products, registered users, RFQs, SQLite database, and product media photos.
+                        </p>
+                    </div>
+                    <button
+                        onClick={loadBackupStats}
+                        className="self-start sm:self-auto text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 px-3 py-1.5 rounded-lg transition flex items-center gap-2"
+                    >
+                        <RefreshCw className="w-3.5 h-3.5" /> Refresh Stats
+                    </button>
+                </div>
+
+                {/* Live Vault Telemetry */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                    <div className="p-3.5 bg-slate-50 dark:bg-white/[0.03] rounded-xl border border-slate-100 dark:border-white/5">
+                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <Package className="w-3.5 h-3.5 text-blue-500" /> Products
+                        </span>
+                        <div className="text-lg font-black text-slate-900 dark:text-white mt-1">
+                            {backupStats ? backupStats.productCount : '...'}
+                        </div>
+                    </div>
+
+                    <div className="p-3.5 bg-slate-50 dark:bg-white/[0.03] rounded-xl border border-slate-100 dark:border-white/5">
+                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <Users className="w-3.5 h-3.5 text-indigo-500" /> Users
+                        </span>
+                        <div className="text-lg font-black text-slate-900 dark:text-white mt-1">
+                            {backupStats ? backupStats.userCount : '...'}
+                        </div>
+                    </div>
+
+                    <div className="p-3.5 bg-slate-50 dark:bg-white/[0.03] rounded-xl border border-slate-100 dark:border-white/5">
+                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <Layers className="w-3.5 h-3.5 text-amber-500" /> RFQs & Leads
+                        </span>
+                        <div className="text-lg font-black text-slate-900 dark:text-white mt-1">
+                            {backupStats ? (backupStats.rfqCount + backupStats.inquiryCount) : '...'}
+                        </div>
+                    </div>
+
+                    <div className="p-3.5 bg-slate-50 dark:bg-white/[0.03] rounded-xl border border-slate-100 dark:border-white/5">
+                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <FolderArchive className="w-3.5 h-3.5 text-teal-500" /> Images
+                        </span>
+                        <div className="text-lg font-black text-slate-900 dark:text-white mt-1">
+                            {backupStats ? `${backupStats.imageCount} files` : '...'}
+                        </div>
+                    </div>
+
+                    <div className="p-3.5 bg-slate-50 dark:bg-white/[0.03] rounded-xl border border-slate-100 dark:border-white/5">
+                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <HardDrive className="w-3.5 h-3.5 text-purple-500" /> Media Size
+                        </span>
+                        <div className="text-lg font-black text-slate-900 dark:text-white mt-1">
+                            {backupStats ? `${(backupStats.mediaSizeBytes / (1024 * 1024)).toFixed(1)} MB` : '...'}
+                        </div>
+                    </div>
+
+                    <div className="p-3.5 bg-slate-50 dark:bg-white/[0.03] rounded-xl border border-slate-100 dark:border-white/5">
+                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <Database className="w-3.5 h-3.5 text-rose-500" /> DB Ledger
+                        </span>
+                        <div className="text-lg font-black text-slate-900 dark:text-white mt-1">
+                            {backupStats ? `${(backupStats.dbSizeBytes / 1024).toFixed(0)} KB` : '...'}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Primary Download Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {/* Full Backup ZIP */}
+                    <a
+                        href="/api/backup?type=full"
+                        download
+                        className="p-4 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white shadow-lg transition-all flex flex-col justify-between group active:scale-[0.99]"
+                    >
+                        <div>
+                            <div className="flex items-center justify-between mb-3">
+                                <span className="p-2 bg-white/20 rounded-lg">
+                                    <Archive className="w-5 h-5 text-white" />
+                                </span>
+                                <span className="text-[10px] font-extrabold uppercase bg-white/20 px-2 py-0.5 rounded-full">
+                                    Recommended
+                                </span>
+                            </div>
+                            <h3 className="font-extrabold text-sm mb-1">Full Vault Snapshot (.ZIP)</h3>
+                            <p className="text-emerald-100 text-xs leading-relaxed">
+                                Complete package: SQLite Database + all uploaded product photos + JSON catalogs.
+                            </p>
+                        </div>
+                        <div className="mt-4 pt-3 border-t border-white/20 flex items-center justify-between text-xs font-bold text-white group-hover:underline">
+                            <span>Download Full Backup</span>
+                            <DownloadCloud className="w-4 h-4" />
+                        </div>
+                    </a>
+
+                    {/* Database Only */}
+                    <a
+                        href="/api/backup?type=db"
+                        download
+                        className="p-4 rounded-xl border border-slate-200 dark:border-white/10 hover:border-blue-500 dark:hover:border-blue-400 bg-white dark:bg-white/[0.02] hover:bg-blue-50/40 dark:hover:bg-blue-950/20 transition-all flex flex-col justify-between group"
+                    >
+                        <div>
+                            <div className="flex items-center justify-between mb-3">
+                                <span className="p-2 bg-blue-500/10 text-blue-600 rounded-lg">
+                                    <Database className="w-5 h-5" />
+                                </span>
+                                <span className="text-[10px] font-mono text-slate-400">dev.db</span>
+                            </div>
+                            <h3 className="font-bold text-sm text-slate-900 dark:text-white mb-1">Database Ledger Only</h3>
+                            <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">
+                                Raw SQLite production file with all accounts, relations, orders, and products.
+                            </p>
+                        </div>
+                        <div className="mt-4 pt-3 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-xs font-bold text-blue-600 dark:text-blue-400 group-hover:underline">
+                            <span>Download DB (.db)</span>
+                            <DownloadCloud className="w-4 h-4" />
+                        </div>
+                    </a>
+
+                    {/* Media Only */}
+                    <a
+                        href="/api/backup?type=media"
+                        download
+                        className="p-4 rounded-xl border border-slate-200 dark:border-white/10 hover:border-amber-500 dark:hover:border-amber-400 bg-white dark:bg-white/[0.02] hover:bg-amber-50/40 dark:hover:bg-amber-950/20 transition-all flex flex-col justify-between group"
+                    >
+                        <div>
+                            <div className="flex items-center justify-between mb-3">
+                                <span className="p-2 bg-amber-500/10 text-amber-600 rounded-lg">
+                                    <FolderArchive className="w-5 h-5" />
+                                </span>
+                                <span className="text-[10px] font-mono text-slate-400">/uploads</span>
+                            </div>
+                            <h3 className="font-bold text-sm text-slate-900 dark:text-white mb-1">Uploaded Media (.ZIP)</h3>
+                            <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">
+                                All uploaded product gallery images, factory certificates, and brand assets.
+                            </p>
+                        </div>
+                        <div className="mt-4 pt-3 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-xs font-bold text-amber-600 dark:text-amber-400 group-hover:underline">
+                            <span>Download Images (.zip)</span>
+                            <DownloadCloud className="w-4 h-4" />
+                        </div>
+                    </a>
+
+                    {/* JSON Catalogs */}
+                    <div className="p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.02] flex flex-col justify-between">
+                        <div>
+                            <div className="flex items-center justify-between mb-3">
+                                <span className="p-2 bg-purple-500/10 text-purple-600 rounded-lg">
+                                    <FileJson className="w-5 h-5" />
+                                </span>
+                                <span className="text-[10px] font-mono text-slate-400">Portable</span>
+                            </div>
+                            <h3 className="font-bold text-sm text-slate-900 dark:text-white mb-1">JSON Data Exports</h3>
+                            <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed mb-3">
+                                Machine-readable exports ready for Excel import or migration.
+                            </p>
+                        </div>
+                        <div className="space-y-1.5 pt-2 border-t border-slate-100 dark:border-white/5">
+                            <a
+                                href="/api/backup?type=products"
+                                download="aelbd-products.json"
+                                className="w-full text-xs font-bold text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/30 py-1.5 px-2.5 rounded-lg flex items-center justify-between transition"
+                            >
+                                <span>Export Products (.json)</span>
+                                <DownloadCloud className="w-3.5 h-3.5" />
+                            </a>
+                            <a
+                                href="/api/backup?type=users"
+                                download="aelbd-users.json"
+                                className="w-full text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 py-1.5 px-2.5 rounded-lg flex items-center justify-between transition"
+                            >
+                                <span>Export Users (.json)</span>
+                                <DownloadCloud className="w-3.5 h-3.5" />
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Operations & Integrity Toolbar: Category Repair + Restore */}
+                <div className="pt-4 border-t border-slate-100 dark:border-white/10 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Category Taxonomy Repair */}
+                    <div className="p-4 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 flex flex-col justify-between">
+                        <div>
+                            <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-sm mb-1">
+                                <Wrench className="w-4 h-4 text-amber-500" />
+                                Category & Taxonomy Relation Repair
+                            </div>
+                            <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed mb-3">
+                                Re-links orphan imported products into the 231 manufacturing category hierarchy (Fashion, Sweatshirts, Hoodies, T-Shirts) so all products appear instantly when filtered.
+                            </p>
+                        </div>
+                        <button
+                            onClick={runCategoryRepair}
+                            disabled={loading}
+                            className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-black py-2.5 px-4 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition disabled:opacity-50 active:scale-98 shadow-sm"
+                        >
+                            <Wrench className="w-4 h-4" />
+                            Repair Category Hierarchy Now
+                        </button>
+                    </div>
+
+                    {/* Restore Database */}
+                    <div className="p-4 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 flex flex-col justify-between">
+                        <div>
+                            <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-sm mb-1">
+                                <Upload className="w-4 h-4 text-rose-500" />
+                                Restore Database Snapshot (.db)
+                            </div>
+                            <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed mb-3">
+                                Upload a previous <code className="text-slate-800 dark:text-slate-200 font-mono">dev.db</code> snapshot to restore immediately. A safety backup of the active database is created automatically.
+                            </p>
+                        </div>
+                        <label className="w-full bg-slate-900 dark:bg-white/10 hover:bg-slate-800 dark:hover:bg-white/15 text-white font-bold py-2.5 px-4 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition cursor-pointer text-center">
+                            <Upload className="w-4 h-4" />
+                            Choose .db File to Restore
+                            <input
+                                type="file"
+                                accept=".db,.sqlite,.sqlite3"
+                                onChange={handleRestoreDatabase}
+                                disabled={loading}
+                                className="hidden"
+                            />
+                        </label>
                     </div>
                 </div>
             </div>
