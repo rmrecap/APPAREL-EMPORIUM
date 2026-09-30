@@ -7,13 +7,13 @@ export const PERMISSIONS = {
         'products.*', 'categories.*', 'blog.*', 'inquiries.*', 'rfq.*', 'users.manage',
         'media.*', 'settings.*', 'seo.*', 'menus.*', 'homepage.*', 'pages.*', 'theme.*',
         'forms.*', 'popups.*', 'activity_log.view', 'email.*', 'analytics.*', 'dashboard.view',
-        'deliveries.*'
+        'deliveries.*', 'maintenance.*', 'backup.*'
     ],
     ADMIN: [
         'products.create', 'products.edit', 'products.delete', 'products.view',
         'categories.*', 'blog.*', 'inquiries.view', 'inquiries.reply',
         'rfq.view', 'rfq.update', 'media.upload', 'media.view', 'analytics.view',
-        'bulk_upload', 'dashboard.view', 'deliveries.*'
+        'bulk_upload', 'dashboard.view', 'deliveries.*', 'maintenance.*', 'backup.*'
     ],
     EDITOR: [
         'products.create', 'products.edit', 'products.view',
@@ -63,7 +63,7 @@ export const ROUTE_PERMISSIONS: Record<string, string | string[]> = {
     '/executive-portal-aelbd/developer-options': ['*'],
     '/executive-portal-aelbd/api-manager': ['*'],
     '/executive-portal-aelbd/tracking': ['*'],
-    '/executive-portal-aelbd/maintenance': ['*'],
+    '/executive-portal-aelbd/maintenance': ['maintenance.*', 'backup.*', '*'],
     '/executive-portal-aelbd/performance': ['*'],
     '/executive-portal-aelbd/activity-log': ['activity_log.view', '*']
 };
@@ -162,11 +162,17 @@ export function getAccessibleSidebarItems(role: Role | undefined | null): Sideba
         items.push({ label: 'Developer API', icon: 'KeyRound', href: '/executive-portal-aelbd/api-manager' });
         items.push({ label: 'Tracking Scripts', icon: 'BarChart3', href: '/executive-portal-aelbd/tracking' });
         items.push({ label: 'Activity Logs', icon: 'Activity', href: '/executive-portal-aelbd/activity-log' });
-        items.push({ label: 'Maintenance', icon: 'ShieldAlert', href: '/executive-portal-aelbd/maintenance' });
-    } else if (hasPermission(role, 'settings.*')) {
-        items.push({ label: 'Developer Options', icon: 'Sliders', href: '/executive-portal-aelbd/developer-options' });
-    } else if (hasPermission(role, 'activity_log.view')) {
-        items.push({ label: 'Activity Logs', icon: 'Activity', href: '/executive-portal-aelbd/activity-log' });
+        items.push({ label: 'Database & Backup Vault', icon: 'HardDrive', href: '/executive-portal-aelbd/maintenance' });
+    } else {
+        if (hasPermission(role, 'backup.*') || hasPermission(role, 'maintenance.*')) {
+            items.push({ label: 'Database & Backup Vault', icon: 'HardDrive', href: '/executive-portal-aelbd/maintenance' });
+        }
+        if (hasPermission(role, 'settings.*')) {
+            items.push({ label: 'Developer Options', icon: 'Sliders', href: '/executive-portal-aelbd/developer-options' });
+        }
+        if (hasPermission(role, 'activity_log.view')) {
+            items.push({ label: 'Activity Logs', icon: 'Activity', href: '/executive-portal-aelbd/activity-log' });
+        }
     }
 
     return items;

@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.2] - 2026-09-30
+### One-Click Google Drive Automated Backup & Restore System
+- **Google Drive Cloud Vault Integration**: Connected Google Drive API using OAuth2 credentials and designated backup folder (`AELBD_Cloud_Backups`).
+- **Database & Media Backup Vault Sidebar Item**: Added permanent "Database & Backup Vault" navigation link in Executive Portal sidebar for Developers, Super Admins, and Admins.
+- **Automated Backup Pipeline (`/api/admin/backup/create`)**: Generates comprehensive PostgreSQL/MySQL/SQLite `.sql` dump, bundles `/public/uploads` media into a timestamped `.zip` archive, uploads directly to Google Drive, and executes 7-day auto-cleanup.
+- **Disaster Recovery Restore Engine (`/api/admin/backup/restore`)**: One-click restore system that downloads archives from Google Drive, extracts them, creates an automatic local safety snapshot (`safety-before-restore-*.db`), restores database tables, and replaces media assets.
+- **Safety Confirmation Modal (`BackupRestoreManager.tsx`)**: High-visibility warning modal with required `RESTORE` confirmation input and multi-step progress indicator before overwriting.
+
 ## [1.0.1] - 2026-09-29
 ### Mobile Responsiveness & One-Click Auto-Deploy
 - **Mobile Navigation Overhaul**: Redesigned header capsule and layout for mobile screens (320px–1024px); eliminated horizontal overflow and truncated CTA buttons.

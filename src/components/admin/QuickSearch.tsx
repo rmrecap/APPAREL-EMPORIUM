@@ -11,6 +11,7 @@ const ADMIN_PAGES = [
     { name: 'Products', url: '/executive-portal-aelbd/products', icon: <ShoppingBag className="w-4 h-4" /> },
     { name: 'Categories', url: '/executive-portal-aelbd/categories', icon: <ShoppingBag className="w-4 h-4" /> },
     { name: 'Custom Forms', url: '/executive-portal-aelbd/forms', icon: <FileText className="w-4 h-4" /> },
+    { name: 'Database & Backup Vault', url: '/executive-portal-aelbd/maintenance', icon: <Command className="w-4 h-4" /> },
     { name: 'Performance Dashboard', url: '/executive-portal-aelbd/performance', icon: <Command className="w-4 h-4" /> }
 ];
 
