@@ -387,8 +387,8 @@ export default function ProductDetail3DView({
                 />
             </div>
 
-            {/* Left Margin Blazer Sleeve (Aligned with Product Overview) */}
-            <div className="hidden lg:block absolute -left-8 top-[590px] pointer-events-none z-0 w-24 h-48 sm:w-28 sm:h-56 overflow-hidden select-none floating-slow">
+            {/* Left Margin Blazer Sleeve (Positioned lower so it NEVER collides with the product stage or thumbnail row) */}
+            <div className="hidden lg:block absolute -left-8 top-[920px] pointer-events-none z-0 w-24 h-48 sm:w-28 sm:h-56 overflow-hidden select-none floating-slow opacity-60">
                 <img
                     src={blazerLight}
                     alt="Tailored Blazer Left Accent"
@@ -408,6 +408,26 @@ export default function ProductDetail3DView({
 
                     {/* Left Column: Spacious Open Product Showcase & Horizontal Thumbnails Row (Matching Reference Layout) */}
                     <div className="lg:col-span-7 flex flex-col w-full">
+                        {/* Breadcrumb Navigation Above Showcase Stage (Matching Reference Screenshot 4: HOME / KNIT / KIDSWEAR) */}
+                        <nav aria-label="Breadcrumb" className="flex items-center flex-wrap gap-2 text-[11px] sm:text-xs font-bold tracking-widest uppercase mb-3.5 text-slate-500 dark:text-slate-400">
+                            <Link href="/" className="hover:text-primary dark:hover:text-cyan-400 transition-colors">HOME</Link>
+                            <span className="text-slate-400 dark:text-slate-600 font-normal">/</span>
+                            <Link 
+                                href={product.category?.slug ? `/products?category=${encodeURIComponent(product.category.slug)}` : '/products'} 
+                                className="hover:text-primary dark:hover:text-cyan-400 transition-colors"
+                            >
+                                {(product.category?.name || 'GARMENTS').toUpperCase()}
+                            </Link>
+                            {(product.subcategory || product.name) && (
+                                <>
+                                    <span className="text-slate-400 dark:text-slate-600 font-normal">/</span>
+                                    <span className="text-primary dark:text-cyan-400 font-black truncate max-w-[260px]">
+                                        {(product.subcategory || product.name).toUpperCase()}
+                                    </span>
+                                </>
+                            )}
+                        </nav>
+
                         <div className="relative w-full">
                             {/* Ambient Top Spotlight Beam in Dark Mode */}
                             <div className="hidden dark:block pointer-events-none absolute -top-16 left-1/2 -translate-x-1/2 w-72 h-72 bg-gradient-to-b from-cyan-400/25 via-cyan-500/10 to-transparent blur-2xl [clip-path:polygon(25%_0%,75%_0%,100%_100%,0%_100%)] z-0" />
@@ -475,9 +495,9 @@ export default function ProductDetail3DView({
                                 </div>
                             </div>
 
-                            {/* Clean Horizontal Row of Rounded Thumbnail Cards Directly Underneath (Matching Reference Layout) */}
+                            {/* Clean Centered Row of 3D Extruded Thumbnail Cards Directly Underneath (No Scrollbar, Cross-Browser) */}
                             {images.length > 1 && (
-                                <div className="flex items-center gap-2.5 sm:gap-3.5 mt-4 overflow-x-auto pb-2 scrollbar-none w-full">
+                                <div className="flex items-center justify-center flex-wrap sm:flex-nowrap gap-3 sm:gap-4 mt-5 py-2 px-1 w-full overflow-x-auto no-scrollbar">
                                     {images.map((img, idx) => {
                                         const isSelected = activeImage === img;
                                         return (
@@ -485,19 +505,17 @@ export default function ProductDetail3DView({
                                                 key={idx}
                                                 type="button"
                                                 onClick={() => setActiveImage(img)}
-                                                className={`relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden p-2 transition-all duration-300 shrink-0 cursor-pointer border ${
-                                                    isSelected
-                                                        ? 'border-primary dark:border-cyan-400 ring-2 ring-primary/50 dark:ring-cyan-400/50 scale-105 bg-white dark:bg-white/10 shadow-lg'
-                                                        : 'border-slate-300/70 dark:border-white/10 bg-white/60 dark:bg-white/[0.03] opacity-70 hover:opacity-100 hover:scale-102 hover:border-slate-400'
+                                                className={`thumb-stage-card relative w-20 h-20 sm:w-22 sm:h-22 md:w-24 md:h-24 rounded-2xl overflow-hidden p-2 transition-all duration-300 shrink-0 cursor-pointer ${
+                                                    isSelected ? 'active-thumb-stage' : 'inactive-thumb-stage'
                                                 }`}
-                                                title={`View image ${idx + 1}`}
+                                                title={`View angle ${idx + 1}`}
                                             >
                                                 <img
                                                     src={img}
                                                     alt={`${product.name} thumbnail ${idx + 1}`}
-                                                    width={112}
-                                                    height={112}
-                                                    className="w-full h-full object-contain pointer-events-none select-none"
+                                                    width={96}
+                                                    height={96}
+                                                    className="w-full h-full object-contain pointer-events-none select-none transition-transform duration-300"
                                                 />
                                             </button>
                                         );
@@ -753,21 +771,23 @@ export default function ProductDetail3DView({
 
             </div>
 
-            {/* ═══════════════════════ AMAZON-STYLE FULLSCREEN HD INSPECTOR MODAL ═══════════════════════ */}
+            {/* ═══════════════════════ FULLSCREEN HD FABRIC INSPECTOR MODAL (3D CLAY & DARK SKEUOMORPHIC) ═══════════════════════ */}
             {isFullscreenZoom && (
                 <div 
-                    className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 sm:p-8 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+                    className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 bg-black/75 dark:bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
                     onClick={() => setIsFullscreenZoom(false)}
                 >
                     <div 
-                        className="relative max-w-4xl w-full h-[85vh] bg-slate-900/90 border border-slate-700/60 rounded-[32px] overflow-hidden flex flex-col shadow-2xl"
+                        className="relative max-w-5xl w-full h-[88vh] bg-[#F3EFE8] dark:bg-[#0B1324] border border-white/80 dark:border-cyan-500/40 rounded-[32px] overflow-hidden flex flex-col shadow-[0_30px_90px_rgba(0,0,0,0.35),inset_0_2px_4px_rgba(255,255,255,0.9)] dark:shadow-[0_0_60px_rgba(6,182,212,0.25),0_30px_90px_rgba(0,0,0,0.85)] z-10"
                         onClick={e => e.stopPropagation()}
                     >
-                        {/* Header Controls */}
-                        <div className="p-4 px-6 border-b border-white/10 flex items-center justify-between text-white">
+                        {/* 3D Header Controls */}
+                        <div className="p-4 sm:p-5 px-6 border-b border-[#D8D2C5]/70 dark:border-cyan-500/20 bg-gradient-to-r from-[#FAF7F2] to-[#ECE6DC] dark:from-[#091120] dark:to-[#0D1829] flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <h4 className="text-sm font-black uppercase tracking-wider">{product.name} — Fabric Inspector</h4>
-                                <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 font-bold">
+                                <h4 className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white font-heading truncate max-w-sm sm:max-w-md">
+                                    {product.name} — Fabric Inspector
+                                </h4>
+                                <span className="text-[11px] px-3 py-1 rounded-full bg-[#E5DFD4] dark:bg-cyan-500/20 text-slate-800 dark:text-cyan-300 font-extrabold border border-[#D0C8B8] dark:border-cyan-400/40 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] shrink-0">
                                     {lightboxZoomLevel}x Magnification
                                 </span>
                             </div>
@@ -775,7 +795,7 @@ export default function ProductDetail3DView({
                                 <button
                                     type="button"
                                     onClick={() => setLightboxZoomLevel(prev => Math.max(1, prev - 0.5))}
-                                    className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors"
+                                    className="p-2 sm:p-2.5 rounded-xl bg-[#FAF7F2] dark:bg-white/10 border border-[#DDD6C8] dark:border-cyan-500/30 text-slate-700 dark:text-cyan-300 hover:bg-[#EAE4D9] dark:hover:bg-cyan-500/20 shadow-sm transition-all cursor-pointer"
                                     title="Zoom Out"
                                 >
                                     <ZoomOut size={16} />
@@ -783,7 +803,7 @@ export default function ProductDetail3DView({
                                 <button
                                     type="button"
                                     onClick={() => setLightboxZoomLevel(prev => Math.min(4, prev + 0.5))}
-                                    className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors"
+                                    className="p-2 sm:p-2.5 rounded-xl bg-[#FAF7F2] dark:bg-white/10 border border-[#DDD6C8] dark:border-cyan-500/30 text-slate-700 dark:text-cyan-300 hover:bg-[#EAE4D9] dark:hover:bg-cyan-500/20 shadow-sm transition-all cursor-pointer"
                                     title="Zoom In"
                                 >
                                     <ZoomIn size={16} />
@@ -791,16 +811,17 @@ export default function ProductDetail3DView({
                                 <button
                                     type="button"
                                     onClick={() => setIsFullscreenZoom(false)}
-                                    className="p-2 rounded-xl bg-white/10 hover:bg-rose-500/30 text-slate-300 hover:text-white transition-colors ml-2"
+                                    className="p-2 sm:p-2.5 rounded-xl bg-[#FAF7F2] dark:bg-white/10 border border-[#DDD6C8] dark:border-white/10 text-slate-500 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/20 shadow-sm transition-all ml-1.5 cursor-pointer"
+                                    title="Close Inspector"
                                 >
                                     <X size={18} />
                                 </button>
                             </div>
                         </div>
 
-                        {/* Interactive Large Pan/Zoom Image Area */}
+                        {/* Interactive Centered Pan/Zoom Image Canvas */}
                         <div 
-                            className="flex-1 w-full h-full overflow-hidden flex items-center justify-center p-6 relative cursor-grab active:cursor-grabbing select-none"
+                            className="flex-1 w-full h-full overflow-hidden flex items-center justify-center p-6 sm:p-10 relative cursor-grab active:cursor-grabbing select-none bg-gradient-to-b from-[#FAF7F2]/50 to-[#EAE4D9]/40 dark:from-[#070D18]/90 dark:to-[#0A1424]/90"
                             onMouseMove={handleMouseMove}
                         >
                             <img
@@ -811,24 +832,26 @@ export default function ProductDetail3DView({
                                     transform: `scale(${lightboxZoomLevel})`,
                                     transition: 'transform 0.1s ease-out'
                                 }}
-                                className="max-w-full max-h-full object-contain pointer-events-none drop-shadow-2xl"
+                                className="max-w-full max-h-[64vh] object-contain pointer-events-none drop-shadow-[0_20px_45px_rgba(150,145,135,0.4)] dark:drop-shadow-[0_0_40px_rgba(6,182,212,0.35)]"
                             />
                         </div>
 
-                        {/* Footer Tips & Thumbnails */}
-                        <div className="p-3 px-6 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
-                            <span>Move cursor to pan across stitches, collar, and fabric grain</span>
+                        {/* 3D Footer Tips & Thumbnails */}
+                        <div className="p-3.5 px-6 border-t border-[#D8D2C5]/70 dark:border-cyan-500/20 bg-gradient-to-r from-[#FAF7F2] to-[#ECE6DC] dark:from-[#091120] dark:to-[#0D1829] flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600 dark:text-slate-400 font-medium">
+                            <span className="hidden sm:inline">Move cursor to pan across stitches, collar, and fabric grain</span>
                             {images.length > 1 && (
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
                                     {images.map((img, idx) => (
                                         <button
                                             key={idx}
                                             onClick={() => setActiveImage(img)}
-                                            className={`w-9 h-9 rounded-lg overflow-hidden border p-0.5 transition-all ${
-                                                activeImage === img ? 'border-cyan-400 scale-105' : 'border-white/20 opacity-70'
+                                            className={`w-11 h-11 rounded-xl overflow-hidden p-1 transition-all cursor-pointer ${
+                                                activeImage === img 
+                                                    ? 'bg-white dark:bg-[#12223D] border-2 border-primary dark:border-cyan-400 shadow-md scale-105' 
+                                                    : 'bg-[#FAF7F2] dark:bg-white/5 border border-[#DDD6C8] dark:border-white/10 opacity-70 hover:opacity-100 hover:scale-102'
                                             }`}
                                         >
-                                            <img src={img} alt="Thumbnail" className="w-full h-full object-contain" />
+                                            <img src={img} alt={`Angle ${idx + 1}`} className="w-full h-full object-contain pointer-events-none" />
                                         </button>
                                     ))}
                                 </div>
@@ -931,6 +954,47 @@ export default function ProductDetail3DView({
                         inset 2px 2px 4px rgba(255, 255, 255, 0.8),
                         inset -2px -2px 4px rgba(0, 0, 0, 0.05);
                     border: 1.5px solid rgba(255, 255, 255, 0.7);
+                }
+
+                /* ── Cross-Browser Scrollbar Elimination ── */
+                .no-scrollbar::-webkit-scrollbar {
+                    display: none !important;
+                    width: 0 !important;
+                    height: 0 !important;
+                }
+                .no-scrollbar {
+                    -ms-overflow-style: none !important;
+                    scrollbar-width: none !important;
+                }
+
+                /* ── 3D Extruded Thumbnails (Light Mode) ── */
+                .thumb-stage-card {
+                    background: #FAF7F2;
+                    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+                }
+                .inactive-thumb-stage {
+                    border: 1.5px solid #DDD6C8;
+                    box-shadow: 
+                        0 4px 10px rgba(150, 145, 135, 0.18),
+                        inset 0 1px 2px rgba(255, 255, 255, 0.9);
+                    opacity: 0.82;
+                }
+                .inactive-thumb-stage:hover {
+                    opacity: 1;
+                    transform: translateY(-2px) scale(1.03);
+                    border-color: #B5ACA0;
+                    box-shadow: 
+                        0 8px 18px rgba(150, 145, 135, 0.28),
+                        inset 0 1px 2px rgba(255, 255, 255, 1);
+                }
+                .active-thumb-stage {
+                    border: 2px solid #1E3A8A;
+                    box-shadow: 
+                        0 0 0 3px rgba(30, 58, 138, 0.2),
+                        0 8px 18px rgba(150, 145, 135, 0.35),
+                        inset 0 1px 3px rgba(255, 255, 255, 1);
+                    transform: scale(1.05);
+                    background: #FFFFFF;
                 }
 
                 /* ── Typography ── */
@@ -1106,6 +1170,35 @@ export default function ProductDetail3DView({
                         inset 0 0 18px rgba(6, 182, 212, 0.12),
                         0 20px 40px rgba(0, 0, 0, 0.7);
                     backdrop-filter: blur(16px);
+                }
+
+                /* ── 3D Extruded Thumbnails (Dark Mode) ── */
+                .dark .thumb-stage-card {
+                    background: rgba(10, 22, 42, 0.85);
+                }
+                .dark .inactive-thumb-stage {
+                    border: 1.5px solid rgba(56, 189, 248, 0.25);
+                    box-shadow: 
+                        0 4px 12px rgba(0, 0, 0, 0.5),
+                        inset 0 1px 2px rgba(255, 255, 255, 0.05);
+                    opacity: 0.75;
+                }
+                .dark .inactive-thumb-stage:hover {
+                    opacity: 1;
+                    border-color: rgba(56, 189, 248, 0.65);
+                    box-shadow: 
+                        0 0 18px rgba(6, 182, 212, 0.3),
+                        0 8px 20px rgba(0, 0, 0, 0.6);
+                    transform: translateY(-2px) scale(1.03);
+                }
+                .dark .active-thumb-stage {
+                    border: 2px solid #38BDF8;
+                    box-shadow: 
+                        0 0 0 3px rgba(56, 189, 248, 0.3),
+                        0 0 25px rgba(6, 182, 212, 0.45),
+                        0 8px 20px rgba(0, 0, 0, 0.7);
+                    transform: scale(1.05);
+                    background: rgba(14, 30, 56, 0.95);
                 }
 
                 /* Dark Titles with Radiant Cyan Neon Glow */

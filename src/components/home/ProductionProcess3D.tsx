@@ -106,37 +106,37 @@ export default function ProductionProcess3D({ headings, data, showDecor = false,
     const categories = [
         { 
             num: '01', 
-            title: 'Knitwear (নিট আইটেম)', 
+            title: 'Knitwear & Jersey Essentials', 
             desc: 'T-shirts, polo shirts, tank tops, hoodies, sweatshirts, and joggers tailored with premium single jersey, pique, interlock, and rib fabrics with custom washes.', 
             icon: Layers 
         },
         { 
             num: '02', 
-            title: 'Woven Garments (ওভেন আইটেম)', 
+            title: 'Woven Garments & Tailoring', 
             desc: 'Casual & formal shirts, denim jeans, twill chinos, cargo trousers, and light jackets with precision stitching and tailored buyer fits.', 
             icon: Scissors 
         },
         { 
             num: '03', 
-            title: 'Sweaters & Knitcraft (সোয়েটার)', 
+            title: 'Sweaters & Heavy Knitcraft', 
             desc: '3GG to 12GG gauge flat-knit pullovers, cardigans, and knitwear crafted from soft cotton, acrylic, cashmere-touch, and blended yarns.', 
             icon: Cpu 
         },
         { 
             num: '04', 
-            title: 'Fashion & Activewear (ফ্যাশন ও অ্যাক্টিভওয়্যার)', 
+            title: 'Fashion & Performance Activewear', 
             desc: 'Contemporary casual dresses, performance sportswear, gym apparel, and custom-styled fashion wear developed directly from buyer tech packs.', 
             icon: FileCheck2 
         },
         { 
             num: '05', 
-            title: 'Home Textiles (হোম টেক্সটাইল)', 
+            title: 'Home Textiles & Terry Linen', 
             desc: 'High-absorbency terry towels, bathrobes, bed sheets, duvet covers, pillowcases, and kitchen linen crafted for lasting softness and durability.', 
             icon: ShieldCheck 
         },
         { 
             num: '06', 
-            title: 'Accessories & Footwear (এক্সেসরিজ ও ফুটওয়্যার)', 
+            title: 'Accessories & Custom Footwear', 
             desc: 'Knitted socks, caps, canvas/casual shoes, woven belts, shopping tote bags, and custom trims tailored to client specifications.', 
             icon: Globe 
         }
@@ -349,31 +349,32 @@ export default function ProductionProcess3D({ headings, data, showDecor = false,
                         onClick={() => setIsModalOpen(false)}
                     />
 
-                    <div className="relative w-full max-w-4xl max-h-[90vh] bg-white dark:bg-[#121826] border border-slate-200 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col z-10 animate-in zoom-in-95 duration-200">
+                    <div className="relative w-full max-w-4xl max-h-[90vh] bg-[#F3EFE8]/98 dark:bg-[#0B1324]/98 border border-white/80 dark:border-cyan-500/35 ring-1 ring-[#D8D2C5]/70 dark:ring-cyan-400/20 rounded-[32px] shadow-[0_30px_70px_rgba(0,0,0,0.22),inset_0_2px_4px_rgba(255,255,255,0.95)] dark:shadow-[0_0_60px_rgba(6,182,212,0.25),0_30px_70px_rgba(0,0,0,0.85)] overflow-hidden flex flex-col z-10 animate-in zoom-in-95 duration-200">
                         
-                        {/* Header */}
-                        <div className="p-6 sm:p-8 border-b border-slate-200 dark:border-white/10 flex items-start justify-between bg-gradient-to-r from-slate-50 to-white dark:from-[#0F1420] dark:to-[#121826]">
+                        {/* 3D Header */}
+                        <div className="p-6 sm:p-8 border-b border-[#D8D2C5]/70 dark:border-cyan-500/20 flex items-start justify-between bg-gradient-to-b from-[#FAF7F2] to-[#ECE6DC] dark:from-[#091120] dark:to-[#0E1B30]">
                             <div>
-                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-blue-500/10 text-primary dark:text-blue-400 border border-blue-500/20 mb-2">
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-[#E5DFD4] dark:bg-cyan-500/20 text-primary dark:text-cyan-300 border border-[#D0C8B8] dark:border-cyan-400/40 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] mb-2">
                                     Apparel Sourcing & Manufacturing
                                 </span>
                                 <h3 id="proc-modal-title" className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-heading">
                                     Apparel Emporium — Sourcing & Manufacturing Scope
                                 </h3>
-                                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1 font-medium">
                                     Integrated apparel solutions tailored to buyers across Europe, North America, and global markets.
                                 </p>
                             </div>
                             <button
                                 type="button"
                                 onClick={() => setIsModalOpen(false)}
-                                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
+                                className="p-2.5 rounded-2xl bg-[#FAF7F2] dark:bg-white/10 border border-[#DDD6C8] dark:border-white/10 text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-[#EAE4D9] dark:hover:bg-cyan-500/20 shadow-sm transition-all cursor-pointer"
+                                title="Close modal"
                             >
                                 <X size={20} />
                             </button>
                         </div>
 
-                        {/* Product Categories Grid */}
+                        {/* 3D Product Categories Grid */}
                         <div className="p-6 sm:p-8 overflow-y-auto space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {categories.map((cat, i) => {
@@ -381,19 +382,19 @@ export default function ProductionProcess3D({ headings, data, showDecor = false,
                                     return (
                                         <div 
                                             key={i}
-                                            className="p-5 rounded-2xl bg-slate-50 dark:bg-[#172033] border border-slate-200/80 dark:border-white/5 flex flex-col justify-between"
+                                            className="p-5 rounded-2xl bg-[#FAF7F2] dark:bg-[#0E1A30]/90 border border-[#DDD6C8] dark:border-cyan-500/25 shadow-[0_6px_16px_rgba(150,145,135,0.18),inset_0_1px_2px_rgba(255,255,255,0.95)] dark:shadow-[0_6px_18px_rgba(0,0,0,0.5),inset_0_1px_2px_rgba(255,255,255,0.04)] hover:shadow-[0_12px_24px_rgba(150,145,135,0.28)] dark:hover:shadow-[0_0_24px_rgba(6,182,212,0.25)] hover:border-[#C4BCAD] dark:hover:border-cyan-400/60 hover:-translate-y-0.5 transition-all flex flex-col justify-between"
                                         >
                                             <div>
                                                 <div className="flex items-center justify-between mb-2">
-                                                    <span className="text-xs font-black tracking-widest text-primary dark:text-blue-400 uppercase">
+                                                    <span className="text-[11px] font-black tracking-widest text-primary dark:text-cyan-300 uppercase bg-[#E8E2D6] dark:bg-cyan-950/70 px-2.5 py-0.5 rounded-full border border-[#D8D2C5] dark:border-cyan-500/40 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]">
                                                         Category {cat.num}
                                                     </span>
                                                 </div>
-                                                <h4 className="text-base font-bold text-slate-900 dark:text-white mb-1.5 flex items-center gap-2">
-                                                    {showIcons && <IconComponent className="w-4 h-4 text-primary dark:text-blue-400 shrink-0" />}
+                                                <h4 className="text-base font-extrabold text-slate-900 dark:text-white mb-1.5 flex items-center gap-2 font-heading">
+                                                    {showIcons && <IconComponent className="w-4 h-4 text-primary dark:text-cyan-400 shrink-0" />}
                                                     {cat.title}
                                                 </h4>
-                                                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
                                                     {cat.desc}
                                                 </p>
                                             </div>
@@ -402,44 +403,43 @@ export default function ProductionProcess3D({ headings, data, showDecor = false,
                                 })}
                             </div>
 
-                            {/* Authentic Sourcing Standards */}
-                            <div className="p-5 rounded-2xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/60 dark:border-blue-500/20 flex flex-wrap items-center justify-around gap-4 text-center">
+                            {/* Authentic Sourcing Standards 3D Inset Plaque */}
+                            <div className="p-5 rounded-2xl bg-[#EAE4D9] dark:bg-[#070F1E] border border-[#D5CEC0] dark:border-cyan-500/25 shadow-[inset_0_2px_5px_rgba(0,0,0,0.07)] dark:shadow-[inset_0_0_20px_rgba(6,182,212,0.08)] flex flex-wrap items-center justify-around gap-4 text-center">
                                 <div className="max-w-[200px]">
-                                    <div className="text-base sm:text-lg font-black text-primary dark:text-blue-400">Flexible Production</div>
+                                    <div className="text-base sm:text-lg font-black text-primary dark:text-cyan-400">Flexible Production</div>
                                     <div className="text-[11px] font-medium text-slate-600 dark:text-slate-400 mt-0.5">Small to custom volume orders adapted to client needs</div>
                                 </div>
-                                <div className="h-8 w-px bg-blue-200 dark:bg-blue-800 hidden sm:block" />
+                                <div className="h-8 w-px bg-[#D0C8B8] dark:bg-cyan-900/60 hidden sm:block" />
                                 <div className="max-w-[200px]">
-                                    <div className="text-base sm:text-lg font-black text-primary dark:text-blue-400">Quality Workmanship</div>
+                                    <div className="text-base sm:text-lg font-black text-primary dark:text-cyan-400">Quality Workmanship</div>
                                     <div className="text-[11px] font-medium text-slate-600 dark:text-slate-400 mt-0.5">Continuous attention to detail, fabric, and finishing</div>
                                 </div>
-                                <div className="h-8 w-px bg-blue-200 dark:bg-blue-800 hidden sm:block" />
+                                <div className="h-8 w-px bg-[#D0C8B8] dark:bg-cyan-900/60 hidden sm:block" />
                                 <div className="max-w-[200px]">
-                                    <div className="text-base sm:text-lg font-black text-primary dark:text-blue-400">Ethical & Transparent</div>
+                                    <div className="text-base sm:text-lg font-black text-primary dark:text-cyan-400">Ethical & Transparent</div>
                                     <div className="text-[11px] font-medium text-slate-600 dark:text-slate-400 mt-0.5">Building dependable, long-term B2B partnerships</div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Footer */}
-                        <div className="p-5 sm:p-6 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0F1420] flex items-center justify-between">
+                        {/* 3D Footer */}
+                        <div className="p-5 sm:p-6 border-t border-[#D8D2C5]/70 dark:border-cyan-500/20 bg-gradient-to-r from-[#FAF7F2] to-[#ECE6DC] dark:from-[#091120] dark:to-[#0E1B30] flex items-center justify-between">
                             <button
                                 type="button"
                                 onClick={() => setIsModalOpen(false)}
-                                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/5 transition-colors"
+                                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 bg-[#FAF7F2] dark:bg-white/5 border border-[#DDD6C8] dark:border-white/10 hover:bg-[#E2DCCE] dark:hover:bg-white/10 shadow-sm transition-all cursor-pointer"
                             >
                                 Close
                             </button>
                             <Link
                                 href="/request-quote"
                                 onClick={() => setIsModalOpen(false)}
-                                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-primary hover:bg-blue-900 text-white dark:bg-blue-600 dark:hover:bg-blue-500 transition-colors shadow-sm"
+                                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-blue-700 via-primary to-blue-900 text-white dark:from-sky-500 dark:to-cyan-400 dark:text-slate-950 shadow-[0_8px_18px_rgba(30,58,138,0.35),inset_0_1px_2px_rgba(255,255,255,0.3)] dark:shadow-[0_0_25px_rgba(6,182,212,0.5)] hover:shadow-[0_12px_24px_rgba(30,58,138,0.45)] dark:hover:shadow-[0_0_35px_rgba(6,182,212,0.7)] hover:-translate-y-0.5 transition-all"
                             >
                                 <span>Request Sourcing Quote</span>
                                 <ArrowRight size={13} />
                             </Link>
                         </div>
-
                     </div>
                 </div>
             )}
