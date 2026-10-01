@@ -6,6 +6,7 @@ interface SettingsContextType {
     settings: Record<string, string>;
     updateSetting: (key: string, value: string) => Promise<void>;
     updateSettings: (newSettings: Record<string, string>) => Promise<void>;
+    refreshSettings: () => Promise<void>;
     getSettingValue: (key: string) => string;
     loading: boolean;
 }
@@ -62,7 +63,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <SettingsContext.Provider value={{ settings, updateSetting, updateSettings, getSettingValue, loading }}>
+        <SettingsContext.Provider value={{ settings, updateSetting, updateSettings, refreshSettings: fetchSettings, getSettingValue, loading }}>
             {children}
         </SettingsContext.Provider>
     );

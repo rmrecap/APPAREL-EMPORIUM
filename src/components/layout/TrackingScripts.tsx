@@ -10,13 +10,12 @@ function CustomScriptRenderer({ scripts, location }: { scripts: any[]; location:
 
     useEffect(() => {
         const activeScripts = (scripts || []).filter(
-            s => s && s.active && s.location === location && typeof s.code === 'string' && s.code.trim().length > 0
+            s => s && (s.active === true || s.active === 'true') && s.location === location && typeof s.code === 'string' && s.code.trim().length > 0
         );
 
-        if (activeScripts.length === 0) return;
-
         if (location === 'head') {
-            const injectedElements: HTMLElement[] = [];
+            if (activeScripts.length === 0) return;
+            const injectedElements: Node[] = [];
 
             activeScripts.forEach((item, index) => {
                 const temp = document.createElement('div');
@@ -43,16 +42,26 @@ function CustomScriptRenderer({ scripts, location }: { scripts: any[]; location:
                     injectedElements.push(newScript);
                 }
 
-                // Handle non-script tags (like <meta>, <style>, <link>)
+                // Handle non-script tags (like <meta>, <style>, <link>, comments)
                 while (temp.firstChild) {
-                    const child = temp.firstChild as HTMLElement;
+                    const child = temp.firstChild;
                     document.head.appendChild(child);
                     injectedElements.push(child);
                 }
             });
 
             return () => {
-                injectedElements.forEach(el => el.remove?.());
+                injectedElements.forEach(el => {
+                    try {
+                        if ((el as any).remove) {
+                            (el as any).remove();
+                        } else if (el.parentNode) {
+                            el.parentNode.removeChild(el);
+                        }
+                    } catch (e) {
+                        // ignore cleanup errors
+                    }
+                });
             };
         } else {
             // body-start or body-end
@@ -60,6 +69,8 @@ function CustomScriptRenderer({ scripts, location }: { scripts: any[]; location:
             if (!container) return;
 
             container.innerHTML = '';
+            if (activeScripts.length === 0) return;
+
             activeScripts.forEach((item) => {
                 const wrapper = document.createElement('div');
                 wrapper.innerHTML = item.code;
@@ -84,7 +95,7 @@ function CustomScriptRenderer({ scripts, location }: { scripts: any[]; location:
     }, [scripts, location]);
 
     if (location === 'head') return null;
-    return <div ref={containerRef} className={location === 'body-end' ? 'custom-scripts-body-end fixed bottom-0 pointer-events-none' : 'custom-scripts-body-start'} />;
+    return <div ref={containerRef} className={location === 'body-end' ? 'custom-scripts-body-end' : 'custom-scripts-body-start'} />;
 }
 
 export default function TrackingScripts() {
@@ -131,14 +142,17 @@ export default function TrackingScripts() {
         }
     }, [settings.google_search_console_meta]);
 
-    const ga4Id = settings.ga4_measurement_id?.trim();
-    const gtmId = settings.gtm_container_id?.trim();
-    const fbPixelId = settings.fb_pixel_id?.trim();
-    const clarityId = settings.clarity_project_id?.trim();
-    const hotjarId = settings.hotjar_site_id?.trim();
-    const tiktokId = settings.tiktok_pixel_id?.trim();
-    const linkedinId = settings.linkedin_partner_id?.trim();
-    const pinterestId = settings.pinterest_tag_id?.trim();
+    const ga4Id = (settings.ga4_measurement_id || settings.ga4_id)?.trim();
+    const gtmId = (settings.gtm_container_id || settings.gtm_id)?.trim();
+    const fbPixelId = (settings.fb_pixel_id || settings.fb_id)?.trim();
+    const clarityId = (settings.clarity_project_id || settings.clarity_id)?.trim();
+    const hotjarId = (settings.hotjar_site_id || settings.hotjar_id)?.trim();
+    const tiktokId = (settings.tiktok_pixel_id || settings.tiktok_id)?.trim();
+    const linkedinId = (settings.linkedin_partner_id || settings.linkedin_id)?.trim();
+    const pinterestId = (settings.pinterest_tag_id || settings.pinterest_id)?.trim();
+    const customHasGa4 = customScripts.some(
+        s => s && (s.active === true || s.active === 'true') && typeof s.code === 'string' && (s.code.includes('googletagmanager.com/gtag/js') || (ga4Id && s.code.includes(ga4Id)))
+    );
 
     return (
         <>
@@ -167,7 +181,7 @@ export default function TrackingScripts() {
                     )}
 
                     {/* GA4 */}
-                    {settings.ga4_enabled === 'true' && ga4Id && settings.gtm_enabled !== 'true' && (
+                    {(settings.ga4_enabled === 'true' || (ga4Id && settings.ga4_enabled !== 'false')) && ga4Id && settings.gtm_enabled !== 'true' && !customHasGa4 && (
                         <>
                             <Script
                                 src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`}
@@ -297,6 +311,5 @@ export default function TrackingScripts() {
             )}
         </>
     );
-}
 }
 
