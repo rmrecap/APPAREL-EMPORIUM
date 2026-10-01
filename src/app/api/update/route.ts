@@ -214,11 +214,10 @@ export async function POST(request: NextRequest) {
                 // 4. Build
                 const buildRes = await execAsync(`${npm} run build`, { env, timeout: 240000 });
 
-                // 5. Reload PM2
+                // 5. Reload PM2 cleanly into single-instance fork mode
                 const reloadCmd = [
+                    `${pm2} delete all || true && ${pm2} start ecosystem.config.js --env production`,
                     `${pm2} reload ecosystem.config.js --env production`,
-                    `${pm2} restart aelbd-production`,
-                    `${pm2} restart garments-website`,
                     `${pm2} restart all`,
                     `${npx} pm2 reload ecosystem.config.js || true`,
                     `echo "Reload complete"`,
