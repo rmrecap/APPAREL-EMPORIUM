@@ -2,7 +2,90 @@
 
 import { useSettings } from '@/context/SettingsContext';
 import Script from 'next/script';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+
+// Safe component to inject and execute custom HTML and scripts in DOM
+function CustomScriptRenderer({ scripts, location }: { scripts: any[]; location: 'head' | 'body-start' | 'body-end' }) {
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const activeScripts = (scripts || []).filter(
+            s => s && s.active && s.location === location && typeof s.code === 'string' && s.code.trim().length > 0
+        );
+
+        if (activeScripts.length === 0) return;
+
+        if (location === 'head') {
+            const injectedElements: HTMLElement[] = [];
+
+            activeScripts.forEach((item, index) => {
+                const temp = document.createElement('div');
+                temp.innerHTML = item.code;
+
+                // Handle script tags
+                const scriptTags = temp.querySelectorAll('script');
+                if (scriptTags.length > 0) {
+                    scriptTags.forEach((oldScript) => {
+                        const newScript = document.createElement('script');
+                        Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                        newScript.textContent = oldScript.textContent;
+                        newScript.setAttribute('data-custom-script-head', `${index}`);
+                        document.head.appendChild(newScript);
+                        injectedElements.push(newScript);
+                        oldScript.remove();
+                    });
+                } else if (!/<[a-z][\s\S]*>/i.test(item.code)) {
+                    // Plain JS snippet without <script> tags
+                    const newScript = document.createElement('script');
+                    newScript.textContent = item.code;
+                    newScript.setAttribute('data-custom-script-head', `plain-${index}`);
+                    document.head.appendChild(newScript);
+                    injectedElements.push(newScript);
+                }
+
+                // Handle non-script tags (like <meta>, <style>, <link>)
+                while (temp.firstChild) {
+                    const child = temp.firstChild as HTMLElement;
+                    document.head.appendChild(child);
+                    injectedElements.push(child);
+                }
+            });
+
+            return () => {
+                injectedElements.forEach(el => el.remove?.());
+            };
+        } else {
+            // body-start or body-end
+            const container = containerRef.current;
+            if (!container) return;
+
+            container.innerHTML = '';
+            activeScripts.forEach((item) => {
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = item.code;
+
+                const scriptTags = wrapper.querySelectorAll('script');
+                scriptTags.forEach((oldScript) => {
+                    const newScript = document.createElement('script');
+                    Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                    newScript.textContent = oldScript.textContent;
+                    oldScript.parentNode?.replaceChild(newScript, oldScript);
+                });
+
+                while (wrapper.firstChild) {
+                    container.appendChild(wrapper.firstChild);
+                }
+            });
+
+            return () => {
+                if (container) container.innerHTML = '';
+            };
+        }
+    }, [scripts, location]);
+
+    if (location === 'head') return null;
+    return <div ref={containerRef} className={location === 'body-end' ? 'custom-scripts-body-end fixed bottom-0 pointer-events-none' : 'custom-scripts-body-start'} />;
+}
 
 export default function TrackingScripts() {
     const { settings } = useSettings();
@@ -17,9 +100,16 @@ export default function TrackingScripts() {
         }
     }, []);
 
-    // Helper functions
-    const isAnalytics = () => consent?.analytics === true;
-    const isMarketing = () => consent?.marketing === true;
+    // If cookie banner is disabled, allow tracking by default. If enabled, allow unless explicitly rejected.
+    const isAnalytics = () => {
+        if (settings.cookie_banner_enabled !== 'true') return true;
+        return consent ? consent.analytics !== false : true;
+    };
+
+    const isMarketing = () => {
+        if (settings.cookie_banner_enabled !== 'true') return true;
+        return consent ? consent.marketing !== false : true;
+    };
 
     // Process Custom Scripts
     let customScripts: any[] = [];
@@ -41,23 +131,28 @@ export default function TrackingScripts() {
         }
     }, [settings.google_search_console_meta]);
 
+    const ga4Id = settings.ga4_measurement_id?.trim();
+    const gtmId = settings.gtm_container_id?.trim();
+    const fbPixelId = settings.fb_pixel_id?.trim();
+    const clarityId = settings.clarity_project_id?.trim();
+    const hotjarId = settings.hotjar_site_id?.trim();
+    const tiktokId = settings.tiktok_pixel_id?.trim();
+    const linkedinId = settings.linkedin_partner_id?.trim();
+    const pinterestId = settings.pinterest_tag_id?.trim();
+
     return (
         <>
             {/* Custom Scripts HEAD */}
-            {customScripts.filter(s => s.active && s.location === 'head').map((script, idx) => (
-                <Script
-                    key={`custom-head-${idx}`}
-                    id={`custom-head-${idx}`}
-                    strategy="afterInteractive"
-                    dangerouslySetInnerHTML={{ __html: script.code.replace(/<script>|<\/script>/g, '') }}
-                />
-            ))}
+            <CustomScriptRenderer scripts={customScripts} location="head" />
+
+            {/* Custom Scripts BODY START */}
+            <CustomScriptRenderer scripts={customScripts} location="body-start" />
 
             {/* 2. Analytics Scripts */}
             {isAnalytics() && (
                 <>
                     {/* GTM */}
-                    {settings.gtm_enabled === 'true' && settings.gtm_container_id && (
+                    {settings.gtm_enabled === 'true' && gtmId && (
                         <Script
                             id="gtag-manager-head"
                             strategy="afterInteractive"
@@ -66,46 +161,49 @@ export default function TrackingScripts() {
                                 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
                                 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                                 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-                                })(window,document,'script','dataLayer','${settings.gtm_container_id}');`
+                                })(window,document,'script','dataLayer','${gtmId}');`
                             }}
                         />
                     )}
 
                     {/* GA4 */}
-                    {settings.ga4_enabled === 'true' && settings.ga4_measurement_id && settings.gtm_enabled !== 'true' && (
+                    {settings.ga4_enabled === 'true' && ga4Id && settings.gtm_enabled !== 'true' && (
                         <>
-                            <Script src={`https://www.googletagmanager.com/gtag/js?id=${settings.ga4_measurement_id}`} strategy="afterInteractive" />
+                            <Script
+                                src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`}
+                                strategy="afterInteractive"
+                            />
                             <Script id="ga4-script" strategy="afterInteractive">
                                 {`
                                   window.dataLayer = window.dataLayer || [];
                                   function gtag(){dataLayer.push(arguments);}
                                   gtag('js', new Date());
-                                  gtag('config', '${settings.ga4_measurement_id}');
+                                  gtag('config', '${ga4Id}');
                                 `}
                             </Script>
                         </>
                     )}
 
                     {/* Clarity */}
-                    {settings.clarity_enabled === 'true' && settings.clarity_project_id && (
+                    {settings.clarity_enabled === 'true' && clarityId && (
                         <Script id="clarity-script" strategy="afterInteractive">
                             {`
                                 (function(c,l,a,r,i,t,y){
                                     c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
                                     t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
                                     y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-                                })(window, document, "clarity", "script", "${settings.clarity_project_id}");
+                                })(window, document, "clarity", "script", "${clarityId}");
                             `}
                         </Script>
                     )}
 
                     {/* Hotjar */}
-                    {settings.hotjar_enabled === 'true' && settings.hotjar_site_id && (
+                    {settings.hotjar_enabled === 'true' && hotjarId && (
                         <Script id="hotjar-script" strategy="afterInteractive">
                             {`
                                 (function(h,o,t,j,a,r){
                                     h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-                                    h._hjSettings={hjid:${settings.hotjar_site_id},hjsv:6};
+                                    h._hjSettings={hjid:${hotjarId},hjsv:6};
                                     a=o.getElementsByTagName('head')[0];
                                     r=o.createElement('script');r.async=1;
                                     r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
@@ -121,7 +219,7 @@ export default function TrackingScripts() {
             {isMarketing() && (
                 <>
                     {/* FB Pixel */}
-                    {settings.fb_pixel_enabled === 'true' && settings.fb_pixel_id && settings.gtm_enabled !== 'true' && (
+                    {settings.fb_pixel_enabled === 'true' && fbPixelId && settings.gtm_enabled !== 'true' && (
                         <Script id="fb-pixel" strategy="afterInteractive">
                             {`
                               !function(f,b,e,v,n,t,s)
@@ -132,19 +230,19 @@ export default function TrackingScripts() {
                               t.src=v;s=b.getElementsByTagName(e)[0];
                               s.parentNode.insertBefore(t,s)}(window, document,'script',
                               'https://connect.facebook.net/en_US/fbevents.js');
-                              fbq('init', '${settings.fb_pixel_id}');
+                              fbq('init', '${fbPixelId}');
                               fbq('track', 'PageView');
                             `}
                         </Script>
                     )}
 
                     {/* TikTok Pixel */}
-                    {settings.tiktok_pixel_enabled === 'true' && settings.tiktok_pixel_id && (
+                    {settings.tiktok_pixel_enabled === 'true' && tiktokId && (
                         <Script id="tiktok-pixel" strategy="afterInteractive">
                             {`
                                 !function (w, d, t) {
                                   w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};
-                                  ttq.load('${settings.tiktok_pixel_id}');
+                                  ttq.load('${tiktokId}');
                                   ttq.page();
                                 }(window, document, 'ttq');
                             `}
@@ -152,10 +250,10 @@ export default function TrackingScripts() {
                     )}
 
                     {/* LinkedIn Insight */}
-                    {settings.linkedin_enabled === 'true' && settings.linkedin_partner_id && (
+                    {settings.linkedin_enabled === 'true' && linkedinId && (
                         <Script id="linkedin-pixel" strategy="afterInteractive">
                             {`
-                                _linkedin_partner_id = "${settings.linkedin_partner_id}";
+                                _linkedin_partner_id = "${linkedinId}";
                                 window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
                                 window._linkedin_data_partner_ids.push(_linkedin_partner_id);
                                 (function(l) {
@@ -171,16 +269,16 @@ export default function TrackingScripts() {
                     )}
 
                     {/* Pinterest Tag */}
-                    {settings.pinterest_enabled === 'true' && settings.pinterest_tag_id && (
+                    {settings.pinterest_enabled === 'true' && pinterestId && (
                         <Script id="pinterest-pixel" strategy="afterInteractive">
                             {`
                                 !function(e){if(!window.pintrk){window.pintrk = function () {
                                 window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var
-                                  n=window.pintrk;n.queue=[],n.version="3.0";var
-                                  t=document.createElement("script");t.async=!0,t.src=e;var
-                                  r=document.getElementsByTagName("script")[0];
-                                  r.parentNode.insertBefore(t,r)}}("https://s.pinimg.com/ct/core.js");
-                                pintrk('load', '${settings.pinterest_tag_id}');
+                                n=window.pintrk;n.queue=[],n.version="3.0";var
+                                t=document.createElement("script");t.async=!0,t.src=e;var
+                                r=document.getElementsByTagName("script")[0];
+                                r.parentNode.insertBefore(t,r)}}("https://s.pinimg.com/ct/core.js");
+                                pintrk('load', '${pinterestId}');
                                 pintrk('page');
                             `}
                         </Script>
@@ -188,30 +286,17 @@ export default function TrackingScripts() {
                 </>
             )}
 
-            {/* Custom Scripts BODY START */}
-            {customScripts.filter(s => s.active && s.location === 'body-start').map((script, idx) => (
-                <div
-                    key={`custom-body-start-${idx}`}
-                    dangerouslySetInnerHTML={{ __html: script.code }}
-                />
-            ))}
-
             {/* Custom Scripts BODY END */}
-            {customScripts.filter(s => s.active && s.location === 'body-end').map((script, idx) => (
-                <div
-                    key={`custom-body-end-${idx}`}
-                    className="fixed bottom-0 pointer-events-none"
-                    dangerouslySetInnerHTML={{ __html: script.code }}
-                />
-            ))}
+            <CustomScriptRenderer scripts={customScripts} location="body-end" />
 
             {/* GTM Noscript Fallback */}
-            {isAnalytics() && settings.gtm_enabled === 'true' && settings.gtm_container_id && (
+            {isAnalytics() && settings.gtm_enabled === 'true' && gtmId && (
                 <noscript dangerouslySetInnerHTML={{
-                    __html: `<iframe src="https://www.googletagmanager.com/ns.html?id=${settings.gtm_container_id}" height="0" width="0" style="display:none;visibility:hidden"></iframe>`
+                    __html: `<iframe src="https://www.googletagmanager.com/ns.html?id=${gtmId}" height="0" width="0" style="display:none;visibility:hidden"></iframe>`
                 }} />
             )}
         </>
     );
+}
 }
 

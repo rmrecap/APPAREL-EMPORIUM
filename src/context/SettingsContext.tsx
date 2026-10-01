@@ -46,9 +46,11 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newSettings),
             });
-            if (res.ok) {
-                setSettings(prev => ({ ...prev, ...newSettings }));
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.error || errData.message || `Failed to update settings (HTTP ${res.status})`);
             }
+            setSettings(prev => ({ ...prev, ...newSettings }));
         } catch (error) {
             console.error("Failed to update settings", error);
             throw error;

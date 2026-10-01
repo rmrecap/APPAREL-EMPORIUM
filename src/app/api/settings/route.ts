@@ -94,23 +94,28 @@ export async function POST(req: Request) {
                 create: { key: data.key, value: String(data.value), group: itemGroup }
             });
         } else {
-            for (const [key, value] of Object.entries(data)) {
-                if (key === 'group') continue;
-                await prisma.siteSetting.upsert({
+            const entries = Object.entries(data).filter(([key]) => key !== 'group');
+            const upsertOps = entries.map(([key, value]) => {
+                const isTrackingKey = key.startsWith('ga4_') || key.startsWith('gtm_') || key.startsWith('fb_') || key.startsWith('clarity_') || key.startsWith('hotjar_') || key.startsWith('tiktok_') || key.startsWith('linkedin_') || key.startsWith('pinterest_') || key === 'custom_scripts' || key === 'google_search_console_meta';
+                const itemGroup = isTrackingKey ? 'tracking' : group;
+                return prisma.siteSetting.upsert({
                     where: { key },
-                    update: { value: String(value), group },
-                    create: { key, value: String(value), group }
+                    update: { value: String(value), group: itemGroup },
+                    create: { key, value: String(value), group: itemGroup }
                 });
-            }
+            });
+            await prisma.$transaction(upsertOps);
         }
 
-        await logActivity({
-            userId: session.user.id,
-            action: 'UPDATE',
-            entity: 'SiteSetting',
-            details: `Updated ${group} settings`,
-            request: req as any
-        });
+        if (session?.user?.id) {
+            await logActivity({
+                userId: session.user.id,
+                action: 'UPDATE',
+                entity: 'SiteSetting',
+                details: `Updated ${group} settings`,
+                request: req as any
+            });
+        }
 
         return NextResponse.json({ success: true, message: 'Settings saved successfully' });
     } catch (error: any) {
