@@ -13,6 +13,7 @@ const nextConfig = {
     },
     experimental: {
         cpus: 1, // Restrict build to 1 CPU thread to avoid Hostinger NPROC/thread exhaustion
+        workerThreads: false, // Prevent Next.js from spawning child worker processes during page generation
     },
     output: 'standalone', // Required for Hostinger Node.js hosting
     images: {

@@ -33,7 +33,8 @@ function getEnhancedEnv(): NodeJS.ProcessEnv {
     return {
         ...process.env,
         PATH: enhancedPath,
-        NODE_OPTIONS: '--max-old-space-size=2048',
+        NODE_OPTIONS: '--max-old-space-size=1280',
+        UV_THREADPOOL_SIZE: '1',
     };
 }
 
@@ -69,8 +70,18 @@ async function pullLatestCode(env: NodeJS.ProcessEnv): Promise<string> {
     if (hasGit) {
         try {
             const gitBin = findBin('git');
+            // Prevent git from exhausting threads and ensure correct repository remote
+            await execAsync(
+                `${gitBin} config --global pack.threads 1 || true && ${gitBin} config --global pack.windowMemory 50m || true`,
+                { env, timeout: 15000 }
+            ).catch(() => {});
+            await execAsync(
+                `${gitBin} remote set-url origin https://github.com/rmrecap/APPAREL-EMPORIUM.git 2>/dev/null || ${gitBin} remote add origin https://github.com/rmrecap/APPAREL-EMPORIUM.git`,
+                { env, timeout: 15000 }
+            ).catch(() => {});
+
             const res = await execAsync(
-                `${gitBin} config --global --add safe.directory "${process.cwd()}" || true && ${gitBin} fetch origin main && ${gitBin} reset --hard origin/main`,
+                `${gitBin} config --global --add safe.directory "${process.cwd()}" || true && ${gitBin} fetch origin main --depth=1 && ${gitBin} reset --hard origin/main`,
                 { env, timeout: 60000 }
             );
             return res.stdout || 'Git fetch & reset completed successfully.';

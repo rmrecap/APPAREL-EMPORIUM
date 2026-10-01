@@ -47,8 +47,9 @@ jobs:
             echo "Deploying to $DEPLOY_DIR"
             cd "$DEPLOY_DIR"
             
-            # Prevent Hostinger memory crashing
-            export NODE_OPTIONS="--max-old-space-size=2048"
+            # Prevent Hostinger memory and thread crashing
+            export NODE_OPTIONS="--max-old-space-size=1280"
+            export UV_THREADPOOL_SIZE=1
             git config --global pack.threads 1
             git config --global pack.windowMemory 50m
             
