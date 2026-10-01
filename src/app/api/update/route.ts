@@ -14,7 +14,9 @@ const execAsync = promisify(exec);
  */
 function getEnhancedEnv(): NodeJS.ProcessEnv {
     const nodeDir = path.dirname(process.execPath);
+    const localBin = path.join(process.cwd(), 'node_modules', '.bin');
     const candidateDirs = [
+        localBin,
         nodeDir,
         '/opt/alt/alt-nodejs22/root/usr/bin',
         '/opt/alt/alt-nodejs20/root/usr/bin',
@@ -42,6 +44,9 @@ function getEnhancedEnv(): NodeJS.ProcessEnv {
  * Locates the exact path of a CLI tool (npm, npx, git, pm2).
  */
 function findBin(tool: string): string {
+    const localBin = path.join(process.cwd(), 'node_modules', '.bin', tool);
+    if (fs.existsSync(localBin)) return `"${localBin}"`;
+
     const nodeDir = path.dirname(process.execPath);
     const directPath = path.join(nodeDir, tool);
     if (fs.existsSync(directPath)) return `"${directPath}"`;
@@ -201,16 +206,27 @@ export async function POST(request: NextRequest) {
                 // 1. Pull / Extract Code
                 const pullMsg = await pullLatestCode(env);
 
-                // 2. Dependencies
+                // 2. Dependencies (include dev to ensure prisma and build dependencies are installed)
                 let installMsg = '';
                 try {
-                    const instRes = await execAsync(`${npm} install --no-audit --no-fund`, { env, timeout: 120000 });
+                    const instRes = await execAsync(`${npm} install --include=dev --no-audit --no-fund`, { env, timeout: 180000 });
                     installMsg = instRes.stdout;
                 } catch (e: any) {
                     installMsg = `Warning: npm install note: ${e.message}`;
                 }
 
-                // 3. Prisma
+                // 2b. Guarantee @prisma/client is completely installed
+                const prismaGenPath = path.join(process.cwd(), 'node_modules', '@prisma', 'client', 'generator-build', 'index.js');
+                if (!fs.existsSync(prismaGenPath)) {
+                    console.warn('[UPDATE] @prisma/client generator missing, running targeted install...');
+                    try {
+                        await execAsync(`${npm} install @prisma/client@5.22.0 prisma@5.22.0 --include=dev --no-audit --no-fund --save`, { env, timeout: 120000 });
+                    } catch (pErr: any) {
+                        console.warn('[UPDATE] Targeted prisma install note:', pErr?.message);
+                    }
+                }
+
+                // 3. Prisma generate & db push
                 let prismaMsg = '';
                 try {
                     const prRes = await execAsync(`${npx} prisma generate && ${npx} prisma db push --accept-data-loss`, {
