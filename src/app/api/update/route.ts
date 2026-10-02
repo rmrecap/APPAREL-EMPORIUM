@@ -220,28 +220,37 @@ export async function POST(request: NextRequest) {
                 if (!fs.existsSync(prismaGenPath)) {
                     console.warn('[UPDATE] @prisma/client generator missing, running targeted install...');
                     try {
-                        await execAsync(`${npm} install @prisma/client@5.22.0 prisma@5.22.0 --include=dev --no-audit --no-fund --save`, { env, timeout: 120000 });
+                        await execAsync(`${npm} install @prisma/client@5.22.0 prisma@5.22.0 --no-audit --no-fund --save`, { env, timeout: 120000 });
                     } catch (pErr: any) {
                         console.warn('[UPDATE] Targeted prisma install note:', pErr?.message);
                     }
                 }
 
-                // 3. Prisma generate & db push
+                // 3. Prisma generate & db push using direct local binary fallback
+                const localPrisma = path.join(process.cwd(), 'node_modules', 'prisma', 'build', 'index.js');
+                const prismaCmd = fs.existsSync(localPrisma) ? `node "${localPrisma}"` : `${npx} prisma`;
                 let prismaMsg = '';
                 try {
-                    const prRes = await execAsync(`${npx} prisma generate && ${npx} prisma db push --accept-data-loss`, {
+                    const prRes = await execAsync(`${prismaCmd} generate && ${prismaCmd} db push --accept-data-loss`, {
                         env,
-                        timeout: 60000,
+                        timeout: 90000,
                     });
                     prismaMsg = prRes.stdout;
                 } catch (e: any) {
                     prismaMsg = `Prisma note: ${e.message}`;
+                    console.warn('[UPDATE] Prisma command warning:', prismaMsg);
                 }
 
-                // 4. Build
+                // 4. Build Next.js application
                 const buildRes = await execAsync(`${npm} run build`, { env, timeout: 240000 });
 
-                // 5. Reload PM2 cleanly into single-instance fork mode
+                // 5. Reload PM2 and Passenger
+                try {
+                    const tmpDir = path.join(process.cwd(), 'tmp');
+                    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
+                    fs.writeFileSync(path.join(tmpDir, 'restart.txt'), `${Date.now()}`);
+                } catch (e) {}
+
                 const reloadCmd = [
                     `${pm2} delete all || true && ${pm2} start ecosystem.config.js --env production`,
                     `${pm2} reload ecosystem.config.js --env production`,
