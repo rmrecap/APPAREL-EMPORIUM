@@ -12,7 +12,7 @@ import TrafficTracker from '@/components/analytics/TrafficTracker';
 import CookieConsent from '@/components/layout/CookieConsent';
 import CompareTray from '@/components/products/CompareTray';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
 
@@ -129,7 +129,7 @@ export default function RootLayout({
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
                 />
             </head>
-            <body className={`${inter.variable} font-sans min-h-screen flex flex-col transition-colors duration-300 dark:bg-dark-bg`} suppressHydrationWarning>
+            <body className={`${inter.variable} font-sans min-h-screen flex flex-col dark:bg-dark-bg`} suppressHydrationWarning>
                 <SettingsProvider>
                     <ThemeProvider>
                         <AuthProvider>

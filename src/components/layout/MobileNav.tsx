@@ -261,11 +261,14 @@ export default function MobileNav({ menus, isOpen, onClose }: MobileNavProps) {
                 {/* Drawer Header */}
                 <div className="px-5 py-4 border-b border-slate-100 dark:border-white/10 flex justify-between items-center bg-[#FAF6F0]/80 dark:bg-[#101726]/80 backdrop-blur-md">
                     <Link href="/" onClick={onClose} className="flex items-center gap-2.5">
-                        <div className="h-7 sm:h-8 max-w-[170px] flex items-center">
-                            <img
+                        <div className="relative h-7 sm:h-8 w-auto max-w-[170px] flex items-center">
+                            <Image
                                 src={logoSrc}
                                 alt={settings.company_name || 'Apparel Emporium'}
+                                width={180}
+                                height={32}
                                 className="h-full w-auto object-contain"
+                                sizes="170px"
                             />
                         </div>
                     </Link>

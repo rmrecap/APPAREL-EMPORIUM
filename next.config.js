@@ -21,6 +21,7 @@ const nextConfig = {
         unoptimized: false, // Next.js image optimization
         // AVIF optimization disabled due to libheif/sharp remote code execution vulnerability (CVE-2026-75604 / GHSA-2xp9-vwfh-vxw4)
         formats: ['image/webp'],
+        minimumCacheTTL: 2592000, // 30 days cache for optimized images
         deviceSizes: [640, 750, 828, 1080, 1200, 1920],
         imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
         remotePatterns: [
@@ -56,6 +57,16 @@ const nextConfig = {
                     { key: 'Access-Control-Allow-Methods', value: 'GET, OPTIONS, PATCH, DELETE, POST, PUT' },
                     { key: 'Access-Control-Allow-Headers', value: 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, x-api-key, x-secret-key, secret-key, api-key, authorization, Authorization, ngrok-skip-browser-warning' },
                     { key: 'Access-Control-Max-Age', value: '86400' },
+                ],
+            },
+            // ── Static Asset Cache Headers ────────────────────────────────────
+            {
+                source: '/:all*(png|jpg|jpeg|webp|svg|ico)',
+                headers: [
+                    {
+                        key: 'Cache-Control',
+                        value: 'public, max-age=31536000, stale-while-revalidate=86400',
+                    },
                 ],
             },
             // ── Security Headers for all routes ───────────────────────────────

@@ -169,7 +169,7 @@ export default function TrackingScripts() {
                     {settings.gtm_enabled === 'true' && gtmId && (
                         <Script
                             id="gtag-manager-head"
-                            strategy="afterInteractive"
+                            strategy="lazyOnload"
                             dangerouslySetInnerHTML={{
                                 __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
                                 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -185,9 +185,9 @@ export default function TrackingScripts() {
                         <>
                             <Script
                                 src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`}
-                                strategy="afterInteractive"
+                                strategy="lazyOnload"
                             />
-                            <Script id="ga4-script" strategy="afterInteractive">
+                            <Script id="ga4-script" strategy="lazyOnload">
                                 {`
                                   window.dataLayer = window.dataLayer || [];
                                   function gtag(){dataLayer.push(arguments);}
@@ -200,7 +200,7 @@ export default function TrackingScripts() {
 
                     {/* Clarity */}
                     {settings.clarity_enabled === 'true' && clarityId && (
-                        <Script id="clarity-script" strategy="afterInteractive">
+                        <Script id="clarity-script" strategy="lazyOnload">
                             {`
                                 (function(c,l,a,r,i,t,y){
                                     c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -213,7 +213,7 @@ export default function TrackingScripts() {
 
                     {/* Hotjar */}
                     {settings.hotjar_enabled === 'true' && hotjarId && (
-                        <Script id="hotjar-script" strategy="afterInteractive">
+                        <Script id="hotjar-script" strategy="lazyOnload">
                             {`
                                 (function(h,o,t,j,a,r){
                                     h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
@@ -234,7 +234,7 @@ export default function TrackingScripts() {
                 <>
                     {/* FB Pixel */}
                     {settings.fb_pixel_enabled === 'true' && fbPixelId && settings.gtm_enabled !== 'true' && (
-                        <Script id="fb-pixel" strategy="afterInteractive">
+                        <Script id="fb-pixel" strategy="lazyOnload">
                             {`
                               !function(f,b,e,v,n,t,s)
                               {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -252,20 +252,20 @@ export default function TrackingScripts() {
 
                     {/* TikTok Pixel */}
                     {settings.tiktok_pixel_enabled === 'true' && tiktokId && (
-                        <Script id="tiktok-pixel" strategy="afterInteractive">
+                        <Script id="tiktok-pixel" strategy="lazyOnload">
                             {`
                                 !function (w, d, t) {
                                   w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};
                                   ttq.load('${tiktokId}');
                                   ttq.page();
-                                }(window, document, 'ttq');
+                                 }(window, document, 'ttq');
                             `}
                         </Script>
                     )}
 
                     {/* LinkedIn Insight */}
                     {settings.linkedin_enabled === 'true' && linkedinId && (
-                        <Script id="linkedin-pixel" strategy="afterInteractive">
+                        <Script id="linkedin-pixel" strategy="lazyOnload">
                             {`
                                 _linkedin_partner_id = "${linkedinId}";
                                 window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
@@ -284,7 +284,7 @@ export default function TrackingScripts() {
 
                     {/* Pinterest Tag */}
                     {settings.pinterest_enabled === 'true' && pinterestId && (
-                        <Script id="pinterest-pixel" strategy="afterInteractive">
+                        <Script id="pinterest-pixel" strategy="lazyOnload">
                             {`
                                 !function(e){if(!window.pintrk){window.pintrk = function () {
                                 window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var

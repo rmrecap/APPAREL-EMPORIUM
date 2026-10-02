@@ -86,11 +86,15 @@ export default function Header() {
                 >
                     {/* Brand / Corporate Logo */}
                     <Link href="/" className="flex items-center gap-2 group h-8 sm:h-9 md:h-10 w-auto shrink min-w-0">
-                        <div className="h-7 sm:h-8 md:h-9 max-w-[140px] xs:max-w-[170px] sm:max-w-[220px] md:max-w-[260px] flex items-center transition-all duration-300">
-                            <img
+                        <div className="relative h-7 sm:h-8 md:h-9 w-auto max-w-[140px] xs:max-w-[170px] sm:max-w-[220px] md:max-w-[260px] flex items-center transition-all duration-300">
+                            <Image
                                 src={logoSrc}
                                 alt={settings.company_name || 'Apparel Emporium'}
+                                width={245}
+                                height={36}
+                                priority
                                 className="h-full w-auto object-contain"
+                                sizes="(max-width: 640px) 170px, 245px"
                             />
                         </div>
                     </Link>

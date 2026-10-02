@@ -269,7 +269,7 @@ export default function Category3DStage({ headings, showDecor = false, showIcons
                             translateZ = -40;
                             rotateY = screenWidth >= 640 ? 12 : 6;
                             scale = screenWidth >= 640 ? 0.86 : 0.74;
-                            opacity = screenWidth >= 640 ? 0.95 : 0.45;
+                            opacity = screenWidth >= 640 ? 0.95 : 0.85;
                             zIndex = 20;
                         } else if (offset === 1) {
                             // Right Card
@@ -277,7 +277,7 @@ export default function Category3DStage({ headings, showDecor = false, showIcons
                             translateZ = -40;
                             rotateY = screenWidth >= 640 ? -12 : -6;
                             scale = screenWidth >= 640 ? 0.86 : 0.74;
-                            opacity = screenWidth >= 640 ? 0.95 : 0.45;
+                            opacity = screenWidth >= 640 ? 0.95 : 0.85;
                             zIndex = 20;
                         } else if (offset === 2) {
                             // Far Right Card (peeking)
@@ -380,7 +380,7 @@ export default function Category3DStage({ headings, showDecor = false, showIcons
 
                                         {/* Side Card Title at bottom */}
                                         <div className="text-center pb-4 sm:pb-5">
-                                            <h3 className="text-base sm:text-lg font-black uppercase tracking-wider text-[#1A1A1A] dark:text-white leading-tight font-heading">
+                                            <h3 className="text-base sm:text-lg font-black uppercase tracking-wider text-[#111827] dark:text-white leading-tight font-heading">
                                                 {pillar.displayTitleLines.map((line, lIdx) => (
                                                     <span key={lIdx} className="block">
                                                         {line}
@@ -405,19 +405,23 @@ export default function Category3DStage({ headings, showDecor = false, showIcons
                         <ChevronLeft size={20} />
                     </button>
 
-                    {/* Indicator Pill Dots */}
-                    <div className="flex items-center gap-2 px-3 py-1.5 bg-white/90 dark:bg-slate-800/90 rounded-full border border-slate-200/80 dark:border-slate-700 shadow-xs backdrop-blur-sm">
+                    {/* Indicator Pill Dots with WCAG compliant touch target size */}
+                    <div className="flex items-center gap-1 px-3 py-1 bg-white/90 dark:bg-slate-800/90 rounded-full border border-slate-200/80 dark:border-slate-700 shadow-xs backdrop-blur-sm">
                         {PILLARS.map((p, idx) => (
                             <button
                                 key={p.id}
                                 onClick={() => setActiveIndex(idx)}
                                 aria-label={`Select ${p.title}`}
-                                className={`h-2 rounded-full transition-all duration-500 ${
-                                    idx === activeIndex
-                                        ? 'w-7 bg-stone-900 dark:bg-blue-400 shadow-xs'
-                                        : 'w-2 bg-stone-300 dark:bg-slate-600 hover:bg-stone-400'
-                                }`}
-                            />
+                                className="p-2.5 flex items-center justify-center focus:outline-hidden"
+                            >
+                                <span
+                                    className={`h-2 rounded-full transition-all duration-500 block ${
+                                        idx === activeIndex
+                                            ? 'w-7 bg-stone-900 dark:bg-blue-400 shadow-xs'
+                                            : 'w-2 bg-stone-400 dark:bg-slate-500 hover:bg-stone-500'
+                                    }`}
+                                />
+                            </button>
                         ))}
                     </div>
 

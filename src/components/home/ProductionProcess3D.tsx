@@ -248,9 +248,11 @@ export default function ProductionProcess3D({ headings, data, showDecor = false,
                                             src="/images/3d/mannequin_studio_light.jpg"
                                             alt="Apparel Emporium 3D Garment Mannequin Studio (Light)"
                                             fill
-                                            sizes="(max-width: 1024px) 100vw, 400px"
+                                            priority
+                                            fetchPriority="high"
+                                            sizes="(max-width: 640px) 340px, (max-width: 1024px) 380px, 400px"
                                             className="object-cover w-full h-full transition-transform duration-700 hover:scale-105"
-                                            quality={95}
+                                            quality={82}
                                         />
                                     </div>
                                     {/* Dark Mode 3D Studio Visual */}
@@ -259,9 +261,9 @@ export default function ProductionProcess3D({ headings, data, showDecor = false,
                                             src="/images/3d/mannequin_studio_dark.jpg"
                                             alt="Apparel Emporium 3D Garment Mannequin Studio (Dark)"
                                             fill
-                                            sizes="(max-width: 1024px) 100vw, 400px"
+                                            sizes="(max-width: 640px) 340px, (max-width: 1024px) 380px, 400px"
                                             className="object-cover w-full h-full transition-transform duration-700 hover:scale-105"
-                                            quality={95}
+                                            quality={82}
                                         />
                                     </div>
                                 </div>

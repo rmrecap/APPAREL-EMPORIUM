@@ -212,9 +212,8 @@ export default function CoreValues3D({ headings, data, showDecor = false, showIc
                                                 src={val.emblemLight || '/images/3d/emblem_ownership_light.png'}
                                                 alt={val.title}
                                                 fill
-                                                sizes="160px"
+                                                sizes="(max-width: 640px) 128px, 144px"
                                                 className="object-contain drop-shadow-[0_12px_20px_rgba(0,0,0,0.18)]"
-                                                priority
                                             />
                                         </div>
 
@@ -224,7 +223,7 @@ export default function CoreValues3D({ headings, data, showDecor = false, showIc
                                                 src={val.emblemDark || '/images/3d/emblem_ownership_dark.png'}
                                                 alt={val.title}
                                                 fill
-                                                sizes="160px"
+                                                sizes="(max-width: 640px) 128px, 144px"
                                                 className={`object-contain transition-all duration-300 ${
                                                     val.id === 'ownership' 
                                                         ? 'drop-shadow-[0_0_24px_rgba(59,130,246,0.65)]' 
@@ -232,7 +231,6 @@ export default function CoreValues3D({ headings, data, showDecor = false, showIc
                                                             ? 'drop-shadow-[0_0_24px_rgba(6,182,212,0.65)]' 
                                                             : 'drop-shadow-[0_0_24px_rgba(16,185,129,0.65)]'
                                                 }`}
-                                                priority
                                             />
                                         </div>
                                     </div>
