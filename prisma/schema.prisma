@@ -312,3 +312,35 @@ model TelegramVideo {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
+
+model TrafficLog {
+  id               String   @id @default(cuid())
+  visitorId        String
+  sessionId        String
+  eventType        String   @default("pageview")
+  pagePath         String
+  pageTitle        String?
+  referrer         String?
+  source           String   @default("direct")
+  sourcePlatform   String?
+  targetUrl        String?
+  ipAddress        String?
+  country          String?  @default("Unknown")
+  countryCode      String?  @default("UN")
+  city             String?  @default("Unknown")
+  deviceType       String   @default("desktop")
+  browser          String?  @default("Chrome")
+  os               String?  @default("Windows")
+  screenResolution String?
+  duration         Int?     @default(0)
+  createdAt        DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([eventType])
+  @@index([source])
+  @@index([countryCode])
+  @@index([pagePath])
+  @@index([sessionId])
+  @@index([visitorId])
+}
+

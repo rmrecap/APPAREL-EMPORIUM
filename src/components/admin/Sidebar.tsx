@@ -21,7 +21,7 @@ export default function Sidebar() {
     const [unreadCount, setUnreadCount] = useState(0);
 
     useEffect(() => {
-        if (role !== 'VIEWER') { // default pre-load state
+        if (role) {
             setGroups(getAccessibleSidebarItems(role as any));
         }
 

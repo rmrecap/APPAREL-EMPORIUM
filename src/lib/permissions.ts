@@ -12,8 +12,9 @@ export const PERMISSIONS = {
     ADMIN: [
         'products.create', 'products.edit', 'products.delete', 'products.view',
         'categories.*', 'blog.*', 'inquiries.view', 'inquiries.reply',
-        'rfq.view', 'rfq.update', 'media.upload', 'media.view', 'analytics.view',
-        'bulk_upload', 'dashboard.view', 'deliveries.*', 'maintenance.*', 'backup.*'
+        'rfq.view', 'rfq.update', 'media.upload', 'media.view', 'analytics.view', 'analytics.*',
+        'bulk_upload', 'dashboard.view', 'deliveries.*', 'maintenance.*', 'backup.*',
+        'settings.*', 'settings.update'
     ],
     EDITOR: [
         'products.create', 'products.edit', 'products.view',
@@ -59,10 +60,11 @@ export const ROUTE_PERMISSIONS: Record<string, string | string[]> = {
     '/buyer-portal/rfqs': ['buyer_dashboard.view'],
     '/buyer-portal/inquiries': ['buyer_dashboard.view'],
 
-    // Developer only routes (checked explicitly)
+    // Analytics and Developer routes
+    '/executive-portal-aelbd/analytics': ['analytics.view', 'analytics.*', '*'],
     '/executive-portal-aelbd/developer-options': ['*'],
     '/executive-portal-aelbd/api-manager': ['*'],
-    '/executive-portal-aelbd/tracking': ['*'],
+    '/executive-portal-aelbd/tracking': ['settings.*', 'analytics.*', '*'],
     '/executive-portal-aelbd/maintenance': ['maintenance.*', 'backup.*', '*'],
     '/executive-portal-aelbd/performance': ['*'],
     '/executive-portal-aelbd/activity-log': ['activity_log.view', '*']
@@ -157,10 +159,19 @@ export function getAccessibleSidebarItems(role: Role | undefined | null): Sideba
     if (hasPermission(role, 'email.*')) items.push({ label: 'Email Config', icon: 'Mail', href: '/executive-portal-aelbd/email' });
     if (hasPermission(role, 'settings.*')) items.push({ label: 'General Settings', icon: 'Settings', href: '/executive-portal-aelbd/settings' });
 
+    // Analytics & Traffic (Built-in In-House Tracking)
+    if (hasPermission(role, 'analytics.view') || hasPermission(role, 'analytics.*') || hasPermission(role, '*') || role === 'DEVELOPER' || role === 'SUPER_ADMIN' || role === 'ADMIN') {
+        items.push({ label: 'Analytics & Traffic', icon: 'LineChart', href: '/executive-portal-aelbd/analytics' });
+    }
+
+    // Tracking & Integrations (Third-party GA4, GTM, Pixels, Custom Scripts)
+    if (hasPermission(role, 'settings.*') || hasPermission(role, '*') || role === 'DEVELOPER' || role === 'SUPER_ADMIN' || role === 'ADMIN') {
+        items.push({ label: 'Tracking & Integrations', icon: 'BarChart3', href: '/executive-portal-aelbd/tracking' });
+    }
+
     if (hasPermission(role, '*')) {
         items.push({ label: 'Developer Options', icon: 'Sliders', href: '/executive-portal-aelbd/developer-options' });
         items.push({ label: 'Developer API', icon: 'KeyRound', href: '/executive-portal-aelbd/api-manager' });
-        items.push({ label: 'Tracking Scripts', icon: 'BarChart3', href: '/executive-portal-aelbd/tracking' });
         items.push({ label: 'Activity Logs', icon: 'Activity', href: '/executive-portal-aelbd/activity-log' });
         items.push({ label: 'Database & Backup Vault', icon: 'HardDrive', href: '/executive-portal-aelbd/maintenance' });
     } else {

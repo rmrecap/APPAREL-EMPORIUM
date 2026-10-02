@@ -6,7 +6,9 @@ import { SettingsProvider } from '@/context/SettingsContext';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import AuthProvider from '@/components/providers/AuthProvider';
+import { Suspense } from 'react';
 import TrackingScripts from '@/components/layout/TrackingScripts';
+import TrafficTracker from '@/components/analytics/TrafficTracker';
 import CookieConsent from '@/components/layout/CookieConsent';
 import CompareTray from '@/components/products/CompareTray';
 
@@ -132,6 +134,9 @@ export default function RootLayout({
                     <ThemeProvider>
                         <AuthProvider>
                             <TrackingScripts />
+                            <Suspense fallback={null}>
+                                <TrafficTracker />
+                            </Suspense>
                             <Header />
                             <main className="flex-grow relative">
                                 {children}

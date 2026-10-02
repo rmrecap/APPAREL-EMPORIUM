@@ -150,9 +150,8 @@ const SERVICES: IntegrationService[] = [
 ];
 
 export default function TrackingPage() {
-    const { settings, updateSettings, refreshSettings } = useSettings();
-    const { role, hasPermission } = usePermission();
-    const isInitializedRef = useRef(false);
+    const { settings, updateSettings, refreshSettings, loading: settingsLoading } = useSettings();
+    const { role, hasPermission, isLoading: authLoading } = usePermission();
 
     const [formData, setFormData] = useState({
         gtm_container_id: '',
@@ -199,8 +198,7 @@ export default function TrackingPage() {
     const [quickStatus, setQuickStatus] = useState('');
 
     useEffect(() => {
-        if (!isInitializedRef.current && settings && Object.keys(settings).length > 0) {
-            isInitializedRef.current = true;
+        if (settings && Object.keys(settings).length > 0) {
             const ga4Val = settings.ga4_measurement_id || settings.ga4_id || 'G-YPNYRVP7HN';
             const gtmVal = settings.gtm_container_id || settings.gtm_id || '';
             const fbVal = settings.fb_pixel_id || settings.fb_id || '';
@@ -210,7 +208,8 @@ export default function TrackingPage() {
             const linkedinVal = settings.linkedin_partner_id || settings.linkedin_id || '';
             const pinterestVal = settings.pinterest_tag_id || settings.pinterest_id || '';
 
-            setFormData({
+            setFormData(prev => ({
+                ...prev,
                 gtm_container_id: gtmVal,
                 gtm_id: gtmVal,
                 gtm_enabled: settings.gtm_enabled || (gtmVal ? 'true' : 'false'),
@@ -246,7 +245,7 @@ export default function TrackingPage() {
                 pinterest_enabled: settings.pinterest_enabled || (pinterestVal ? 'true' : 'false'),
 
                 custom_scripts: settings.custom_scripts || '[]'
-            });
+            }));
 
             try {
                 if (settings.custom_scripts) {
@@ -268,12 +267,22 @@ export default function TrackingPage() {
         }
     }, [settings]);
 
-    const isPermitted = role === 'DEVELOPER' || role === 'SUPER_ADMIN' || (hasPermission && hasPermission('settings.update')) || (hasPermission && hasPermission('*'));
+    // Handle authentication & initial loading state gracefully
+    if (authLoading || settingsLoading) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] gap-3">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Loading tracking configurations...</p>
+            </div>
+        );
+    }
+
+    const isPermitted = role === 'DEVELOPER' || role === 'SUPER_ADMIN' || role === 'ADMIN' || (hasPermission && hasPermission('settings.update')) || (hasPermission && hasPermission('settings.*')) || (hasPermission && hasPermission('*'));
 
     if (!isPermitted) {
         return (
             <div className="p-8 text-center text-red-500 font-bold max-w-xl mx-auto bg-red-50 dark:bg-red-950/20 rounded-xl border border-red-200 mt-12">
-                Access Denied: Requires DEVELOPER or SUPER_ADMIN privileges.
+                Access Denied: Requires DEVELOPER or Administrator privileges.
             </div>
         );
     }
@@ -543,8 +552,23 @@ export default function TrackingPage() {
 
             if (saveSucceeded) {
                 if (refreshSettings) await refreshSettings();
+                const activeList = [
+                    ga4Val && formData.ga4_enabled === 'true' ? `GA4 (${ga4Val})` : null,
+                    gtmVal && formData.gtm_enabled === 'true' ? `GTM (${gtmVal})` : null,
+                    fbVal && formData.fb_pixel_enabled === 'true' ? 'Meta Pixel' : null,
+                    clarityVal && formData.clarity_enabled === 'true' ? 'Microsoft Clarity' : null,
+                    hotjarVal && formData.hotjar_enabled === 'true' ? 'Hotjar' : null,
+                    tiktokVal && formData.tiktok_pixel_enabled === 'true' ? 'TikTok Pixel' : null,
+                    linkedinVal && formData.linkedin_enabled === 'true' ? 'LinkedIn Tag' : null,
+                    pinterestVal && formData.pinterest_enabled === 'true' ? 'Pinterest Tag' : null,
+                ].filter(Boolean);
+
+                const activeSummary = activeList.length > 0 
+                    ? `Live: ${activeList.join(', ')} and custom scripts.` 
+                    : 'All tags and tracking configurations have been updated.';
+
                 setMessage({ 
-                    text: 'Tracking settings saved successfully! Google Tag (G-YPNYRVP7HN) and all active scripts are now live.', 
+                    text: `Tracking settings saved successfully! ${activeSummary}`, 
                     type: 'success' 
                 });
             }

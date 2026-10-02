@@ -122,7 +122,11 @@ export async function middleware(req: NextRequest) {
 
     // 5. Developer Admin API Endpoints RBAC
     if (token && isAdminApiRoute) {
-        if (path.includes('/api/admin/tracking') || path.includes('/api/admin/maintenance')) {
+        if (path.includes('/api/admin/tracking')) {
+            if (!['DEVELOPER', 'SUPER_ADMIN', 'ADMIN'].includes(token.role as string)) {
+                return NextResponse.json({ error: "Forbidden: Developer or Administrator access required" }, { status: 403 });
+            }
+        } else if (path.includes('/api/admin/maintenance')) {
             if (token.role !== 'DEVELOPER') {
                 return NextResponse.json({ error: "Forbidden: Developer access required" }, { status: 403 });
             }
