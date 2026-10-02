@@ -15,6 +15,7 @@ const nextConfig = {
         cpus: 1, // Restrict build to 1 CPU thread to avoid Hostinger NPROC/thread exhaustion
         workerThreads: false, // Prevent Next.js from spawning child worker processes during page generation
     },
+    serverExternalPackages: ['geoip-lite'],
     output: 'standalone', // Required for Hostinger Node.js hosting
     images: {
         unoptimized: false, // Next.js image optimization

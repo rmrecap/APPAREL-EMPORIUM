@@ -1,4 +1,19 @@
-import geoip from 'geoip-lite';
+// Lazy-loaded geoip-lite to avoid build-time webpack data file errors (ENOENT geoip-country.dat)
+let geoipModule: any = null;
+let geoipLoadAttempted = false;
+
+function getGeoIp(): any {
+    if (!geoipLoadAttempted) {
+        geoipLoadAttempted = true;
+        try {
+            geoipModule = require('geoip-lite');
+        } catch (e: any) {
+            console.warn('[GEOIP] Native geoip lookup disabled during build/runtime, falling back to CDN headers:', e?.message);
+            geoipModule = null;
+        }
+    }
+    return geoipModule;
+}
 
 export interface GeoLocationInfo {
     country: string;
@@ -84,22 +99,25 @@ export function resolveGeoLocation(req: Request): GeoLocationInfo {
         };
     }
 
-    // 3. Check GeoIP lookup
+    // 3. Check GeoIP lookup safely without throwing build-time exceptions
     try {
-        const geo = geoip.lookup(cleanIp);
-        if (geo) {
-            const countryCode = geo.country || cfCountry || 'US';
-            const countryName = COUNTRY_NAMES[countryCode] || countryCode;
-            const city = geo.city || cfCity || 'Unknown City';
-            return {
-                country: countryName,
-                countryCode: countryCode.toUpperCase(),
-                city: city,
-                ip: cleanIp
-            };
+        const geoip = getGeoIp();
+        if (geoip && typeof geoip.lookup === 'function') {
+            const geo = geoip.lookup(cleanIp);
+            if (geo) {
+                const countryCode = geo.country || cfCountry || 'US';
+                const countryName = COUNTRY_NAMES[countryCode] || countryCode;
+                const city = geo.city || cfCity || 'Unknown City';
+                return {
+                    country: countryName,
+                    countryCode: countryCode.toUpperCase(),
+                    city: city,
+                    ip: cleanIp
+                };
+            }
         }
     } catch (e) {
-        console.warn('GeoIP lookup warning:', e);
+        // Safe fallback
     }
 
     if (cfCountry) {
