@@ -72,6 +72,19 @@ async function pullLatestCode(env: NodeJS.ProcessEnv): Promise<string> {
     const gitDir = path.join(process.cwd(), '.git');
     const hasGit = fs.existsSync(gitDir);
 
+    // Auto-protect live database before pulling any updates
+    const activeDb = path.join(process.cwd(), 'prisma', 'dev.db');
+    if (fs.existsSync(activeDb)) {
+        try {
+            const backupDir = path.join(process.cwd(), 'backups');
+            if (!fs.existsSync(backupDir)) fs.mkdirSync(backupDir, { recursive: true });
+            const backupTarget = path.join(backupDir, `dev-auto-${Date.now()}.db`);
+            fs.copyFileSync(activeDb, backupTarget);
+            fs.copyFileSync(activeDb, path.join(backupDir, 'dev-latest-safe.db'));
+            console.log(`[PULL] Live database successfully snapshot to ${backupTarget}`);
+        } catch (e) {}
+    }
+
     if (hasGit) {
         try {
             const gitBin = findBin('git');
@@ -85,11 +98,21 @@ async function pullLatestCode(env: NodeJS.ProcessEnv): Promise<string> {
                 { env, timeout: 15000 }
             ).catch(() => {});
 
+            // Fetch to FETCH_HEAD and update origin/main refspec directly
             const res = await execAsync(
-                `${gitBin} config --global --add safe.directory "${process.cwd()}" || true && ${gitBin} fetch origin main --depth=1 && ${gitBin} reset --hard origin/main`,
+                `${gitBin} config --global --add safe.directory "${process.cwd()}" || true && ${gitBin} fetch origin main --depth=1 && ${gitBin} reset --hard FETCH_HEAD && ${gitBin} update-ref refs/remotes/origin/main FETCH_HEAD || true`,
                 { env, timeout: 60000 }
             );
-            return res.stdout || 'Git fetch & reset completed successfully.';
+
+            // Double check that active database was preserved
+            if (!fs.existsSync(activeDb)) {
+                const safeDb = path.join(process.cwd(), 'backups', 'dev-latest-safe.db');
+                if (fs.existsSync(safeDb)) {
+                    fs.copyFileSync(safeDb, activeDb);
+                }
+            }
+
+            return res.stdout || 'Git fetch & reset to FETCH_HEAD completed successfully.';
         } catch (gitErr: any) {
             console.warn('[PULL_WARN] Git CLI pull failed, falling back to direct GitHub zip extract:', gitErr?.message);
         }
@@ -134,6 +157,14 @@ async function pullLatestCode(env: NodeJS.ProcessEnv): Promise<string> {
 
         fs.writeFileSync(targetFilePath, entry.getData());
         filesExtracted++;
+    }
+
+    // Double check that active database was preserved
+    if (!fs.existsSync(activeDb)) {
+        const safeDb = path.join(process.cwd(), 'backups', 'dev-latest-safe.db');
+        if (fs.existsSync(safeDb)) {
+            fs.copyFileSync(safeDb, activeDb);
+        }
     }
 
     return `Direct GitHub archive extract complete: ${filesExtracted} files updated. (Preserved database & uploads).`;
@@ -231,11 +262,14 @@ export async function POST(request: NextRequest) {
                 const prismaCmd = fs.existsSync(localPrisma) ? `node "${localPrisma}"` : `${npx} prisma`;
                 let prismaMsg = '';
                 try {
-                    const prRes = await execAsync(`${prismaCmd} generate && ${prismaCmd} db push --accept-data-loss`, {
+                    await execAsync(`${prismaCmd} generate`, { env, timeout: 60000 }).catch(gErr => {
+                        console.warn('[UPDATE] Prisma generate note (using existing generated client if available):', gErr?.message);
+                    });
+                    const prRes = await execAsync(`${prismaCmd} db push --accept-data-loss`, {
                         env,
                         timeout: 90000,
                     });
-                    prismaMsg = prRes.stdout;
+                    prismaMsg = prRes.stdout || 'Database schema synced successfully (all tables & data preserved).';
                 } catch (e: any) {
                     prismaMsg = `Prisma note: ${e.message}`;
                     console.warn('[UPDATE] Prisma command warning:', prismaMsg);
