@@ -75,6 +75,40 @@ export async function POST(req: Request) {
         return NextResponse.json({ success: true });
     } catch (error: any) {
         console.error('Analytics track error:', error);
+
+        // Self-healing: if TrafficLog table does not exist in SQLite, create it on-the-fly without affecting existing tables
+        if (error?.message?.includes('TrafficLog') || error?.message?.includes('no such table')) {
+            try {
+                await prisma.$executeRawUnsafe(`
+                    CREATE TABLE IF NOT EXISTS "TrafficLog" (
+                        "id" TEXT NOT NULL PRIMARY KEY,
+                        "visitorId" TEXT NOT NULL,
+                        "sessionId" TEXT NOT NULL,
+                        "eventType" TEXT NOT NULL DEFAULT 'pageview',
+                        "pagePath" TEXT NOT NULL,
+                        "pageTitle" TEXT,
+                        "referrer" TEXT,
+                        "source" TEXT NOT NULL DEFAULT 'direct',
+                        "sourcePlatform" TEXT,
+                        "targetUrl" TEXT,
+                        "ipAddress" TEXT,
+                        "country" TEXT DEFAULT 'Unknown',
+                        "countryCode" TEXT DEFAULT 'UN',
+                        "city" TEXT DEFAULT 'Unknown',
+                        "deviceType" TEXT NOT NULL DEFAULT 'desktop',
+                        "browser" TEXT DEFAULT 'Chrome',
+                        "os" TEXT DEFAULT 'Windows',
+                        "screenResolution" TEXT,
+                        "duration" INTEGER DEFAULT 0,
+                        "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+                    );
+                `);
+                return NextResponse.json({ success: true, healed: true });
+            } catch (healErr: any) {
+                console.warn('TrafficLog auto-table creation note:', healErr?.message);
+            }
+        }
+
         return NextResponse.json({ success: false, error: error.message || 'Tracking failed' }, { status: 500 });
     }
 }
