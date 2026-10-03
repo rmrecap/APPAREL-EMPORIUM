@@ -44,11 +44,28 @@ function copyDirSync(src, dest) {
     }
 }
 
+const origLog = console.log;
+console.log = function(...args) {
+    origLog.apply(console, args);
+    console.error.apply(console, args);
+};
+
 async function main() {
     const cwd = process.cwd();
     const dbPath = path.join(cwd, 'prisma', 'dev.db');
     // 0. DIAGNOSTIC FILE INTEGRITY CHECK
-    console.log('🔍 [DIAGNOSTIC] Checking repository files on disk:');
+    console.log('🔍 [DIAGNOSTIC] Current working directory:', cwd);
+    try {
+        console.log('📁 [SRC CONTENTS]:', fs.readdirSync(path.join(cwd, 'src')));
+        if (fs.existsSync(path.join(cwd, 'src', 'context'))) {
+            console.log('📁 [SRC/CONTEXT CONTENTS]:', fs.readdirSync(path.join(cwd, 'src', 'context')));
+        } else {
+            console.log('❌ [SRC/CONTEXT DOES NOT EXIST]');
+        }
+    } catch (e) {
+        console.log('📁 [SRC ERROR]:', e.message);
+    }
+
     const checkPaths = [
         'src/context/SettingsContext.tsx',
         'src/components/products/Coded3DGlobe.tsx',
