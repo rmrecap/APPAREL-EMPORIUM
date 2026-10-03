@@ -89,6 +89,11 @@ const nextConfig = {
         ];
     },
     webpack: (config, { isServer, dev }) => {
+        config.resolve.alias = {
+            ...config.resolve.alias,
+            '@': path.resolve(__dirname, 'src'),
+        };
+
         if (!isServer) {
             // Needed if using prisma/sqlite on frontend/browser components
             config.resolve.fallback = {
