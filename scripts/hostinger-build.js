@@ -8,7 +8,7 @@ function run(cmd, desc) {
     console.log(`$ ${cmd}`);
     console.log(`======================================================`);
     try {
-        const out = execSync(cmd, {
+        execSync(cmd, {
             stdio: 'inherit',
             env: {
                 ...process.env,
@@ -20,6 +20,20 @@ function run(cmd, desc) {
     } catch (err) {
         console.error(`❌ [FAILED] ${desc}:`, err.message);
         throw err;
+    }
+}
+
+function copyDirSync(src, dest) {
+    if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+    const entries = fs.readdirSync(src, { withFileTypes: true });
+    for (const entry of entries) {
+        const srcPath = path.join(src, entry.name);
+        const destPath = path.join(dest, entry.name);
+        if (entry.isDirectory()) {
+            copyDirSync(srcPath, destPath);
+        } else {
+            fs.copyFileSync(srcPath, destPath);
+        }
     }
 }
 
@@ -45,17 +59,28 @@ async function main() {
         }
     }
 
-    // 2. CHECK / INSTALL REQUIRED DEPENDENCIES
+    // 2. CHECK & RESTORE @PRISMA/CLIENT GENERATOR
     const prismaGen = path.join(cwd, 'node_modules', '@prisma', 'client', 'generator-build', 'index.js');
-    const nextBin = path.join(cwd, 'node_modules', 'next', 'dist', 'bin', 'next');
+    const fallbackDir = path.join(cwd, 'scripts', 'prisma-client-fallback');
+    const targetClientDir = path.join(cwd, 'node_modules', '@prisma', 'client');
 
-    if (!fs.existsSync(prismaGen) || !fs.existsSync(nextBin)) {
-        console.log('⚠️ [DEPS] Required dependencies missing. Running targeted install...');
-        run('npm install @prisma/client@5.22.0 prisma@5.22.0 cross-env@7.0.3 --no-audit --no-fund', 'Install Prisma & Core Dependencies');
-        run('npm install --include=dev --no-audit --no-fund', 'Install Full Dependencies');
+    if (!fs.existsSync(prismaGen)) {
+        console.log('⚠️ [DEPS] @prisma/client generator is missing in node_modules.');
+        if (fs.existsSync(fallbackDir)) {
+            console.log('🔄 [DEPS] Restoring @prisma/client from verified repository fallback...');
+            copyDirSync(fallbackDir, targetClientDir);
+            console.log('✅ [DEPS] Successfully restored @prisma/client from fallback.');
+        }
     }
 
-    // 3. GENERATE PRISMA CLIENT WITH LOCAL PINNED BINARY
+    // 3. CHECK NEXT BINARY
+    const nextBin = path.join(cwd, 'node_modules', 'next', 'dist', 'bin', 'next');
+    if (!fs.existsSync(nextBin)) {
+        console.log('⚠️ [DEPS] next binary is missing. Installing dependencies...');
+        run('npm install --include=dev --no-audit --no-fund --prefix .', 'Install Dependencies');
+    }
+
+    // 4. GENERATE PRISMA CLIENT WITH LOCAL PINNED BINARY
     const localPrisma = path.join(cwd, 'node_modules', 'prisma', 'build', 'index.js');
     if (fs.existsSync(localPrisma)) {
         run(`node "${localPrisma}" generate`, 'Generate Prisma Client');
@@ -63,12 +88,12 @@ async function main() {
         run('npx -y prisma@5.22.0 generate', 'Generate Prisma Client via npx');
     }
 
-    // 4. PRE-MIGRATION PRODUCT INTEGRITY GUARD
+    // 5. PRE-MIGRATION PRODUCT INTEGRITY GUARD
     if (fs.existsSync(path.join(cwd, 'scripts', 'guard-product-integrity.js'))) {
         run('node scripts/guard-product-integrity.js', 'Pre-migration Product Integrity Guard');
     }
 
-    // 5. UPDATE SCHEMA & SETTINGS
+    // 6. UPDATE SCHEMA & SETTINGS
     if (fs.existsSync(localPrisma)) {
         run(`node "${localPrisma}" db push --accept-data-loss`, 'Sync Database Schema');
     } else {
@@ -79,12 +104,12 @@ async function main() {
         run('node scripts/sync-corporate-settings.js', 'Synchronize Corporate Site Settings');
     }
 
-    // 6. POST-MIGRATION PRODUCT INTEGRITY GUARD
+    // 7. POST-MIGRATION PRODUCT INTEGRITY GUARD
     if (fs.existsSync(path.join(cwd, 'scripts', 'guard-product-integrity.js'))) {
         run('node scripts/guard-product-integrity.js', 'Post-migration Product Integrity Guard');
     }
 
-    // 7. BUILD NEXT.JS PRODUCTION APPLICATION
+    // 8. BUILD NEXT.JS PRODUCTION APPLICATION
     console.log('\n🏗️ [BUILD] Compiling Next.js production build...');
     if (fs.existsSync(nextBin)) {
         run(`node "${nextBin}" build`, 'Next.js Production Build');
@@ -92,7 +117,7 @@ async function main() {
         run('npx next build', 'Next.js Production Build via npx');
     }
 
-    // 8. FINAL INTEGRITY CHECK
+    // 9. FINAL INTEGRITY CHECK
     if (fs.existsSync(path.join(cwd, 'scripts', 'guard-product-integrity.js'))) {
         run('node scripts/guard-product-integrity.js', 'Final Production Product Verification');
     }
