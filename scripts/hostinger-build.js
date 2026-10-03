@@ -12,6 +12,7 @@ function run(cmd, desc) {
             stdio: 'inherit',
             env: {
                 ...process.env,
+                NEXT_DEBUG_BUILD: '1',
                 NODE_OPTIONS: '--max-old-space-size=1280',
                 UV_THREADPOOL_SIZE: '1'
             }
@@ -111,6 +112,7 @@ async function main() {
 
     // 8. BUILD NEXT.JS PRODUCTION APPLICATION
     console.log('\n🏗️ [BUILD] Compiling Next.js production build...');
+    process.env.NEXT_DEBUG_BUILD = '1';
     if (fs.existsSync(nextBin)) {
         run(`node "${nextBin}" build`, 'Next.js Production Build');
     } else {
