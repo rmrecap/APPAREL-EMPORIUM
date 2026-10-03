@@ -29,14 +29,14 @@ const localBusinessSchema = {
     '@type': 'LocalBusiness',
     'name': 'Apparel Emporium Ltd.',
     'image': `${baseUrl}/logo.jpg`,
-    'telephone': '+880-2-1234-5678',
-    'email': 'info@apparelemporium.com',
+    'telephone': '+88 02 4895 5519',
+    'email': 'kamal@aelbd.net',
     'url': `${baseUrl}/contact`,
     'address': {
         '@type': 'PostalAddress',
-        'streetAddress': 'House 12, Road 5, Gulshan-1',
+        'streetAddress': 'House # 03 (2nd Floor), Road # 12, Sector # 13, Uttara Model Town',
         'addressLocality': 'Dhaka',
-        'postalCode': '1212',
+        'postalCode': '1230',
         'addressCountry': 'BD'
     },
     'geo': {

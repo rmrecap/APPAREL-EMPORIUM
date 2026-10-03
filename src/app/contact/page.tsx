@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { MapPin, Mail, Phone, MessageSquare, X, CheckCircle2, Copy, Check } from 'lucide-react';
+import { MapPin, Mail, Phone, MessageSquare, X, CheckCircle2, Copy, Check, MessageCircle, ArrowUpRight, UserCheck, Building2 } from 'lucide-react';
 import { useSettings } from '@/context/SettingsContext';
 import Coded3DGlobe from '@/components/products/Coded3DGlobe';
 import { Flowchart3DIcon, MapPin3DIcon, Mail3DIcon, Phone3DIcon } from '@/components/ui/Claymorphic3DIcons';
@@ -113,12 +113,20 @@ export default function ContactPage() {
     const contactSubtitle = settings.contact_subtitle ||
         'Feel free to talk to our representative at any time through our website or by using one of our contact numbers. Let us build your future together.';
 
-    const addressLabel = settings.contact_address_label || 'Address Icon';
-    const addressValue = settings.contact_address       || 'Heuse-74, Road-13, Sector-10, Uttara Model Town, Dhaka, Bangladesh.';
-    const emailLabel   = settings.contact_email_label   || 'Email Icon';
-    const emailValue   = settings.contact_email         || 'info@apparelemporium.net';
-    const phoneLabel   = settings.contact_phone_label   || 'Phone Icon';
-    const phoneValue   = settings.contact_phone         || '+88 01670 15 46 46';
+    const companyName     = settings.company_name         || 'Apparel Emporium';
+    const proprietorName  = settings.proprietor_name      || 'Md. Kamal Hossain';
+    const proprietorTitle = settings.proprietor_title     || 'Proprietor';
+    const addressLabel    = settings.contact_address_label || 'Address Icon';
+    const addressValue    = settings.contact_address       || settings.company_address || 'House # 03 (2nd Floor), Road # 12, Sector # 13, Uttara Model Town, Dhaka- 1230, Bangladesh';
+    const emailLabel      = settings.contact_email_label   || 'Email Icon';
+    const emailValue      = settings.contact_email         || settings.company_email   || 'kamal@aelbd.net';
+    const phoneLabel      = settings.contact_phone_label   || 'Phone Icon';
+    const phoneValue      = settings.contact_phone         || settings.company_phone   || '+88 02 4895 5519, 096 6691 2038';
+    const whatsappLabel   = settings.contact_whatsapp_label || 'WhatsApp Icon';
+    const whatsappValue   = settings.contact_whatsapp       || settings.whatsapp_number || '+88 018 1142 2225';
+    const cleanWaNumber   = whatsappValue.replace(/[^0-9]/g, '');
+    const waChatUrl       = `https://wa.me/${cleanWaNumber}?text=${encodeURIComponent('Hello Apparel Emporium, I would like to inquire about your garments manufacturing and sourcing services.')}`;
+    const websiteValue    = settings.website_url           || 'www.aelbd.net';
 
     /* ── Image assets ── */
     const showroomLight = settings.contact_showroom_light || '/images/contact/showroom_light.jpg';
@@ -223,11 +231,33 @@ export default function ContactPage() {
                             <h2 className="contact-heading text-xl sm:text-2xl font-black tracking-tight mb-2.5 uppercase font-heading">
                                 {contactHeading}
                             </h2>
-                            <p className="contact-subtext text-xs sm:text-[13px] leading-relaxed font-medium mb-6">
+                            <p className="contact-subtext text-xs sm:text-[13px] leading-relaxed font-medium mb-4">
                                 {contactSubtitle}
                             </p>
 
-                            {/* 3 Contact Pills */}
+                            {/* Proprietor Leadership Card */}
+                            <div className="mb-4 p-3 sm:p-3.5 rounded-2xl bg-white/60 dark:bg-white/[0.04] border border-white/80 dark:border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.04)] flex items-center justify-between gap-3">
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#128C7E] via-teal-700 to-[#1B365D] flex items-center justify-center font-black text-white text-xs shadow-md shrink-0">
+                                        KH
+                                    </div>
+                                    <div className="min-w-0">
+                                        <div className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-cyan-400 flex items-center gap-1">
+                                            <UserCheck size={11} />
+                                            <span>{proprietorTitle} &bull; {companyName}</span>
+                                        </div>
+                                        <div className="text-xs sm:text-sm font-black text-slate-900 dark:text-white truncate">
+                                            {proprietorName}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="hidden sm:flex flex-col items-end shrink-0 text-right">
+                                    <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Corporate Desk</span>
+                                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Direct Inquiries</span>
+                                </div>
+                            </div>
+
+                            {/* Contact Pills */}
                             <div className="space-y-3.5">
 
                                 {/* 1. Address Pill */}
@@ -288,11 +318,48 @@ export default function ContactPage() {
                                     </div>
                                 </a>
 
+                                {/* 4. WhatsApp Pill */}
+                                <a
+                                    href={waChatUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="contact-pill rounded-2xl p-3 sm:p-3.5 flex items-center gap-3.5 group transition-all duration-200 hover:scale-[1.02] active:scale-[0.99] border border-emerald-500/30 dark:border-emerald-500/20 hover:border-emerald-500/60"
+                                    title="Click to chat directly on WhatsApp"
+                                >
+                                    <div className="pill-inset-icon-box rounded-xl w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center shrink-0 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:bg-[#25D366] group-hover:text-white transition-all shadow-inner">
+                                        <MessageCircle size={22} className="text-emerald-600 dark:text-emerald-400 group-hover:text-white transition-colors" />
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <div className="pill-label text-[11px] font-bold uppercase tracking-wider mb-0.5 text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                                            <span>{whatsappLabel}</span>
+                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                        </div>
+                                        <div className="pill-value text-[11px] sm:text-xs font-semibold flex items-center gap-2">
+                                            <span>{whatsappValue}</span>
+                                            <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-extrabold uppercase tracking-wide">
+                                                Message
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="shrink-0 text-emerald-600 dark:text-emerald-400 opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all pr-1">
+                                        <ArrowUpRight size={16} />
+                                    </div>
+                                </a>
+
                             </div>
                         </div>
 
-                        {/* Send Direct Inquiry Link Button */}
-                        <div className="pt-6 flex justify-end">
+                        {/* Action Buttons: WhatsApp Direct & Direct Inquiry */}
+                        <div className="pt-6 flex flex-wrap items-center justify-between sm:justify-end gap-3">
+                            <a
+                                href={waChatUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="rounded-full px-5 py-2.5 text-[11px] font-bold uppercase tracking-wider transition-all duration-200 hover:scale-105 active:scale-95 inline-flex items-center gap-2 cursor-pointer shadow-sm bg-gradient-to-r from-[#128C7E] to-[#25D366] hover:from-[#0e6e63] hover:to-[#1fa851] text-white"
+                            >
+                                <MessageCircle size={14} />
+                                <span>Chat on WhatsApp</span>
+                            </a>
                             <button
                                 onClick={() => setIsFormOpen(true)}
                                 className="inquiry-btn rounded-full px-5 py-2.5 text-[11px] font-bold uppercase tracking-wider transition-all duration-200 hover:scale-105 active:scale-95 inline-flex items-center gap-2 cursor-pointer shadow-sm"
@@ -456,6 +523,22 @@ export default function ContactPage() {
                                 >
                                     {formLoading ? 'Submitting...' : 'Submit Inquiry'}
                                 </button>
+
+                                <div className="relative flex py-1 items-center">
+                                    <div className="flex-grow border-t border-slate-300 dark:border-white/10" />
+                                    <span className="flex-shrink mx-3 text-[10px] uppercase font-bold text-slate-400">Or Message Instantly</span>
+                                    <div className="flex-grow border-t border-slate-300 dark:border-white/10" />
+                                </div>
+
+                                <a
+                                    href={waChatUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#128C7E] to-[#25D366] hover:from-[#0e6e63] hover:to-[#1fa851] text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-sm transition-all"
+                                >
+                                    <MessageCircle size={15} />
+                                    <span>Chat on WhatsApp: {whatsappValue}</span>
+                                </a>
                             </form>
                         )}
                     </div>

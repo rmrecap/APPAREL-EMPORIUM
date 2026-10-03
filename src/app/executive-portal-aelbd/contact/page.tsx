@@ -41,27 +41,36 @@ const CONTACT_CARD_FIELDS: FieldDef[] = [
 ];
 
 const CONTACT_CHANNELS_FIELDS: FieldDef[] = [
+    { key: 'proprietor_name', label: 'Proprietor / Executive Name', placeholder: 'Md. Kamal Hossain', hint: 'Displayed in corporate leadership cards, signatures and footer.' },
+    { key: 'proprietor_title', label: 'Proprietor Designation / Role', placeholder: 'Proprietor', hint: 'Official leadership title.' },
     { key: 'contact_address_label', label: 'Address Pill — Label', placeholder: 'Address Icon' },
     {
         key: 'contact_address',
         label: 'Corporate Address',
         type: 'textarea',
-        placeholder: 'Heuse-74, Road-13, Sector-10, Uttara Model Town, Dhaka, Bangladesh.',
+        placeholder: 'House # 03 (2nd Floor), Road # 12, Sector # 13, Uttara Model Town, Dhaka- 1230, Bangladesh',
         hint: 'Full physical office / buying house address.'
     },
     { key: 'contact_email_label', label: 'Email Pill — Label', placeholder: 'Email Icon' },
     {
         key: 'contact_email',
         label: 'Corporate Email Address',
-        placeholder: 'info@apparelemporium.net',
+        placeholder: 'kamal@aelbd.net',
         hint: 'Primary inbox for buyer RFQs and sourcing communications.'
     },
     { key: 'contact_phone_label', label: 'Phone Pill — Label', placeholder: 'Phone Icon' },
     {
         key: 'contact_phone',
         label: 'Corporate Phone / Hotline',
-        placeholder: '+88 01670 15 46 46',
-        hint: 'Primary contact or WhatsApp number.'
+        placeholder: '+88 02 4895 5519, 096 6691 2038',
+        hint: 'Primary corporate telephone hotline.'
+    },
+    { key: 'contact_whatsapp_label', label: 'WhatsApp Pill — Label', placeholder: 'WhatsApp Icon' },
+    {
+        key: 'contact_whatsapp',
+        label: 'Official WhatsApp Number (Click-to-Chat)',
+        placeholder: '+88 018 1142 2225',
+        hint: 'Direct WhatsApp hotline for buyer & customer inquiries (e.g. +88 018 1142 2225).'
     },
 ];
 

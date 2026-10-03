@@ -76,8 +76,8 @@ export default function PrivacyPolicyPage() {
                         </p>
                         <div className="bg-gray-50 dark:bg-gray-800/40 p-4 rounded-2xl border border-gray-200 dark:border-gray-700/60 text-sm">
                             <p className="font-semibold text-gray-900 dark:text-white">Apparel Emporium Compliance Office</p>
-                            <p>House 12, Road 5, Gulshan-1, Dhaka 1212, Bangladesh</p>
-                            <p>Email: <a href="mailto:info@apparelemporium.com" className="text-primary dark:text-secondary hover:underline">info@apparelemporium.com</a></p>
+                            <p>House # 03 (2nd Floor), Road # 12, Sector # 13, Uttara Model Town, Dhaka- 1230, Bangladesh</p>
+                            <p>Email: <a href="mailto:kamal@aelbd.net" className="text-primary dark:text-secondary hover:underline">kamal@aelbd.net</a></p>
                         </div>
                     </section>
                 </div>

@@ -11,6 +11,7 @@ import TrackingScripts from '@/components/layout/TrackingScripts';
 import TrafficTracker from '@/components/analytics/TrafficTracker';
 import CookieConsent from '@/components/layout/CookieConsent';
 import CompareTray from '@/components/products/CompareTray';
+import FloatingWhatsApp from '@/components/layout/FloatingWhatsApp';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 
@@ -88,7 +89,7 @@ const organizationSchema = {
             'contactPoint': [
                 {
                     '@type': 'ContactPoint',
-                    'telephone': '+880-2-1234-5678',
+                    'telephone': '+88 02 4895 5519',
                     'contactType': 'customer service',
                     'areaServed': 'Global',
                     'availableLanguage': ['English', 'Bengali']
@@ -96,9 +97,9 @@ const organizationSchema = {
             ],
             'address': {
                 '@type': 'PostalAddress',
-                'streetAddress': 'House 12, Road 5, Gulshan-1',
+                'streetAddress': 'House # 03 (2nd Floor), Road # 12, Sector # 13, Uttara Model Town',
                 'addressLocality': 'Dhaka',
-                'postalCode': '1212',
+                'postalCode': '1230',
                 'addressCountry': 'BD'
             }
         },
@@ -144,6 +145,7 @@ export default function RootLayout({
                             <Footer />
                             <CompareTray />
                             <CookieConsent />
+                            <FloatingWhatsApp />
                         </AuthProvider>
                     </ThemeProvider>
                 </SettingsProvider>

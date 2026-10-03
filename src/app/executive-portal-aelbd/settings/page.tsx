@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Save, Loader2, Globe, Facebook, Linkedin, Instagram, Twitter, Youtube, MapPin, Building, Phone, Mail, Clock, DollarSign, Image as ImageIcon } from 'lucide-react';
+import { Save, Loader2, Globe, Facebook, Linkedin, Instagram, Twitter, Youtube, MapPin, Building, Phone, Mail, Clock, DollarSign, Image as ImageIcon, MessageCircle } from 'lucide-react';
 import ImagePicker from '@/components/admin/ImagePicker';
 
 export default function SettingsPage() {
@@ -31,10 +31,14 @@ export default function SettingsPage() {
         setMessage('');
 
         try {
+            const payload = { ...formData };
+            if (payload.whatsapp_number) {
+                payload.contact_whatsapp = payload.whatsapp_number;
+            }
             const res = await fetch('/api/settings', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(payload),
             });
             const data = await res.json();
             if (data.success) {
@@ -166,6 +170,14 @@ export default function SettingsPage() {
                             <input name="company_tagline" type="text" value={formData.company_tagline || ''} onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary/50 transition-shadow" />
                         </div>
                         <div>
+                            <label className="block text-sm font-semibold mb-2">Proprietor Name</label>
+                            <input name="proprietor_name" type="text" placeholder="Md. Kamal Hossain" value={formData.proprietor_name || ''} onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary/50 transition-shadow" />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold mb-2">Proprietor Title / Role</label>
+                            <input name="proprietor_title" type="text" placeholder="Proprietor" value={formData.proprietor_title || ''} onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary/50 transition-shadow" />
+                        </div>
+                        <div>
                             <label className="block text-sm font-semibold mb-2">Founded Year</label>
                             <input name="founded_year" type="text" value={formData.founded_year || ''} onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary/50 transition-shadow" />
                         </div>
@@ -178,8 +190,8 @@ export default function SettingsPage() {
                             <input name="company_phone" type="text" value={formData.company_phone || ''} onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary/50 transition-shadow" />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold mb-2 flex items-center gap-2"><Mail className="w-4 h-4 text-gray-400" /> WhatsApp Number</label>
-                            <input name="whatsapp_number" type="text" value={formData.whatsapp_number || ''} onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 outline-none focus:ring-2 focus:ring-primary/50 transition-shadow" />
+                            <label className="block text-sm font-semibold mb-2 flex items-center gap-2"><MessageCircle className="w-4 h-4 text-emerald-500" /> WhatsApp Number (Click-to-Chat)</label>
+                            <input name="whatsapp_number" type="text" placeholder="+88 018 1142 2225" value={formData.whatsapp_number || ''} onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 outline-none focus:ring-2 focus:ring-primary/50 transition-shadow" />
                         </div>
                         <div>
                             <label className="block text-sm font-semibold mb-2 flex items-center gap-2"><Mail className="w-4 h-4 text-gray-400" /> Email Address</label>

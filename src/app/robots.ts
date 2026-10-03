@@ -7,13 +7,13 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
 
     try {
-        const customSetting = await prisma.setting.findUnique({
+        const customSetting = await prisma.siteSetting.findUnique({
             where: { key: 'seo_custom_robots' },
         });
 
         if (customSetting?.value?.trim()) {
-            const lines = customSetting.value.split('\n').map((l) => l.trim()).filter(Boolean);
-            const rules: Array<{ userAgent?: string | string[]; allow?: string | string[]; disallow?: string | string[] }> = [];
+            const lines = customSetting.value.split('\n').map((l: string) => l.trim()).filter(Boolean);
+            const rules: Array<{ userAgent: string | string[]; allow?: string | string[]; disallow?: string | string[] }> = [];
             let currentRule: { userAgent: string[]; allow: string[]; disallow: string[] } | null = null;
             let sitemapUrl: string = `${baseUrl}/sitemap.xml`;
 

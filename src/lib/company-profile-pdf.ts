@@ -118,10 +118,11 @@ export async function generateCompanyProfilePDF(): Promise<Buffer> {
     // 4. Dynamic strings from settings with sanitized buyer-centric fallbacks
     const companyName = settings.company_name || 'Apparel Emporium';
     const companyTagline = settings.company_tagline || '100% Export Oriented Readymade Garments Buying House';
-    const address = settings.contact_address || 'House-74, Road-13, Sector-10, Uttara Model Town, Dhaka-1230, Bangladesh';
-    const email = settings.contact_email || 'info@apparelemporium.net';
-    const phone = settings.contact_phone || '+88 01670 15 46 46';
-    const website = settings.site_url || 'https://www.apparelemporium.net';
+    const address = settings.contact_address || settings.company_address || 'House # 03 (2nd Floor), Road # 12, Sector # 13, Uttara Model Town, Dhaka-1230, Bangladesh';
+    const email = settings.contact_email || settings.company_email || 'kamal@aelbd.net';
+    const phone = settings.contact_phone || settings.company_phone || '+88 02 4895 5519, 096 6691 2038';
+    const whatsapp = settings.contact_whatsapp || settings.whatsapp_number || '+88 018 1142 2225';
+    const website = settings.website_url || settings.site_url || 'https://www.aelbd.net';
 
     const aboutParagraph = settings.about_paragraph ||
         'Apparel Emporium is a premier 100% export-oriented garments buying house headquartered in Bangladesh. We specialize in B2B corporate sourcing, design, manufacturing supervision, and global logistics for readymade garments, knitwear, woven fashion, sweaters, home textiles, and accessories.';
@@ -131,7 +132,7 @@ export async function generateCompanyProfilePDF(): Promise<Buffer> {
         'Our unwavering mission is delivering reliable apparel sourcing aligned strictly with buyer-defined quality specifications and ethical supply chains.';
     const ceoP2 = settings.ceo_p2 && !/AQL/i.test(settings.ceo_p2) ? settings.ceo_p2 :
         'With over 15 years of industry leadership, our dedicated merchandising and quality assurance teams guarantee total production transparency and buyer satisfaction.';
-    const ceoSignoff = settings.ceo_signoff || 'Managing Director & CEO, Apparel Emporium';
+    const ceoSignoff = settings.ceo_signoff || `${settings.proprietor_name || 'Md. Kamal Hossain'}, ${settings.proprietor_title || 'Proprietor'}, Apparel Emporium`;
 
     const vision = settings.vision_text || 'To be the most trusted, socially compliant, and quality-driven garments buying house in South Asia for world-class fashion brands.';
     const mission = settings.mission_text || 'To engineer sustainable garment manufacturing partnerships, offering complete end-to-end merchandising from design to FOB shipment.';
@@ -858,8 +859,8 @@ export async function generateCompanyProfilePDF(): Promise<Buffer> {
         },
         {
             title: 'HOTLINES & WHATSAPP',
-            p1: `Hotline: ${phone}`,
-            p2: 'WhatsApp 24/7 Support',
+            p1: `Cell/WA: ${whatsapp}`,
+            p2: `Hotline: ${phone}`,
             p3: 'Direct Buyer Merchandising Desk'
         },
         {
