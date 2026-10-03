@@ -8,19 +8,25 @@ function run(cmd, desc) {
     console.log(`$ ${cmd}`);
     console.log(`======================================================`);
     try {
-        execSync(cmd, {
-            stdio: 'inherit',
+        const out = execSync(cmd, {
+            encoding: 'utf8',
+            maxBuffer: 50 * 1024 * 1024,
             env: {
                 ...process.env,
                 NEXT_DEBUG_BUILD: '1',
-                NODE_OPTIONS: '--max-old-space-size=1280',
+                NODE_OPTIONS: '--max-old-space-size=1280 --stack-trace-limit=100',
                 UV_THREADPOOL_SIZE: '1'
             }
         });
+        console.log(out);
         return true;
     } catch (err) {
-        console.error(`❌ [FAILED] ${desc}:`, err.message);
-        throw err;
+        const stdOut = err.stdout ? err.stdout.toString() : '';
+        const stdErr = err.stderr ? err.stderr.toString() : '';
+        console.error(`❌ [FAILED] ${desc}`);
+        if (stdOut) console.error('--- STDOUT ---\n', stdOut);
+        if (stdErr) console.error('--- STDERR ---\n', stdErr);
+        throw new Error(`[${desc}] failed:\n${stdErr || stdOut || err.message}`);
     }
 }
 

@@ -16,6 +16,7 @@ const nextConfig = {
         workerThreads: false, // Prevent Next.js from spawning child worker processes during page generation
     },
     serverExternalPackages: ['geoip-lite'],
+    generateBuildId: async () => 'aelbd-prod-' + Date.now(),
     output: 'standalone', // Required for Hostinger Node.js hosting
     images: {
         unoptimized: false, // Next.js image optimization
