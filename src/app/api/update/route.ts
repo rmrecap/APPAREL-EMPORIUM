@@ -194,7 +194,9 @@ export async function POST(request: NextRequest) {
             }
 
             case 'rebuild': {
-                const res = await execAsync(`${npm} run build`, { env, timeout: 180000 });
+                const nextBin = path.join(process.cwd(), 'node_modules', 'next', 'dist', 'bin', 'next');
+                const buildCmd = fs.existsSync(nextBin) ? `node "${nextBin}" build` : `${npm} run build`;
+                const res = await execAsync(buildCmd, { env, timeout: 240000 });
                 stdoutOutput = res.stdout;
                 break;
             }
@@ -282,7 +284,9 @@ export async function POST(request: NextRequest) {
                 }
 
                 // 4. Build Next.js application
-                const buildRes = await execAsync(`${npm} run build`, { env, timeout: 240000 });
+                const nextBin = path.join(process.cwd(), 'node_modules', 'next', 'dist', 'bin', 'next');
+                const buildCmd = fs.existsSync(nextBin) ? `node "${nextBin}" build` : `${npm} run build`;
+                const buildRes = await execAsync(buildCmd, { env, timeout: 240000 });
 
                 // 5. Reload PM2 and Passenger
                 try {
