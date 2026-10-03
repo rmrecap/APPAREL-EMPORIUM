@@ -89,10 +89,16 @@ const nextConfig = {
         ];
     },
     webpack: (config, { isServer, dev }) => {
+        const srcPath = path.resolve(process.cwd(), 'src');
         config.resolve.alias = {
             ...config.resolve.alias,
-            '@': path.resolve(__dirname, 'src'),
+            '@': srcPath,
         };
+
+        config.resolve.extensions = Array.from(new Set([
+            ...(config.resolve.extensions || []),
+            '.tsx', '.ts', '.jsx', '.js', '.json'
+        ]));
 
         if (!isServer) {
             // Needed if using prisma/sqlite on frontend/browser components

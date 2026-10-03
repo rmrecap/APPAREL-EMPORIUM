@@ -45,9 +45,21 @@ function copyDirSync(src, dest) {
 }
 
 async function main() {
-    console.log('🚀 [HOSTINGER DEPLOY] Starting automated zero-data-loss build pipeline...');
     const cwd = process.cwd();
     const dbPath = path.join(cwd, 'prisma', 'dev.db');
+    // 0. DIAGNOSTIC FILE INTEGRITY CHECK
+    console.log('🔍 [DIAGNOSTIC] Checking repository files on disk:');
+    const checkPaths = [
+        'src/context/SettingsContext.tsx',
+        'src/components/products/Coded3DGlobe.tsx',
+        'src/components/ui/Claymorphic3DIcons.tsx',
+        'src/hooks/usePermission.ts',
+        'src/app/contact/page.tsx',
+    ];
+    for (const cp of checkPaths) {
+        const fullP = path.join(cwd, cp);
+        console.log(`   ${cp}: ${fs.existsSync(fullP) ? 'EXISTS (' + fs.statSync(fullP).size + ' bytes)' : 'MISSING ❌'}`);
+    }
     const homeDir = process.env.HOME || process.env.USERPROFILE || '';
     const backupDir = path.join(homeDir, 'db_backups');
 
