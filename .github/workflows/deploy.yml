@@ -58,9 +58,29 @@ jobs:
             fi
             git remote set-url origin https://github.com/rmrecap/APPAREL-EMPORIUM.git 2>/dev/null || git remote add origin https://github.com/rmrecap/APPAREL-EMPORIUM.git
             
+            # CRITICAL ZERO-DATA-LOSS BACKUP: Backup live SQLite database before git reset
+            mkdir -p "$HOME/db_backups"
+            if [ -f "prisma/dev.db" ]; then
+              DB_SIZE=$(wc -c < "prisma/dev.db" 2>/dev/null || stat -c%s "prisma/dev.db" 2>/dev/null || echo 0)
+              echo "Preserving live database before git reset (current size: $DB_SIZE bytes)..."
+              cp prisma/dev.db "$HOME/db_backups/live_backup_latest.db"
+              cp prisma/dev.db "$HOME/db_backups/live_backup_$(date +%Y%m%d_%H%M%S).db"
+              cp prisma/dev.db prisma/dev.db.live_backup
+            fi
+            
             # Fetch safely with fallbacks
             git fetch origin main || git fetch origin main --depth=1
             git reset --hard origin/main
+            
+            # RESTORE LIVE DATABASE: Guarantee zero product or user data loss
+            if [ -f "prisma/dev.db.live_backup" ]; then
+              echo "Restoring live database to guarantee zero product loss..."
+              cp prisma/dev.db.live_backup prisma/dev.db
+              rm -f prisma/dev.db.live_backup
+            elif [ -f "$HOME/db_backups/live_backup_latest.db" ]; then
+              echo "Restoring live database from persistent backup..."
+              cp "$HOME/db_backups/live_backup_latest.db" prisma/dev.db
+            fi
             
             # Ensure .env is created for production with robust fallbacks
             if [ ! -f .env ]; then
@@ -116,8 +136,17 @@ jobs:
             echo "Generating Prisma client..."
             npx prisma generate || node ./node_modules/prisma/build/index.js generate
             
+            echo "Running Pre-migration Product Integrity Guard..."
+            node scripts/guard-product-integrity.js || true
+            
             echo "Updating database schema..."
             npx prisma db push --accept-data-loss || node ./node_modules/prisma/build/index.js db push --accept-data-loss
+            
+            echo "Synchronizing corporate contact details while verifying product integrity..."
+            node scripts/sync-corporate-settings.js || true
+
+            echo "Running Post-migration Product Integrity Guard..."
+            node scripts/guard-product-integrity.js
             
             echo "Building Next.js application..."
             npm run build
