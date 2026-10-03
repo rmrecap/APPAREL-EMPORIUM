@@ -51,6 +51,19 @@ async function main() {
     const homeDir = process.env.HOME || process.env.USERPROFILE || '';
     const backupDir = path.join(homeDir, 'db_backups');
 
+    // 0. FIX PERMISSIONS ON PRISMA DATABASE
+    try {
+        const pDir = path.join(cwd, 'prisma');
+        fs.chmodSync(pDir, 0o777);
+        const dFile = path.join(pDir, 'dev.db');
+        if (fs.existsSync(dFile)) fs.chmodSync(dFile, 0o666);
+        const jFile = path.join(pDir, 'dev.db-journal');
+        if (fs.existsSync(jFile)) fs.chmodSync(jFile, 0o666);
+        console.log('✅ [PERMS] Database file permissions configured (chmod 777/666).');
+    } catch (permErr) {
+        console.warn('⚠️ [PERMS WARNING]', permErr.message);
+    }
+
     // 1. BACKUP DATABASE BEFORE ANY ACTIONS
     if (fs.existsSync(dbPath)) {
         const stats = fs.statSync(dbPath);
@@ -80,11 +93,12 @@ async function main() {
         }
     }
 
-    // 3. CHECK NEXT BINARY
+    // 3. CHECK CORE DEPENDENCIES (NEXT & REACT-DOM)
     const nextBin = path.join(cwd, 'node_modules', 'next', 'dist', 'bin', 'next');
-    if (!fs.existsSync(nextBin)) {
-        console.log('⚠️ [DEPS] next binary is missing. Installing dependencies...');
-        run('npm install --include=dev --no-audit --no-fund --prefix .', 'Install Dependencies');
+    const reactDomClient = path.join(cwd, 'node_modules', 'react-dom', 'client.js');
+    if (!fs.existsSync(nextBin) || !fs.existsSync(reactDomClient)) {
+        console.log('⚠️ [DEPS] Core dependencies missing. Running targeted npm install...');
+        run('npm install react@18.3.1 react-dom@18.3.1 next@15.5.27 --no-audit --no-fund --prefix .', 'Install Core React & Next Dependencies');
     }
 
     // 3b. ENSURE NEXT.JS BUILD ID GENERATOR RESILIENCE
