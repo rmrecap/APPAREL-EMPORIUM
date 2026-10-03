@@ -5,6 +5,15 @@ const path = require('path');
 const prisma = new PrismaClient();
 
 async function main() {
+    try {
+        const pDir = path.join(process.cwd(), 'prisma');
+        fs.chmodSync(pDir, 0o777);
+        const dFile = path.join(pDir, 'dev.db');
+        if (fs.existsSync(dFile)) fs.chmodSync(dFile, 0o666);
+        const jFile = path.join(pDir, 'dev.db-journal');
+        if (fs.existsSync(jFile)) fs.chmodSync(jFile, 0o666);
+    } catch (e) {}
+
     console.log('=== Checking Product Integrity Before Settings Update ===');
     let initialProductCount = await prisma.product.count();
     console.log(`Initial product count: ${initialProductCount}`);

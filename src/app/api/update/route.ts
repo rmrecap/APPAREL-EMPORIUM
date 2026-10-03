@@ -236,6 +236,18 @@ export async function POST(request: NextRequest) {
                 break;
             }
 
+            case 'fix-perms': {
+                try {
+                    const prismaDir = path.join(process.cwd(), 'prisma');
+                    await execAsync(`chmod -R 777 "${prismaDir}" || true && chmod 666 "${prismaDir}"/dev.db* || true`, { env });
+                    const res = await execAsync(`node scripts/sync-corporate-settings.js`, { env });
+                    stdoutOutput = 'Permissions fixed and corporate settings synced:\n' + res.stdout;
+                } catch (e: any) {
+                    stdoutOutput = 'Fix perms note: ' + (e.stderr || e.stdout || e.message);
+                }
+                break;
+            }
+
             case 'full':
             case 'auto-deploy':
             default: {
