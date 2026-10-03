@@ -87,6 +87,25 @@ async function main() {
         run('npm install --include=dev --no-audit --no-fund --prefix .', 'Install Dependencies');
     }
 
+    // 3b. ENSURE NEXT.JS BUILD ID GENERATOR RESILIENCE
+    const buildIdGenPath = path.join(cwd, 'node_modules', 'next', 'dist', 'build', 'generate-build-id.js');
+    if (fs.existsSync(buildIdGenPath)) {
+        try {
+            let content = fs.readFileSync(buildIdGenPath, 'utf8');
+            if (content.includes('let buildId = await generate();')) {
+                console.log('🔧 [PATCH] Applying buildId generator safety patch to Next.js...');
+                content = content.replace(
+                    'let buildId = await generate();',
+                    'let buildId = typeof generate === "function" ? await generate() : null;'
+                );
+                fs.writeFileSync(buildIdGenPath, content, 'utf8');
+                console.log('✅ [PATCH] Next.js buildId generator patched successfully.');
+            }
+        } catch (patchErr) {
+            console.warn('⚠️ [PATCH WARNING]', patchErr.message);
+        }
+    }
+
     // 4. GENERATE PRISMA CLIENT WITH LOCAL PINNED BINARY
     const localPrisma = path.join(cwd, 'node_modules', 'prisma', 'build', 'index.js');
     if (fs.existsSync(localPrisma)) {
@@ -137,6 +156,13 @@ async function main() {
         console.log('▶ [BUILD ENGINE] Invoking Next.js compiler directly...');
         await nextBuild(cwd, false, false, false, false, true, false, false, undefined);
         console.log('✅ [BUILD] Next.js compilation completed successfully.');
+
+        // 9. FINAL INTEGRITY CHECK
+        if (fs.existsSync(path.join(cwd, 'scripts', 'guard-product-integrity.js'))) {
+            run('node scripts/guard-product-integrity.js', 'Final Production Product Verification');
+        }
+
+        console.log('\n🎉 [SUCCESS] Deployment build and verification completed successfully!');
     } catch (err) {
         console.error('\n❌ [BUILD EXCEPTION CAUGHT]');
         if (Array.isArray(err)) {
