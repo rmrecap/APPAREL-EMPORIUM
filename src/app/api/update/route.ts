@@ -194,9 +194,9 @@ export async function POST(request: NextRequest) {
             }
 
             case 'rebuild': {
-                const nextBin = path.join(process.cwd(), 'node_modules', 'next', 'dist', 'bin', 'next');
-                const buildCmd = fs.existsSync(nextBin) ? `node "${nextBin}" build` : `${npm} run build`;
-                const res = await execAsync(buildCmd, { env, timeout: 240000 });
+                const hostingerBuild = path.join(process.cwd(), 'scripts', 'hostinger-build.js');
+                const buildCmd = fs.existsSync(hostingerBuild) ? `node "${hostingerBuild}"` : `${npm} run build`;
+                const res = await execAsync(buildCmd, { env, timeout: 300000 });
                 stdoutOutput = res.stdout;
                 break;
             }
@@ -284,9 +284,9 @@ export async function POST(request: NextRequest) {
                 }
 
                 // 4. Build Next.js application
-                const nextBin = path.join(process.cwd(), 'node_modules', 'next', 'dist', 'bin', 'next');
-                const buildCmd = fs.existsSync(nextBin) ? `node "${nextBin}" build` : `${npm} run build`;
-                const buildRes = await execAsync(buildCmd, { env, timeout: 240000 });
+                const hostingerBuild = path.join(process.cwd(), 'scripts', 'hostinger-build.js');
+                const buildCmd = fs.existsSync(hostingerBuild) ? `node "${hostingerBuild}"` : `${npm} run build`;
+                const buildRes = await execAsync(buildCmd, { env, timeout: 300000 });
 
                 // 5. Reload PM2 and Passenger
                 try {

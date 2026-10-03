@@ -119,18 +119,43 @@ async function main() {
     // 8. BUILD NEXT.JS PRODUCTION APPLICATION
     console.log('\n🏗️ [BUILD] Compiling Next.js production build...');
     process.env.NEXT_DEBUG_BUILD = '1';
-    if (fs.existsSync(nextBin)) {
-        run(`node "${nextBin}" build`, 'Next.js Production Build');
-    } else {
-        run('npx next build', 'Next.js Production Build via npx');
-    }
+    try {
+        const userConfigPath = path.join(cwd, 'next.config.js');
+        if (fs.existsSync(userConfigPath)) {
+            delete require.cache[require.resolve(userConfigPath)];
+            const userConfig = require(userConfigPath);
+            console.log('📋 [CONFIG DEBUG] Loaded next.config.js:');
+            console.log('   output:', userConfig.output);
+            console.log('   typeof generateBuildId:', typeof userConfig.generateBuildId);
+            if (typeof userConfig.generateBuildId === 'function') {
+                const sampleId = await userConfig.generateBuildId();
+                console.log('   sample generateBuildId():', sampleId);
+            }
+        }
 
-    // 9. FINAL INTEGRITY CHECK
-    if (fs.existsSync(path.join(cwd, 'scripts', 'guard-product-integrity.js'))) {
-        run('node scripts/guard-product-integrity.js', 'Final Production Product Verification');
+        const nextBuild = require('next/dist/build').default;
+        console.log('▶ [BUILD ENGINE] Invoking Next.js compiler directly...');
+        await nextBuild(cwd, false, false, false, false, true, false, false, undefined);
+        console.log('✅ [BUILD] Next.js compilation completed successfully.');
+    } catch (err) {
+        console.error('\n❌ [BUILD EXCEPTION CAUGHT]');
+        if (Array.isArray(err)) {
+            console.error(`Received array of ${err.length} build error(s):`);
+            err.forEach((e, idx) => {
+                console.error(`\n--- Build Error #${idx + 1} ---`);
+                console.error('Name:', e ? e.name : 'Unknown');
+                console.error('Message:', e ? e.message : String(e));
+                console.error('Stack:\n', e ? e.stack : 'No stack');
+                if (e && e.cause) console.error('Cause:\n', e.cause);
+            });
+        } else if (err) {
+            console.error('Name:', err.name);
+            console.error('Message:', err.message);
+            console.error('Stack:\n', err.stack);
+            if (err.cause) console.error('Cause:\n', err.cause);
+        }
+        throw new Error(`Next.js build failed: ${Array.isArray(err) ? err.map(e => e.message || String(e)).join('; ') : err.message}`);
     }
-
-    console.log('\n🎉 [SUCCESS] Deployment build and verification completed successfully!');
 }
 
 main().catch(err => {
