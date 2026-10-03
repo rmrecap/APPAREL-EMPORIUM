@@ -3,9 +3,9 @@
     "version": "1.0.2",
     "private": true,
     "scripts": {
-        "dev": "next dev",
-        "build": "next build",
-        "start": "next start -p $PORT",
+        "dev": "node node_modules/next/dist/bin/next dev",
+        "build": "node node_modules/next/dist/bin/next build",
+        "start": "node node_modules/next/dist/bin/next start -p $PORT",
         "seed": "npx prisma db seed",
         "db:push": "npx prisma db push",
         "db:reset": "npx prisma db push --force-reset && npx prisma db seed",
