@@ -214,7 +214,10 @@ export async function POST(request: NextRequest) {
             }
 
             case 'db': {
-                const res = await execAsync(`${npx} prisma generate && ${npx} prisma db push --accept-data-loss`, {
+                const localPrisma = path.join(process.cwd(), 'node_modules', 'prisma', 'build', 'index.js');
+                const prismaCmd = fs.existsSync(localPrisma) ? `node "${localPrisma}"` : `${npx} -y prisma@5.22.0`;
+                const guardCmd = `node scripts/guard-product-integrity.js`;
+                const res = await execAsync(`${guardCmd} || true && ${prismaCmd} generate && ${prismaCmd} db push --accept-data-loss && ${guardCmd}`, {
                     env,
                     timeout: 60000,
                 });
@@ -259,9 +262,10 @@ export async function POST(request: NextRequest) {
 
                 // 3. Prisma generate & db push using direct local binary fallback
                 const localPrisma = path.join(process.cwd(), 'node_modules', 'prisma', 'build', 'index.js');
-                const prismaCmd = fs.existsSync(localPrisma) ? `node "${localPrisma}"` : `${npx} prisma`;
+                const prismaCmd = fs.existsSync(localPrisma) ? `node "${localPrisma}"` : `${npx} -y prisma@5.22.0`;
                 let prismaMsg = '';
                 try {
+                    await execAsync(`node scripts/guard-product-integrity.js || true`, { env, timeout: 30000 }).catch(() => {});
                     await execAsync(`${prismaCmd} generate`, { env, timeout: 60000 }).catch(gErr => {
                         console.warn('[UPDATE] Prisma generate note (using existing generated client if available):', gErr?.message);
                     });
@@ -269,6 +273,8 @@ export async function POST(request: NextRequest) {
                         env,
                         timeout: 90000,
                     });
+                    await execAsync(`node scripts/sync-corporate-settings.js || true`, { env, timeout: 30000 }).catch(() => {});
+                    await execAsync(`node scripts/guard-product-integrity.js`, { env, timeout: 30000 }).catch(() => {});
                     prismaMsg = prRes.stdout || 'Database schema synced successfully (all tables & data preserved).';
                 } catch (e: any) {
                     prismaMsg = `Prisma note: ${e.message}`;
