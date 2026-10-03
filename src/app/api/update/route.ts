@@ -337,7 +337,10 @@ export async function POST(request: NextRequest) {
             {
                 success: false,
                 error: error.message || 'Action failed',
-                details: error.stderr || error.stdout || 'No additional details',
+                details: [
+                    error.stdout ? `=== STDOUT ===\n${error.stdout}` : '',
+                    error.stderr ? `=== STDERR ===\n${error.stderr}` : '',
+                ].filter(Boolean).join('\n\n') || error.message || 'No additional details',
             },
             { status: 500 }
         );
