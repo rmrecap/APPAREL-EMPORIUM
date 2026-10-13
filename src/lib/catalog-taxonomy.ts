@@ -77,10 +77,10 @@ export const DEFAULT_CATALOG_TAXONOMY: TaxonomyDivision[] = [
         slug: 'mens-fashion',
         groups: [
           {
-            id: 'men-knit',
-            name: 'KNIT FASHION',
-            slug: 'men-knit-fashion',
-            badge: 'Circular & Flat Knit',
+            id: 'men-circular-knit',
+            name: 'Circular Knit Items',
+            slug: 'men-circular-knit',
+            badge: 'Cut & Sew Knits',
             items: [
               { id: 'm-k-1', name: 'T-Shirt', slug: 'mens-t-shirt', isActive: true, order: 1 },
               { id: 'm-k-2', name: 'Polo-Shirt', slug: 'mens-polo-shirt', isActive: true, order: 2 },
@@ -97,9 +97,22 @@ export const DEFAULT_CATALOG_TAXONOMY: TaxonomyDivision[] = [
             ],
           },
           {
+            id: 'men-flat-knit',
+            name: 'Flat Knit Items',
+            slug: 'men-flat-knit',
+            badge: 'Sweaters & Knitwear',
+            items: [
+              { id: 'm-s-1', name: 'Sweaters / Cardigans', slug: 'mens-sweaters-cardigans', isActive: true, order: 1 },
+              { id: 'm-s-2', name: 'Pullovers / Jumpers', slug: 'mens-pullover', isActive: true, order: 2 },
+              { id: 'm-s-3', name: 'Cardigans / Jackets', slug: 'mens-cardigans-jackets', isActive: true, order: 3 },
+              { id: 'm-s-4', name: 'Ponchos', slug: 'mens-poncho', isActive: true, order: 4 },
+              { id: 'm-s-5', name: 'Muffler / Scarf', slug: 'mens-muffler', isActive: true, order: 5 },
+            ],
+          },
+          {
             id: 'men-woven',
-            name: 'WOVEN FASHION',
-            slug: 'men-woven-fashion',
+            name: 'Woven Items',
+            slug: 'men-woven',
             badge: 'Tailored & Casual',
             items: [
               { id: 'm-w-1', name: 'Jacket/Vest', slug: 'mens-woven-jacket-vest', isActive: true, order: 1 },
@@ -115,19 +128,6 @@ export const DEFAULT_CATALOG_TAXONOMY: TaxonomyDivision[] = [
               { id: 'm-w-11', name: 'Uniform / School Uniform', slug: 'mens-woven-uniform', isActive: true, order: 11 },
             ],
           },
-          {
-            id: 'men-sweater',
-            name: 'SWEATER FASHION',
-            slug: 'men-sweater-fashion',
-            badge: 'Fine & Heavy Gauge',
-            items: [
-              { id: 'm-s-1', name: 'Sweaters / Cardigans', slug: 'mens-sweaters-cardigans', isActive: true, order: 1 },
-              { id: 'm-s-2', name: 'Pullovers / Jumpers', slug: 'mens-pullover', isActive: true, order: 2 },
-              { id: 'm-s-3', name: 'Cardigans / Jackets', slug: 'mens-cardigans-jackets', isActive: true, order: 3 },
-              { id: 'm-s-4', name: 'Ponchos', slug: 'mens-poncho', isActive: true, order: 4 },
-              { id: 'm-s-5', name: 'Muffler / Scarf', slug: 'mens-muffler', isActive: true, order: 5 },
-            ],
-          },
         ],
       },
       {
@@ -136,10 +136,10 @@ export const DEFAULT_CATALOG_TAXONOMY: TaxonomyDivision[] = [
         slug: 'womens-fashion',
         groups: [
           {
-            id: 'women-knit',
-            name: 'KNIT FASHION',
-            slug: 'women-knit-fashion',
-            badge: 'Circular & Flat Knit',
+            id: 'women-circular-knit',
+            name: 'Circular Knit Items',
+            slug: 'women-circular-knit',
+            badge: 'Cut & Sew Knits',
             items: [
               { id: 'w-k-1', name: 'T-Shirt', slug: 'womens-t-shirt', isActive: true, order: 1 },
               { id: 'w-k-2', name: 'Polo-Shirt', slug: 'womens-polo-shirt', isActive: true, order: 2 },
@@ -156,9 +156,21 @@ export const DEFAULT_CATALOG_TAXONOMY: TaxonomyDivision[] = [
             ],
           },
           {
+            id: 'women-flat-knit',
+            name: 'Flat Knit Items',
+            slug: 'women-flat-knit',
+            badge: 'Sweaters & Knitwear',
+            items: [
+              { id: 'w-s-1', name: 'Sweaters / Cardigans / Pullovers', slug: 'womens-sweaters-cardigans-pullovers', isActive: true, order: 1 },
+              { id: 'w-s-2', name: 'Cut & sew', slug: 'womens-cut-and-sew', isActive: true, order: 2 },
+              { id: 'w-s-3', name: 'Poncho', slug: 'womens-poncho', isActive: true, order: 3 },
+              { id: 'w-s-4', name: 'Muffler / Scarf', slug: 'womens-muffler', isActive: true, order: 4 },
+            ],
+          },
+          {
             id: 'women-woven',
-            name: 'WOVEN FASHION',
-            slug: 'women-woven-fashion',
+            name: 'Woven Items',
+            slug: 'women-woven',
             badge: 'Tailored & Casual',
             items: [
               { id: 'w-w-1', name: 'Jacket/Vest', slug: 'womens-woven-jacket-vest', isActive: true, order: 1 },
@@ -174,18 +186,6 @@ export const DEFAULT_CATALOG_TAXONOMY: TaxonomyDivision[] = [
               { id: 'w-w-11', name: 'Workwear / Uniforms', slug: 'womens-woven-uniform', isActive: true, order: 11 },
             ],
           },
-          {
-            id: 'women-sweater',
-            name: 'SWEATER FASHION',
-            slug: 'women-sweater-fashion',
-            badge: 'Fine & Heavy Gauge',
-            items: [
-              { id: 'w-s-1', name: 'Sweaters / Cardigans / Pullovers', slug: 'womens-sweaters-cardigans-pullovers', isActive: true, order: 1 },
-              { id: 'w-s-2', name: 'Cut & sew', slug: 'womens-cut-and-sew', isActive: true, order: 2 },
-              { id: 'w-s-3', name: 'Poncho', slug: 'womens-poncho', isActive: true, order: 3 },
-              { id: 'w-s-4', name: 'Muffler / Scarf', slug: 'womens-muffler', isActive: true, order: 4 },
-            ],
-          },
         ],
       },
       {
@@ -194,10 +194,10 @@ export const DEFAULT_CATALOG_TAXONOMY: TaxonomyDivision[] = [
         slug: 'childrens-fashion',
         groups: [
           {
-            id: 'kids-knit',
-            name: 'KNIT FASHION',
-            slug: 'kids-knit-fashion',
-            badge: 'Circular & Flat Knit',
+            id: 'kids-circular-knit',
+            name: 'Circular Knit Items',
+            slug: 'kids-circular-knit',
+            badge: 'Cut & Sew Knits',
             items: [
               { id: 'k-k-1', name: 'T-Shirt', slug: 'kids-t-shirt', isActive: true, order: 1 },
               { id: 'k-k-2', name: 'Polo-Shirt', slug: 'kids-polo-shirt', isActive: true, order: 2 },
@@ -212,9 +212,21 @@ export const DEFAULT_CATALOG_TAXONOMY: TaxonomyDivision[] = [
             ],
           },
           {
+            id: 'kids-flat-knit',
+            name: 'Flat Knit Items',
+            slug: 'kids-flat-knit',
+            badge: 'Sweaters & Knitwear',
+            items: [
+              { id: 'k-s-1', name: 'Sweaters / Cardigans / Pullovers', slug: 'kids-sweaters-cardigans-pullovers', isActive: true, order: 1 },
+              { id: 'k-s-2', name: 'Cut & sew', slug: 'kids-cut-and-sew', isActive: true, order: 2 },
+              { id: 'k-s-3', name: 'Poncho', slug: 'kids-poncho', isActive: true, order: 3 },
+              { id: 'k-s-4', name: 'Muffler / Scarf', slug: 'kids-muffler', isActive: true, order: 4 },
+            ],
+          },
+          {
             id: 'kids-woven',
-            name: 'WOVEN FASHION',
-            slug: 'kids-woven-fashion',
+            name: 'Woven Items',
+            slug: 'kids-woven',
             badge: 'Tailored & Casual',
             items: [
               { id: 'k-w-1', name: 'Jacket/Vest', slug: 'kids-woven-jacket-vest', isActive: true, order: 1 },
@@ -228,18 +240,6 @@ export const DEFAULT_CATALOG_TAXONOMY: TaxonomyDivision[] = [
               { id: 'k-w-9', name: 'Nightwear / Sleepwear', slug: 'kids-woven-nightwear', isActive: true, order: 9 },
               { id: 'k-w-10', name: 'School Uniform', slug: 'kids-woven-uniform', isActive: true, order: 10 },
               { id: 'k-w-11', name: 'Sportswear', slug: 'kids-woven-sportswear', isActive: true, order: 11 },
-            ],
-          },
-          {
-            id: 'kids-sweater',
-            name: 'SWEATER FASHION',
-            slug: 'kids-sweater-fashion',
-            badge: 'Fine & Heavy Gauge',
-            items: [
-              { id: 'k-s-1', name: 'Sweaters / Cardigans / Pullovers', slug: 'kids-sweaters-cardigans-pullovers', isActive: true, order: 1 },
-              { id: 'k-s-2', name: 'Cut & sew', slug: 'kids-cut-and-sew', isActive: true, order: 2 },
-              { id: 'k-s-3', name: 'Poncho', slug: 'kids-poncho', isActive: true, order: 3 },
-              { id: 'k-s-4', name: 'Muffler / Scarf', slug: 'kids-muffler', isActive: true, order: 4 },
             ],
           },
         ],
@@ -427,9 +427,10 @@ export function getFilterMainCategories(): FilterMainCategory[] {
         name: toTitleCase(dept.name),
         slug: dept.slug,
         groups: dept.groups.map(grp => ({
-          name: toTitleCase(grp.name),
+          name: grp.name,
           slug: grp.slug,
-          items: grp.items.map(it => ({ name: it.name, slug: it.slug }))
+          // Granular items hidden from filter list per client instructions
+          items: []
         }))
       }))
     },
@@ -439,7 +440,7 @@ export function getFilterMainCategories(): FilterMainCategory[] {
       subcategories: (homeDiv?.departments[0]?.groups || []).map(grp => ({
         name: toTitleCase(grp.name),
         slug: grp.slug,
-        items: grp.items.map(it => ({ name: it.name, slug: it.slug }))
+        items: []
       }))
     },
     {
@@ -448,7 +449,7 @@ export function getFilterMainCategories(): FilterMainCategory[] {
       subcategories: (footwearDiv?.departments[0]?.groups || []).map(grp => ({
         name: toTitleCase(grp.name),
         slug: grp.slug,
-        items: grp.items.map(it => ({ name: it.name, slug: it.slug }))
+        items: []
       }))
     },
     {
@@ -480,6 +481,15 @@ export function getAllDescendantSlugs(targetSlug: string): string[] {
     results.add('mens-fashion');
     results.add('womens-fashion');
     results.add('childrens-fashion');
+    results.add('men-circular-knit');
+    results.add('men-flat-knit');
+    results.add('men-woven');
+    results.add('women-circular-knit');
+    results.add('women-flat-knit');
+    results.add('women-woven');
+    results.add('kids-circular-knit');
+    results.add('kids-flat-knit');
+    results.add('kids-woven');
     results.add('knitwear-mens');
     results.add('knitwear-womens');
     results.add('knitwear-kids');
@@ -489,6 +499,122 @@ export function getAllDescendantSlugs(targetSlug: string): string[] {
     results.add('sweater-mens');
     results.add('sweater-womens');
     results.add('sweater-kids');
+  } else if (norm === 'men-circular-knit' || norm === 'men-knit-fashion' || norm === 'knitwear-mens') {
+    results.add('men-circular-knit');
+    results.add('men-knit-fashion');
+    results.add('knitwear-mens');
+    results.add('mens-t-shirt');
+    results.add('mens-polo-shirt');
+    results.add('mens-sweatshirt');
+    results.add('mens-knit-jacket-vest');
+    results.add('mens-trousers-joggers');
+    results.add('mens-undergarments');
+    results.add('mens-boxershorts');
+    results.add('mens-knit-swimwear');
+    results.add('mens-knit-sportswear');
+    results.add('mens-knit-nightwear');
+    results.add('mens-knit-workwear');
+    results.add('mens-thermal-wear');
+  } else if (norm === 'women-circular-knit' || norm === 'women-knit-fashion' || norm === 'knitwear-womens') {
+    results.add('women-circular-knit');
+    results.add('women-knit-fashion');
+    results.add('knitwear-womens');
+    results.add('womens-t-shirt');
+    results.add('womens-polo-shirt');
+    results.add('womens-sweatshirt');
+    results.add('womens-knit-jacket-vest');
+    results.add('womens-knit-dress');
+    results.add('womens-trouser-pyjama-skirt');
+    results.add('womens-jumpsuits-overalls');
+    results.add('womens-knit-swimwear');
+    results.add('womens-undergarments');
+    results.add('womens-knit-sportswear');
+    results.add('womens-knit-nightwear');
+    results.add('womens-thermal-wear');
+  } else if (norm === 'kids-circular-knit' || norm === 'kids-knit-fashion' || norm === 'knitwear-kids') {
+    results.add('kids-circular-knit');
+    results.add('kids-knit-fashion');
+    results.add('knitwear-kids');
+    results.add('kids-t-shirt');
+    results.add('kids-polo-shirt');
+    results.add('kids-sweatshirt');
+    results.add('kids-knit-jacket-vest');
+    results.add('kids-pant-legging-skirt');
+    results.add('kids-romper');
+    results.add('kids-knit-dress');
+    results.add('kids-knit-sportswear');
+    results.add('kids-knit-nightwear');
+    results.add('kids-thermal-wear');
+  } else if (norm === 'men-flat-knit' || norm === 'men-sweater-fashion' || norm === 'sweater-mens') {
+    results.add('men-flat-knit');
+    results.add('men-sweater-fashion');
+    results.add('sweater-mens');
+    results.add('mens-sweaters-cardigans');
+    results.add('mens-pullover');
+    results.add('mens-cardigans-jackets');
+    results.add('mens-poncho');
+    results.add('mens-muffler');
+  } else if (norm === 'women-flat-knit' || norm === 'women-sweater-fashion' || norm === 'sweater-womens') {
+    results.add('women-flat-knit');
+    results.add('women-sweater-fashion');
+    results.add('sweater-womens');
+    results.add('womens-sweaters-cardigans-pullovers');
+    results.add('womens-cut-and-sew');
+    results.add('womens-poncho');
+    results.add('womens-muffler');
+  } else if (norm === 'kids-flat-knit' || norm === 'kids-sweater-fashion' || norm === 'sweater-kids') {
+    results.add('kids-flat-knit');
+    results.add('kids-sweater-fashion');
+    results.add('sweater-kids');
+    results.add('kids-sweaters-cardigans-pullovers');
+    results.add('kids-cut-and-sew');
+    results.add('kids-poncho');
+    results.add('kids-muffler');
+  } else if (norm === 'men-woven' || norm === 'men-woven-fashion' || norm === 'woven-mens') {
+    results.add('men-woven');
+    results.add('men-woven-fashion');
+    results.add('woven-mens');
+    results.add('mens-woven-jacket-vest');
+    results.add('mens-coat-blazer');
+    results.add('mens-shirt');
+    results.add('mens-pant');
+    results.add('mens-bermudas-shorts');
+    results.add('mens-woven-swimwear');
+    results.add('mens-woven-boxershorts');
+    results.add('mens-woven-sportswear');
+    results.add('mens-woven-nightwear');
+    results.add('mens-woven-workwear');
+    results.add('mens-woven-uniform');
+  } else if (norm === 'women-woven' || norm === 'women-woven-fashion' || norm === 'woven-womens') {
+    results.add('women-woven');
+    results.add('women-woven-fashion');
+    results.add('woven-womens');
+    results.add('womens-woven-jacket-vest');
+    results.add('womens-coat-blazer');
+    results.add('womens-shirt-blouse');
+    results.add('womens-pant-skirt');
+    results.add('womens-bermudas-shorts');
+    results.add('womens-woven-dress');
+    results.add('womens-woven-swimwear');
+    results.add('womens-woven-boxershorts');
+    results.add('womens-woven-sportswear');
+    results.add('womens-woven-nightwear');
+    results.add('womens-woven-uniform');
+  } else if (norm === 'kids-woven' || norm === 'kids-woven-fashion' || norm === 'woven-kids') {
+    results.add('kids-woven');
+    results.add('kids-woven-fashion');
+    results.add('woven-kids');
+    results.add('kids-woven-jacket-vest');
+    results.add('kids-coat-blazer');
+    results.add('kids-shirt-blouse');
+    results.add('kids-pant-skirt');
+    results.add('kids-bermudas-shorts');
+    results.add('kids-woven-swimwear');
+    results.add('kids-woven-dress');
+    results.add('kids-woven-boxershorts');
+    results.add('kids-woven-nightwear');
+    results.add('kids-woven-uniform');
+    results.add('kids-woven-sportswear');
   } else if (norm === 'hometextiles' || norm === 'home-textiles') {
     results.add('hometextiles');
     results.add('home-textiles');
@@ -706,10 +832,77 @@ export function buildCategoryPrismaFilter(
     );
   }
 
+  // Circular Knit matching
+  if (norm.includes('circular-knit') || norm.includes('knit')) {
+    orConditions.push(
+      { divisionType: { in: ['Knit', 'knit'] } },
+      { category: { name: { contains: 'knit' } } },
+      { category: { slug: { contains: 'knit' } } },
+      { subCategory: { contains: 'knit' } },
+      { name: { contains: 'T-Shirt' } },
+      { name: { contains: 'Polo' } },
+      { name: { contains: 'Hoodie' } },
+      { name: { contains: 'Sweatshirt' } },
+      { name: { contains: 'Jogger' } }
+    );
+  }
+
+  // Flat Knit matching (Sweaters, Cardigans, Pullovers)
+  if (norm.includes('flat-knit') || norm.includes('sweater')) {
+    orConditions.push(
+      { divisionType: { in: ['Sweater', 'sweater'] } },
+      { category: { name: { contains: 'sweater' } } },
+      { category: { slug: { contains: 'sweater' } } },
+      { subCategory: { contains: 'sweater' } },
+      { name: { contains: 'Sweater' } },
+      { name: { contains: 'Cardigan' } },
+      { name: { contains: 'Pullover' } },
+      { name: { contains: 'Jumper' } },
+      { name: { contains: 'Poncho' } }
+    );
+  }
+
+  // Woven matching
+  if (norm.includes('woven')) {
+    orConditions.push(
+      { divisionType: { in: ['Woven', 'woven'] } },
+      { category: { name: { contains: 'woven' } } },
+      { category: { slug: { contains: 'woven' } } },
+      { subCategory: { contains: 'woven' } },
+      { name: { contains: 'Shirt' } },
+      { name: { contains: 'Blazer' } },
+      { name: { contains: 'Jacket' } },
+      { name: { contains: 'Pant' } },
+      { name: { contains: 'Chino' } },
+      { name: { contains: 'Denim' } }
+    );
+  }
+
   const isExplicitWomen = norm.includes('women');
   const isExplicitMen = norm.includes('men') && !norm.includes('women');
+  const isExplicitKids = norm.includes('kids') || norm.includes('children');
 
   const baseFilter = { OR: orConditions };
+
+  if (isExplicitKids) {
+    return {
+      AND: [
+        baseFilter,
+        {
+          OR: [
+            { name: { contains: 'Kids' } },
+            { name: { contains: 'kids' } },
+            { name: { contains: 'Child' } },
+            { name: { contains: 'children' } },
+            { category: { name: { contains: 'kids' } } },
+            { category: { slug: { contains: 'kids' } } },
+            { subCategory: { contains: 'kids' } },
+            { department: 'Kidswear' }
+          ]
+        }
+      ]
+    };
+  }
 
   if (isExplicitWomen) {
     return {

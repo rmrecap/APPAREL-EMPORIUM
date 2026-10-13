@@ -2,9 +2,9 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { useSettings } from '@/context/SettingsContext';
-import Coded3DGlobe from '@/components/products/Coded3DGlobe';
-import { Vision3DIcon, Mission3DIcon, Values3DIcon, Flowchart3DIcon } from '@/components/ui/Claymorphic3DIcons';
+import { useSettings } from '../../context/SettingsContext';
+import Coded3DGlobe from '../../components/products/Coded3DGlobe';
+import { Vision3DIcon, Mission3DIcon, Values3DIcon, Flowchart3DIcon } from '../../components/ui/Claymorphic3DIcons';
 
 export default function AboutPage() {
     const { settings } = useSettings();

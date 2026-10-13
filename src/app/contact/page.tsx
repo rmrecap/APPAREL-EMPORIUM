@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react';
 import { MapPin, Mail, Phone, MessageSquare, X, CheckCircle2, Copy, Check, MessageCircle, ArrowUpRight, UserCheck, Building2 } from 'lucide-react';
-import { useSettings } from '@/context/SettingsContext';
-import Coded3DGlobe from '@/components/products/Coded3DGlobe';
-import { Flowchart3DIcon, MapPin3DIcon, Mail3DIcon, Phone3DIcon } from '@/components/ui/Claymorphic3DIcons';
+import { useSettings } from '../../context/SettingsContext';
+import Coded3DGlobe from '../../components/products/Coded3DGlobe';
+import { Flowchart3DIcon, MapPin3DIcon, Mail3DIcon, Phone3DIcon } from '../../components/ui/Claymorphic3DIcons';
 
 /* ─────────────────────────────────────────────────────────────
    3D Flowchart Diagram (Exact match to screenshot in Light & Dark)

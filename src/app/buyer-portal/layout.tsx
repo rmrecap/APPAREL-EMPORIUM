@@ -3,8 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { usePermission } from '@/hooks/usePermission';
-import Sidebar from '@/components/admin/Sidebar';
+import { usePermission } from '../../hooks/usePermission';
+import Sidebar from '../../components/admin/Sidebar';
 import { User, Bell, LayoutDashboard, ShoppingBag, Settings, LogOut, Package, ClipboardList, MessageSquare } from 'lucide-react';
 
 export default function BuyerLayout({ children }: { children: React.ReactNode }) {

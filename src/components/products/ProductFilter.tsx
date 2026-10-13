@@ -34,22 +34,15 @@ export default function ProductFilter({ categories }: ProductFilterProps) {
 
     // Filter states
     const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
-    const [selectedFabrics, setSelectedFabrics] = useState<string[]>(searchParams.get('fabric')?.split(',').filter(Boolean) || []);
-    const [selectedMOQs, setSelectedMOQs] = useState<string[]>(searchParams.get('moq')?.split(',').filter(Boolean) || []);
     const [activeGender, setActiveGender] = useState<string | null>(null);
 
     // Category tree & expansion states
     const [categorySearch, setCategorySearch] = useState('');
 
-    const FABRIC_OPTIONS = ['Cotton', 'Polyester', 'Denim', 'Linen', 'Silk', 'Viscose', 'Jersey', 'Fleece'];
-    const MOQ_OPTIONS = ['< 100', '100-500', '500-1000', '1000+'];
-
     // Sync from URL
     useEffect(() => {
         const cat = searchParams.get('category') || '';
         setSelectedCategory(cat);
-        setSelectedFabrics(searchParams.get('fabric')?.split(',').filter(Boolean) || []);
-        setSelectedMOQs(searchParams.get('moq')?.split(',').filter(Boolean) || []);
         setSearch(searchParams.get('q') || '');
 
         if (cat.includes('men')) setActiveGender('men');
@@ -90,18 +83,16 @@ export default function ProductFilter({ categories }: ProductFilterProps) {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const applyFilters = (newCategory?: string, newFabrics?: string[], newMOQs?: string[], newSearch?: string) => {
+    const applyFilters = (newCategory?: string, newSearch?: string) => {
         const params = new URLSearchParams(searchParams.toString());
 
         const cat = newCategory !== undefined ? newCategory : selectedCategory;
-        const fab = newFabrics !== undefined ? newFabrics : selectedFabrics;
-        const moq = newMOQs !== undefined ? newMOQs : selectedMOQs;
         const q = newSearch !== undefined ? newSearch : search;
 
         if (q) params.set('q', q); else params.delete('q');
         if (cat) params.set('category', cat); else params.delete('category');
-        if (fab.length) params.set('fabric', fab.join(',')); else params.delete('fabric');
-        if (moq.length) params.set('moq', moq.join(',')); else params.delete('moq');
+        params.delete('fabric');
+        params.delete('moq');
 
         params.set('page', '1');
         router.push(`/products?${params.toString()}`);
@@ -112,27 +103,9 @@ export default function ProductFilter({ categories }: ProductFilterProps) {
         applyFilters(slug);
     };
 
-    const toggleFabric = (fabric: string) => {
-        const updated = selectedFabrics.includes(fabric)
-            ? selectedFabrics.filter(f => f !== fabric)
-            : [...selectedFabrics, fabric];
-        setSelectedFabrics(updated);
-        applyFilters(undefined, updated);
-    };
-
-    const toggleMOQ = (moq: string) => {
-        const updated = selectedMOQs.includes(moq)
-            ? selectedMOQs.filter(m => m !== moq)
-            : [...selectedMOQs, moq];
-        setSelectedMOQs(updated);
-        applyFilters(undefined, undefined, updated);
-    };
-
     const clearAll = () => {
         setSearch('');
         setSelectedCategory('');
-        setSelectedFabrics([]);
-        setSelectedMOQs([]);
         setCategorySearch('');
         setActiveGender(null);
         router.push('/products');
@@ -229,7 +202,7 @@ export default function ProductFilter({ categories }: ProductFilterProps) {
         return selectedCategory;
     }, [selectedCategory]);
 
-    const hasActiveFilters = !!selectedCategory || selectedFabrics.length > 0 || selectedMOQs.length > 0 || !!search;
+    const hasActiveFilters = !!selectedCategory || !!search;
 
     return (
         <div className="sidebar-3d-panel p-5 sm:p-6 rounded-[28px] space-y-6 max-w-full relative">
@@ -478,35 +451,25 @@ export default function ProductFilter({ categories }: ProductFilterProps) {
                                                         </div>
                                                     </div>
 
-                                                    {/* ── Tier 3A: Fashion Groups (Knit, Woven, Sweater) ── */}
+                                                    {/* ── Tier 3A: Fashion Groups (Circular Knit Items, Flat Knit Items, Woven Items) ── */}
                                                     {isSubOpen && sub.groups && (
                                                         <div className="ml-3 pl-2.5 border-l border-slate-300/60 dark:border-slate-700/50 space-y-1 py-0.5">
                                                             {sub.groups.map((grp) => {
                                                                 const isGrpChecked = selectedCategory === grp.slug;
-                                                                const grpKey = `${subKey}-${grp.slug}`;
-                                                                const isGrpOpen = q ? true : !!expandedCategories[grpKey];
-                                                                const hasItems = grp.items && grp.items.length > 0;
 
                                                                 return (
                                                                     <div key={grp.slug} className="space-y-0.5">
-                                                                        <div className="flex items-center justify-between py-1 px-1 rounded hover:bg-black/[0.03] dark:hover:bg-white/[0.04] transition-colors group/grp cursor-pointer">
-                                                                            <div 
-                                                                                onClick={() => hasItems ? toggleExpand(grpKey) : handleCategorySelect(isGrpChecked ? '' : grp.slug)}
-                                                                                className="flex items-center gap-1.5 flex-1 min-w-0"
-                                                                            >
-                                                                                {hasItems && (
-                                                                                    <button type="button" className="p-0.5 text-slate-400">
-                                                                                        {isGrpOpen ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
-                                                                                    </button>
-                                                                                )}
-                                                                                <span className={`text-[11.5px] font-bold uppercase tracking-wider transition-colors truncate ${
-                                                                                    isGrpChecked
-                                                                                        ? 'text-[#1B2B44] dark:text-blue-400 font-extrabold'
-                                                                                        : 'text-slate-600 dark:text-slate-400 group-hover/grp:text-slate-900 dark:group-hover/grp:white'
-                                                                                }`}>
-                                                                                    {grp.name}
-                                                                                </span>
-                                                                            </div>
+                                                                        <div 
+                                                                            onClick={() => handleCategorySelect(isGrpChecked ? '' : grp.slug)}
+                                                                            className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-black/[0.03] dark:hover:bg-white/[0.04] transition-colors group/grp cursor-pointer"
+                                                                        >
+                                                                            <span className={`text-[12px] font-bold tracking-tight transition-colors truncate ${
+                                                                                isGrpChecked
+                                                                                    ? 'text-[#1B2B44] dark:text-blue-400 font-extrabold'
+                                                                                    : 'text-slate-700 dark:text-slate-300 group-hover/grp:text-slate-900 dark:group-hover/grp:white'
+                                                                            }`}>
+                                                                                {grp.name}
+                                                                            </span>
 
                                                                             <div 
                                                                                 onClick={(e) => {
@@ -523,45 +486,14 @@ export default function ProductFilter({ categories }: ProductFilterProps) {
                                                                                 {isGrpChecked && <Check size={10} className="stroke-[3]" />}
                                                                             </div>
                                                                         </div>
-
-                                                                        {/* Tier 4: Garment Items inside Fashion Groups */}
-                                                                        {isGrpOpen && grp.items && (
-                                                                            <div className="ml-2.5 pl-2 border-l border-slate-200 dark:border-slate-800 space-y-0.5 py-0.5">
-                                                                                {grp.items.map((it) => {
-                                                                                    const isItemChecked = selectedCategory === it.slug;
-                                                                                    return (
-                                                                                        <div 
-                                                                                            key={it.slug}
-                                                                                            onClick={() => handleCategorySelect(isItemChecked ? '' : it.slug)}
-                                                                                            className="flex items-center justify-between py-0.5 px-1 rounded hover:bg-black/[0.03] dark:hover:bg-white/[0.04] transition-colors cursor-pointer group/it"
-                                                                                        >
-                                                                                            <span className={`text-[11px] font-medium transition-colors truncate ${
-                                                                                                isItemChecked
-                                                                                                    ? 'text-[#1B2B44] dark:text-blue-400 font-bold'
-                                                                                                    : 'text-slate-600 dark:text-slate-400 group-hover/it:text-slate-900 dark:group-hover/it:white'
-                                                                                            }`}>
-                                                                                                {it.name}
-                                                                                            </span>
-                                                                                            <div className={`w-3.5 h-3.5 rounded-[3px] border flex items-center justify-center transition-all shrink-0 ml-2 ${
-                                                                                                isItemChecked
-                                                                                                    ? 'bg-[#1B2B44] dark:bg-blue-600 border-[#1B2B44] dark:border-blue-600 text-white'
-                                                                                                    : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-400'
-                                                                                            }`}>
-                                                                                                {isItemChecked && <Check size={8} className="stroke-[3]" />}
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    );
-                                                                                })}
-                                                                            </div>
-                                                                        )}
                                                                     </div>
                                                                 );
                                                             })}
                                                         </div>
                                                     )}
 
-                                                    {/* ── Tier 3B: Direct Items (Home Textiles, Footwear, etc.) ── */}
-                                                    {isSubOpen && sub.items && (
+                                                    {/* ── Tier 3B: Direct Structural Groups (Home Textiles, Footwear, etc.) ── */}
+                                                    {isSubOpen && sub.items && sub.items.length > 0 && (
                                                         <div className="ml-3 pl-2.5 border-l border-slate-300/60 dark:border-slate-700/50 space-y-0.5 py-0.5">
                                                             {sub.items.map((it) => {
                                                                 const isItemChecked = selectedCategory === it.slug;
@@ -569,7 +501,7 @@ export default function ProductFilter({ categories }: ProductFilterProps) {
                                                                     <div 
                                                                         key={it.slug}
                                                                         onClick={() => handleCategorySelect(isItemChecked ? '' : it.slug)}
-                                                                        className="flex items-center justify-between py-1 px-1 rounded hover:bg-black/[0.03] dark:hover:bg-white/[0.04] transition-colors cursor-pointer group/it"
+                                                                        className="flex items-center justify-between py-1 px-1.5 rounded-lg hover:bg-black/[0.03] dark:hover:bg-white/[0.04] transition-colors cursor-pointer group/it"
                                                                     >
                                                                         <span className={`text-[11.5px] font-medium transition-colors truncate ${
                                                                             isItemChecked
@@ -596,60 +528,6 @@ export default function ProductFilter({ categories }: ProductFilterProps) {
                                     </div>
                                 )}
                             </div>
-                        );
-                    })}
-                </div>
-            </div>
-
-            {/* ── FABRIC TYPE ── */}
-            <div>
-                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300 mb-2.5">
-                    Fabric Type
-                </label>
-                <div className="flex flex-wrap gap-1.5">
-                    {FABRIC_OPTIONS.map((fabric) => {
-                        const isSelected = selectedFabrics.includes(fabric);
-                        return (
-                            <button
-                                key={fabric}
-                                type="button"
-                                onClick={() => toggleFabric(fabric)}
-                                className={`px-3 py-1 rounded-full text-[10.5px] font-bold transition-all cursor-pointer ${isSelected
-                                    ? 'bg-[#1B2B44] text-white shadow-sm scale-105'
-                                    : 'bg-[#ECE5DC] dark:bg-[#121A2C] text-slate-700 dark:text-slate-300 hover:bg-[#E2D8CC] dark:hover:bg-[#1A253E] border border-white/60 dark:border-white/5'
-                                    }`}
-                            >
-                                {fabric}
-                            </button>
-                        );
-                    })}
-                </div>
-            </div>
-
-            {/* ── MOQ REQUIREMENTS (PCS) ── */}
-            <div>
-                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300 mb-2.5">
-                    MOQ Requirements (PCS)
-                </label>
-                <div className="space-y-2 px-1">
-                    {MOQ_OPTIONS.map((moq) => {
-                        const isChecked = selectedMOQs.includes(moq);
-                        return (
-                            <label
-                                key={moq}
-                                onClick={() => toggleMOQ(moq)}
-                                className="flex items-center justify-between cursor-pointer group select-none py-0.5"
-                            >
-                                <span className={`text-xs font-semibold ${isChecked ? 'text-[#1B2B44] dark:text-blue-400 font-bold' : 'text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white'}`}>
-                                    {moq}
-                                </span>
-                                <div className={`w-4 h-4 rounded-[5px] border flex items-center justify-center transition-all ${isChecked
-                                    ? 'bg-[#1B2B44] dark:bg-blue-600 border-[#1B2B44] dark:border-blue-600 text-white shadow-xs'
-                                    : 'border-slate-300 dark:border-slate-600 bg-white/70 dark:bg-slate-800'
-                                    }`}>
-                                    {isChecked && <Check size={11} className="stroke-[3]" />}
-                                </div>
-                            </label>
                         );
                     })}
                 </div>

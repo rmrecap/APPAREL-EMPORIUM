@@ -25,10 +25,9 @@ export async function middleware(req: NextRequest) {
         return preflightResponse;
     }
 
-    // ── PRIORITY 2: External API routes bypass ALL middleware auth ─────────────
-    // /api/external/* is secured by API Key inside the route handler itself.
-    // Middleware must not touch these routes — it has no session to check.
-    if (path.startsWith('/api/external/')) {
+    // ── PRIORITY 2: External API & Backup routes bypass middleware session auth ─
+    // /api/external/* and /api/admin/backup/* have their own route-level token & secret verification.
+    if (path.startsWith('/api/external/') || path.startsWith('/api/admin/backup/') || path.startsWith('/api/backup/')) {
         return NextResponse.next();
     }
 

@@ -5,16 +5,16 @@ import Link from 'next/link';
 import {
     CheckCircle2, Headphones, ArrowRight, Sparkles, HelpCircle
 } from 'lucide-react';
-import AtelierDecorations3D from '@/components/products/AtelierDecorations3D';
-import Coded3DGlobe from '@/components/products/Coded3DGlobe';
+import AtelierDecorations3D from '../../components/products/AtelierDecorations3D';
+import Coded3DGlobe from '../../components/products/Coded3DGlobe';
 import { 
     QCShield3DIcon, 
     TechPack3DIcon, 
     SourcingLayers3DIcon, 
     LogisticsTruck3DIcon, 
     Flowchart3DIcon 
-} from '@/components/ui/Claymorphic3DIcons';
-import { useSettings } from '@/context/SettingsContext';
+} from '../../components/ui/Claymorphic3DIcons';
+import { useSettings } from '../../context/SettingsContext';
 
 export default function SupportPage() {
     const { settings } = useSettings();

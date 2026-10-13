@@ -44,11 +44,7 @@ function copyDirSync(src, dest) {
     }
 }
 
-const origLog = console.log;
-console.log = function(...args) {
-    origLog.apply(console, args);
-    console.error.apply(console, args);
-};
+
 
 async function main() {
     const cwd = process.cwd();

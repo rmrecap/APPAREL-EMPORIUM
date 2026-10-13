@@ -89,11 +89,6 @@ const nextConfig = {
         ];
     },
     webpack: (config, { isServer, dev }) => {
-        const srcPath = path.resolve(process.cwd(), 'src');
-        config.resolve.alias = {
-            ...config.resolve.alias,
-            '@': srcPath,
-        };
 
         config.resolve.extensions = Array.from(new Set([
             ...(config.resolve.extensions || []),
