@@ -225,77 +225,100 @@ export default function CatalogTaxonomyDirectory({ initialTaxonomy }: Props) {
               })}
             </div>
 
-            {/* ── 3D HIERARCHY TREE MATRIX (Inspired by Reference Screenshot 2) ── */}
-            {activeDivisionId === 'fashion' && currentDivision && (
-              <div className="mb-10 p-5 sm:p-7 rounded-3xl bg-[#F4EFE6]/90 dark:bg-slate-900/60 border border-[#D9D1C4] dark:border-white/10 shadow-[6px_6px_20px_rgba(160,150,135,0.25),-4px_-4px_16px_rgba(255,255,255,0.8)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
-                {/* Master Node: FASHION */}
-                <div className="flex flex-col items-center">
-                  <div className="px-6 py-2 rounded-2xl bg-[#142338] text-white font-black text-xs sm:text-sm tracking-widest uppercase shadow-md border border-blue-400/30 flex items-center gap-2">
-                    <Shirt className="w-4 h-4 text-cyan-400" />
-                    <span>FASHION</span>
-                  </div>
-
-                  {/* Vertical Trunk Line */}
-                  <div className="w-0.5 h-4 bg-blue-600/60 dark:bg-blue-400/60"></div>
-
-                  {/* Horizontal Blue Hierarchy Branch Spanning across all 3 departments */}
-                  <div className="w-full max-w-4xl relative flex items-center justify-between">
-                    <div className="absolute top-1/2 left-4 right-4 h-1 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 dark:from-cyan-500 dark:via-blue-500 dark:to-cyan-500 rounded-full shadow-[0_0_8px_rgba(37,99,235,0.4)]"></div>
-                    <div className="w-3 h-3 rounded-full bg-blue-600 dark:bg-cyan-400 border-2 border-white relative z-10"></div>
-                    <div className="w-3 h-3 rounded-full bg-blue-600 dark:bg-cyan-400 border-2 border-white relative z-10"></div>
-                    <div className="w-3 h-3 rounded-full bg-blue-600 dark:bg-cyan-400 border-2 border-white relative z-10"></div>
-                  </div>
+            {/* ── 3D HIERARCHY TREE MATRIX: 3 PILLARS (KNIT, WOVEN, SWEATER) ── */}
+            <div className="mb-10 p-5 sm:p-7 rounded-3xl bg-[#F4EFE6]/90 dark:bg-slate-900/60 border border-[#D9D1C4] dark:border-white/10 shadow-[6px_6px_20px_rgba(160,150,135,0.25),-4px_-4px_16px_rgba(255,255,255,0.8)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+              {/* Master Node: PRODUCTS */}
+              <div className="flex flex-col items-center">
+                <div className="px-6 py-2 rounded-2xl bg-[#142338] text-white font-black text-xs sm:text-sm tracking-widest uppercase shadow-md border border-blue-400/30 flex items-center gap-2">
+                  <Shirt className="w-4 h-4 text-cyan-400" />
+                  <span>PRODUCTS ARCHITECTURE</span>
                 </div>
 
-                {/* 3 Department Columns Matching Excel Reference (Men's, Women's, Children's) */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mt-4 max-w-5xl mx-auto">
-                  {currentDivision.departments.map(dept => {
-                    const isDeptActive = dept.id === activeDepartmentId;
-                    return (
-                      <div
-                        key={dept.id}
-                        onClick={() => setActiveDepartmentId(dept.id)}
-                        className={`cursor-pointer rounded-2xl p-4 transition-all duration-200 border flex flex-col justify-between ${
-                          isDeptActive
-                            ? 'bg-white dark:bg-slate-800/90 border-blue-600/70 dark:border-blue-400 shadow-md ring-2 ring-blue-500/20 scale-[1.02]'
-                            : 'bg-white/60 dark:bg-slate-900/40 border-slate-200/80 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800/60'
-                        }`}
-                      >
-                        {/* Department Header Node */}
-                        <div className="text-center pb-2.5 border-b border-slate-200 dark:border-slate-700/60">
-                          <span className={`text-xs sm:text-[13px] font-black uppercase tracking-wider ${
-                            isDeptActive ? 'text-blue-700 dark:text-cyan-400' : 'text-slate-800 dark:text-slate-200'
-                          }`}>
-                            {dept.name}
-                          </span>
-                        </div>
+                {/* Vertical Trunk Line */}
+                <div className="w-0.5 h-4 bg-blue-600/60 dark:bg-blue-400/60"></div>
 
-                        {/* Subcategories (Circular Knit, Flat Knit, Woven) */}
-                        <div className="grid grid-cols-3 gap-1.5 pt-3 text-center">
-                          {dept.groups.map(grp => (
-                            <div
-                              key={grp.id}
-                              className={`p-1.5 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all leading-tight ${
-                                isDeptActive
-                                  ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-900 dark:text-blue-200 border border-blue-200/60 dark:border-blue-800/40'
-                                  : 'bg-slate-100/80 dark:bg-slate-800/60 text-slate-600 dark:text-slate-400'
-                              }`}
-                            >
-                              {grp.name.replace(' Items', '')}
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Active Selection Indicator */}
-                        <div className="mt-3 pt-2 text-center text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400">
-                          {isDeptActive ? '● Active Deep Dive' : 'Click to inspect'}
-                        </div>
-                      </div>
-                    );
-                  })}
+                {/* Horizontal Blue Hierarchy Branch Spanning across all 3 pillars */}
+                <div className="w-full max-w-4xl relative flex items-center justify-between">
+                  <div className="absolute top-1/2 left-4 right-4 h-1 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 dark:from-cyan-500 dark:via-blue-500 dark:to-cyan-500 rounded-full shadow-[0_0_8px_rgba(37,99,235,0.4)]"></div>
+                  <div className="w-3 h-3 rounded-full bg-blue-600 dark:bg-cyan-400 border-2 border-white relative z-10"></div>
+                  <div className="w-3 h-3 rounded-full bg-blue-600 dark:bg-cyan-400 border-2 border-white relative z-10"></div>
+                  <div className="w-3 h-3 rounded-full bg-blue-600 dark:bg-cyan-400 border-2 border-white relative z-10"></div>
                 </div>
               </div>
-            )}
+
+              {/* 3 Pillars: KNIT, WOVEN, SWEATER (Matching Reference Exactly) */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mt-4 max-w-5xl mx-auto">
+                {[
+                  {
+                    title: 'KNIT',
+                    url: '/products?category=knitwear',
+                    subItems: [
+                      { label: 'Menswear', url: '/products?category=knitwear-mens' },
+                      { label: 'Womenswear', url: '/products?category=knitwear-womens' },
+                      { label: 'Kidswear', url: '/products?category=knitwear-kids' },
+                    ]
+                  },
+                  {
+                    title: 'WOVEN',
+                    url: '/products?category=woven',
+                    subItems: [
+                      { label: 'Men', url: '/products?category=woven-mens' },
+                      { label: 'Women', url: '/products?category=woven-womens' },
+                      { label: 'Kids', url: '/products?category=woven-kids' },
+                    ]
+                  },
+                  {
+                    title: 'SWEATER',
+                    url: '/products?category=sweater',
+                    subItems: [
+                      { label: 'Men', url: '/products?category=sweater-mens' },
+                      { label: 'Women', url: '/products?category=sweater-womens' },
+                      { label: 'Kids', url: '/products?category=sweater-kids' },
+                    ]
+                  }
+                ].map((pillar) => (
+                  <div
+                    key={pillar.title}
+                    className="rounded-2xl p-4 sm:p-5 bg-white dark:bg-slate-800/90 border border-slate-200/90 dark:border-slate-700 shadow-md flex flex-col justify-between transition-all hover:shadow-lg hover:border-blue-500/50"
+                  >
+                    {/* Pillar Header */}
+                    <div className="text-center pb-3 border-b border-slate-200 dark:border-slate-700/60">
+                      <Link
+                        href={pillar.url}
+                        className="text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-cyan-400 transition-colors inline-flex items-center gap-1"
+                      >
+                        <span>{pillar.title}</span>
+                        <ArrowUpRight className="w-3.5 h-3.5 opacity-60" />
+                      </Link>
+                    </div>
+
+                    {/* 3 Subcategory Pills */}
+                    <div className="grid grid-cols-3 gap-2 pt-3.5 text-center">
+                      {pillar.subItems.map((sub) => (
+                        <Link
+                          key={sub.label}
+                          href={sub.url}
+                          className="p-2 rounded-xl text-xs font-bold transition-all bg-slate-50 dark:bg-slate-900/60 text-slate-700 dark:text-slate-300 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white border border-slate-200/60 dark:border-slate-700 shadow-xs active:scale-95 flex items-center justify-center min-h-[36px]"
+                        >
+                          {sub.label}
+                        </Link>
+                      ))}
+                    </div>
+
+                    {/* Sourcing Link */}
+                    <div className="mt-4 pt-2.5 text-center border-t border-slate-100 dark:border-slate-700/40">
+                      <Link
+                        href={pillar.url}
+                        className="text-[11px] font-black uppercase tracking-widest text-blue-600 dark:text-cyan-400 hover:underline inline-flex items-center gap-1"
+                      >
+                        <span>Explore {pillar.title} Collection</span>
+                        <ArrowUpRight className="w-3 h-3" />
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
 
             {/* Level 2: Sub-Departments Switcher Pills (for quick switching) */}
             {currentDivision && currentDivision.departments.length > 1 && (

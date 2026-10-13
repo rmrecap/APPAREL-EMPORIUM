@@ -205,6 +205,10 @@ async function main() {
         run('node scripts/sync-corporate-settings.js', 'Synchronize Corporate Site Settings');
     }
 
+    if (fs.existsSync(path.join(cwd, 'scripts', 'update-megamenu.js'))) {
+        run('node scripts/update-megamenu.js', 'Synchronize MegaMenu Structure');
+    }
+
     // 7. POST-MIGRATION PRODUCT INTEGRITY GUARD
     if (fs.existsSync(path.join(cwd, 'scripts', 'guard-product-integrity.js'))) {
         run('node scripts/guard-product-integrity.js', 'Post-migration Product Integrity Guard');

@@ -25,16 +25,16 @@ interface MegaMenuProps {
     onItemClick?: () => void;
 }
 
-const DEFAULT_COLUMNS: MegaMenuColumn[] = [
+export const PRODUCT_MEGA_COLUMNS: MegaMenuColumn[] = [
     {
         title: 'KNIT',
         sections: [
             {
                 header: '',
                 links: [
-                    { label: 'Menswear', url: '/products?category=men-circular-knit' },
-                    { label: 'Womenswear', url: '/products?category=women-circular-knit' },
-                    { label: 'Kidswear', url: '/products?category=kids-circular-knit' }
+                    { label: 'Menswear', url: '/products?category=knitwear-mens' },
+                    { label: 'Womenswear', url: '/products?category=knitwear-womens' },
+                    { label: 'Kidswear', url: '/products?category=knitwear-kids' }
                 ]
             }
         ]
@@ -45,9 +45,9 @@ const DEFAULT_COLUMNS: MegaMenuColumn[] = [
             {
                 header: '',
                 links: [
-                    { label: 'Men', url: '/products?category=men-woven' },
-                    { label: 'Women', url: '/products?category=women-woven' },
-                    { label: 'Kids', url: '/products?category=kids-woven' }
+                    { label: 'Men', url: '/products?category=woven-mens' },
+                    { label: 'Women', url: '/products?category=woven-womens' },
+                    { label: 'Kids', url: '/products?category=woven-kids' }
                 ]
             }
         ]
@@ -58,48 +58,29 @@ const DEFAULT_COLUMNS: MegaMenuColumn[] = [
             {
                 header: '',
                 links: [
-                    { label: 'Men', url: '/products?category=men-flat-knit' },
-                    { label: 'Women', url: '/products?category=women-flat-knit' },
-                    { label: 'Kids', url: '/products?category=kids-flat-knit' }
+                    { label: 'Men', url: '/products?category=sweater-mens' },
+                    { label: 'Women', url: '/products?category=sweater-womens' },
+                    { label: 'Kids', url: '/products?category=sweater-kids' }
                 ]
             }
         ]
     }
 ];
 
-export default function MegaMenu({ data, isVisible, onItemClick }: MegaMenuProps) {
+export default function MegaMenu({ isVisible, onItemClick }: MegaMenuProps) {
     if (!isVisible) return null;
 
-    let columns: MegaMenuColumn[] = [];
-    try {
-        if (data) {
-            const parsed = JSON.parse(data);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-                // If it's legacy multi-division format, streamline to 3-column fashion view
-                if (parsed.length > 3) {
-                    columns = DEFAULT_COLUMNS;
-                } else {
-                    columns = parsed.map(col => ({
-                        title: col.title,
-                        sections: col.sections || [{ header: '', links: col.links || [] }]
-                    }));
-                }
-            }
-        }
-    } catch (e) {
-        console.error('MegaMenu Parse Error', e);
-    }
-
-    if (columns.length === 0) {
-        columns = DEFAULT_COLUMNS;
-    }
+    // Strict 3-column, 9-item structure matching reference screenshot:
+    // KNIT: Menswear, Womenswear, Kidswear
+    // WOVEN: Men, Women, Kids
+    // SWEATER: Men, Women, Kids
+    const columns: MegaMenuColumn[] = PRODUCT_MEGA_COLUMNS;
 
     return (
         <div className="w-full bg-[#FAF6F0]/98 dark:bg-[#0E1626]/98 backdrop-blur-2xl text-slate-800 dark:text-white shadow-[0_20px_50px_rgba(0,0,0,0.16)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.7)] border border-[#E8E0D2] dark:border-white/10 rounded-2xl p-5 sm:p-6 transition-all duration-200">
-            {/* 3-Column Minimal Grid Matching Reference Screenshot */}
+            {/* 3-Column Grid Matching Reference Screenshot Exactly */}
             <div className="grid grid-cols-3 gap-4 sm:gap-6">
                 {columns.map((col, idx) => {
-                    // Extract all links for this column
                     const links: MegaMenuLink[] = [];
                     col.sections.forEach(sec => {
                         if (sec.links) links.push(...sec.links);
@@ -108,14 +89,14 @@ export default function MegaMenu({ data, isVisible, onItemClick }: MegaMenuProps
                     return (
                         <div key={idx} className="flex flex-col">
                             {/* Column Header */}
-                            <div className="pb-2 mb-2.5 border-b border-[#E0D7C6] dark:border-slate-800">
+                            <div className="pb-2 mb-2 border-b border-[#E0D7C6] dark:border-slate-800">
                                 <h3 className="font-black text-slate-900 dark:text-white uppercase tracking-wider text-xs sm:text-[13px] font-heading">
                                     {col.title}
                                 </h3>
                             </div>
 
                             {/* Item Links */}
-                            <ul className="space-y-1.5 flex-1">
+                            <ul className="space-y-1 flex-1">
                                 {links.map((link, lIdx) => (
                                     <li key={lIdx}>
                                         <Link
@@ -131,18 +112,6 @@ export default function MegaMenu({ data, isVisible, onItemClick }: MegaMenuProps
                         </div>
                     );
                 })}
-            </div>
-
-            {/* Clean Bottom Link */}
-            <div className="mt-3.5 pt-2.5 border-t border-[#E8E0D2] dark:border-slate-800/80 flex items-center justify-between text-[11px]">
-                <Link
-                    href="/products"
-                    onClick={onItemClick}
-                    className="font-bold text-blue-700 dark:text-blue-400 hover:underline flex items-center gap-1 group"
-                >
-                    <span>View All Products</span>
-                    <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
-                </Link>
             </div>
         </div>
     );

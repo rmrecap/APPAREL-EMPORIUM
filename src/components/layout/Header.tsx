@@ -102,7 +102,8 @@ export default function Header() {
                     {/* Navigation Engine (Desktop) */}
                     <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
                         {navItems.map((item) => {
-                            const hasMega = Boolean(item.isMegaMenu && item.megaMenuData);
+                            const isProducts = item.label.toLowerCase() === 'products';
+                            const hasMega = Boolean((item.isMegaMenu || isProducts) && (item.megaMenuData || isProducts));
                             const isActive = pathname === item.url || (item.url !== '/' && pathname.startsWith(item.url));
                             const linkTarget = item.target && item.target !== '_self' ? item.target : undefined;
 
@@ -117,7 +118,7 @@ export default function Header() {
                                         href={item.url}
                                         target={linkTarget}
                                         prefetch={true}
-                                        className={`px-3.5 py-1.5 rounded-full font-bold text-xs uppercase tracking-widest transition-all duration-200 flex items-center gap-1 cursor-pointer
+                                        className={`relative px-3.5 py-1.5 rounded-full font-bold text-xs uppercase tracking-widest transition-all duration-200 flex items-center gap-1 cursor-pointer
                                         ${isActive
                                                 ? 'bg-white dark:bg-white/10 text-slate-900 dark:text-white shadow-xs border border-[#E5DEC8] dark:border-white/15'
                                                 : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 border border-transparent'
@@ -127,12 +128,14 @@ export default function Header() {
                                         {hasMega && (
                                             <ChevronDown size={13} className={`transform transition-transform duration-300 ${hoveredMenu === item.id ? 'rotate-180 text-primary' : 'text-slate-400 dark:text-slate-400'}`} />
                                         )}
+                                        {/* Subtle underline indicator on hover matching screenshot */}
+                                        <span className={`absolute -bottom-1 left-2.5 right-2.5 h-[2px] rounded-full bg-blue-600 dark:bg-blue-400 transition-all duration-200 ${hoveredMenu === item.id ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'}`} />
                                     </Link>
 
                                     {/* Mega Menu Dropdown anchored cleanly beneath hovered item */}
                                     {hasMega && hoveredMenu === item.id && (
                                         <div
-                                            className="absolute top-[calc(100%+10px)] left-0 sm:left-1/2 sm:-translate-x-1/2 w-[92vw] sm:w-[420px] z-50 animate-in fade-in slide-in-from-top-1 duration-200"
+                                            className="absolute top-[calc(100%+12px)] left-1/2 -translate-x-1/2 w-[92vw] sm:w-[400px] z-50 animate-in fade-in slide-in-from-top-1 duration-200"
                                             onMouseEnter={() => setHoveredMenu(item.id)}
                                             onMouseLeave={() => setHoveredMenu(null)}
                                         >
