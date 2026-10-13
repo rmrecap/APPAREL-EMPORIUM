@@ -29,21 +29,10 @@ jobs:
           fi
           echo "✅ Private key validated successfully (Fingerprint: $(ssh-keygen -l -f ~/.ssh/id_ed25519))"
 
-          # 2. Resolve Hostinger SSH details (fallback to verified working details from hPanel)
-          HOST="${SSH_HOST:-109.106.250.84}"
-          if [ "$HOST" = "aelbd.net" ] || [ "$HOST" = "www.aelbd.net" ] || [ "$HOST" = "ftp.aelbd.net" ] || [ -z "$HOST" ]; then
-            HOST="109.106.250.84"
-          fi
-
-          PORT="${SSH_PORT:-65002}"
-          if [ "$PORT" = "22" ] || [ -z "$PORT" ]; then
-            PORT="65002"
-          fi
-
-          USER="${SSH_USER:-u309337298}"
-          if [ -z "$USER" ]; then
-            USER="u309337298"
-          fi
+          # 2. Hostinger SSH connection parameters (verified directly from hPanel SSH details)
+          HOST="109.106.250.84"
+          PORT="65002"
+          USER="u309337298"
 
           echo "🚀 Connecting to $USER@$HOST on port $PORT..."
 
