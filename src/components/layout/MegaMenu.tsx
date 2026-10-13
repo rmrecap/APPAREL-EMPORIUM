@@ -22,106 +22,128 @@ type MegaMenuColumn = {
 interface MegaMenuProps {
     data: string | null;
     isVisible: boolean;
+    onItemClick?: () => void;
 }
 
-export default function MegaMenu({ data, isVisible }: MegaMenuProps) {
-    if (!isVisible || !data) return null;
+const DEFAULT_COLUMNS: MegaMenuColumn[] = [
+    {
+        title: 'KNIT',
+        sections: [
+            {
+                header: '',
+                links: [
+                    { label: 'Menswear', url: '/products?category=men-circular-knit' },
+                    { label: 'Womenswear', url: '/products?category=women-circular-knit' },
+                    { label: 'Kidswear', url: '/products?category=kids-circular-knit' }
+                ]
+            }
+        ]
+    },
+    {
+        title: 'WOVEN',
+        sections: [
+            {
+                header: '',
+                links: [
+                    { label: 'Men', url: '/products?category=men-woven' },
+                    { label: 'Women', url: '/products?category=women-woven' },
+                    { label: 'Kids', url: '/products?category=kids-woven' }
+                ]
+            }
+        ]
+    },
+    {
+        title: 'SWEATER',
+        sections: [
+            {
+                header: '',
+                links: [
+                    { label: 'Men', url: '/products?category=men-flat-knit' },
+                    { label: 'Women', url: '/products?category=women-flat-knit' },
+                    { label: 'Kids', url: '/products?category=kids-flat-knit' }
+                ]
+            }
+        ]
+    }
+];
+
+export default function MegaMenu({ data, isVisible, onItemClick }: MegaMenuProps) {
+    if (!isVisible) return null;
 
     let columns: MegaMenuColumn[] = [];
     try {
-        const parsed = JSON.parse(data);
-        if (Array.isArray(parsed)) {
-            columns = parsed.map(col => ({
-                title: col.title,
-                sections: col.sections || [{ header: '', links: col.links || [] }]
-            }));
+        if (data) {
+            const parsed = JSON.parse(data);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                // If it's legacy multi-division format, streamline to 3-column fashion view
+                if (parsed.length > 3) {
+                    columns = DEFAULT_COLUMNS;
+                } else {
+                    columns = parsed.map(col => ({
+                        title: col.title,
+                        sections: col.sections || [{ header: '', links: col.links || [] }]
+                    }));
+                }
+            }
         }
     } catch (e) {
-        console.error("MegaMenu Parse Error", e);
-        return null;
+        console.error('MegaMenu Parse Error', e);
     }
 
-    if (columns.length === 0) return null;
-
-    const gridClass = columns.length === 4
-        ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 xl:gap-6"
-        : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6";
+    if (columns.length === 0) {
+        columns = DEFAULT_COLUMNS;
+    }
 
     return (
-        <div className="w-full bg-white/95 dark:bg-[#0B0F19]/98 backdrop-blur-2xl text-slate-800 dark:text-white shadow-[0_25px_60px_rgba(0,0,0,0.15)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.85)] border-t border-slate-200 dark:border-slate-800 border-b border-slate-200 dark:border-slate-800 animate-in slide-in-from-top-2 duration-300 z-50 overflow-hidden max-h-[calc(100vh-90px)] overflow-y-auto custom-scrollbar">
-            <div className="max-w-7xl mx-auto px-6 lg:px-10 py-7 lg:py-8">
-                <div className={gridClass}>
-                    {columns.map((col, idx) => (
-                        <div
-                            key={idx}
-                            className="flex flex-col space-y-4 bg-slate-50/90 dark:bg-[#111827] hover:bg-slate-100/90 dark:hover:bg-[#162032] p-5 rounded-2xl border border-slate-200/90 dark:border-slate-800 hover:border-primary/50 dark:hover:border-blue-500/50 transition-all duration-300 shadow-sm dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)] group/card"
-                        >
-                            {/* Pillar Header */}
-                            <div className="border-b border-slate-200 dark:border-slate-800 pb-3 flex items-center justify-between">
-                                <h3 className="font-extrabold text-blue-700 dark:text-blue-400 uppercase tracking-wider text-sm sm:text-base flex items-center gap-2">
-                                    <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(37,99,235,0.8)]"></span>
-                                    <span className="group-hover/card:text-blue-600 dark:group-hover/card:text-blue-300 transition-colors">{col.title}</span>
+        <div className="w-full bg-[#FAF6F0]/98 dark:bg-[#0E1626]/98 backdrop-blur-2xl text-slate-800 dark:text-white shadow-[0_20px_50px_rgba(0,0,0,0.16)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.7)] border border-[#E8E0D2] dark:border-white/10 rounded-2xl p-5 sm:p-6 transition-all duration-200">
+            {/* 3-Column Minimal Grid Matching Reference Screenshot */}
+            <div className="grid grid-cols-3 gap-4 sm:gap-6">
+                {columns.map((col, idx) => {
+                    // Extract all links for this column
+                    const links: MegaMenuLink[] = [];
+                    col.sections.forEach(sec => {
+                        if (sec.links) links.push(...sec.links);
+                    });
+
+                    return (
+                        <div key={idx} className="flex flex-col">
+                            {/* Column Header */}
+                            <div className="pb-2 mb-2.5 border-b border-[#E0D7C6] dark:border-slate-800">
+                                <h3 className="font-black text-slate-900 dark:text-white uppercase tracking-wider text-xs sm:text-[13px] font-heading">
+                                    {col.title}
                                 </h3>
-                                <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-slate-200/60 dark:bg-slate-800 px-2 py-0.5 rounded-full">
-                                    Division
-                                </span>
                             </div>
 
-                            {/* Subcategories (Men's, Women's, Children's) */}
-                            <div className="space-y-3.5 flex-1">
-                                {col.sections.map((section, sIdx) => (
-                                    <div
-                                        key={sIdx}
-                                        className="p-3 rounded-xl bg-white dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 hover:border-primary/40 dark:hover:border-blue-400/40 transition-all duration-200 space-y-2 shadow-xs"
-                                    >
-                                        {section.header && (
-                                            <h4 className="font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider text-[11px] sm:text-xs flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-700/50">
-                                                <span className="flex items-center gap-1.5">
-                                                    <span className="w-1.5 h-1.5 rounded-full bg-primary/70 dark:bg-blue-400"></span>
-                                                    {section.header}
-                                                </span>
-                                                <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
-                                                    {section.links.length} items
-                                                </span>
-                                            </h4>
-                                        )}
-                                        <ul className="space-y-0.5">
-                                            {section.links.map((link, lIdx) => (
-                                                <li key={lIdx}>
-                                                    <Link
-                                                        href={link.url}
-                                                        className="text-slate-700 dark:text-slate-200 hover:text-primary dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700/60 px-2 py-1 rounded-lg transition-all text-xs sm:text-[13px] font-medium flex items-center group/link justify-between"
-                                                    >
-                                                        <span className="flex items-center">
-                                                            <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-500 mr-2 group-hover/link:bg-primary transition-all"></span>
-                                                            <span className="group-hover/link:translate-x-0.5 transition-transform">{link.label}</span>
-                                                        </span>
-                                                        <ArrowRight size={11} className="opacity-0 group-hover/link:opacity-100 text-primary dark:text-blue-400 transition-opacity shrink-0 ml-1" />
-                                                    </Link>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
+                            {/* Item Links */}
+                            <ul className="space-y-1.5 flex-1">
+                                {links.map((link, lIdx) => (
+                                    <li key={lIdx}>
+                                        <Link
+                                            href={link.url}
+                                            onClick={onItemClick}
+                                            className="text-xs sm:text-[13px] font-semibold text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:translate-x-1 transition-all block py-1"
+                                        >
+                                            {link.label}
+                                        </Link>
+                                    </li>
                                 ))}
-                            </div>
-
-                            {/* Department Quick Link */}
-                            <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
-                                <Link
-                                    href="/products"
-                                    className="w-full inline-flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-blue-400 transition-colors tracking-wide uppercase py-1"
-                                >
-                                    <span>Browse All {col.title}</span>
-                                    <ArrowRight size={13} className="group-hover/card:translate-x-1 transition-transform text-primary dark:text-blue-400" />
-                                </Link>
-                            </div>
+                            </ul>
                         </div>
-                    ))}
-                </div>
+                    );
+                })}
             </div>
 
-            {/* Aesthetic Gradient Divider */}
-            <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
+            {/* Clean Bottom Link */}
+            <div className="mt-3.5 pt-2.5 border-t border-[#E8E0D2] dark:border-slate-800/80 flex items-center justify-between text-[11px]">
+                <Link
+                    href="/products"
+                    onClick={onItemClick}
+                    className="font-bold text-blue-700 dark:text-blue-400 hover:underline flex items-center gap-1 group"
+                >
+                    <span>View All Products</span>
+                    <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+            </div>
         </div>
     );
 }

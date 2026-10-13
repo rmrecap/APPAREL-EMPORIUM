@@ -128,6 +128,21 @@ export default function Header() {
                                             <ChevronDown size={13} className={`transform transition-transform duration-300 ${hoveredMenu === item.id ? 'rotate-180 text-primary' : 'text-slate-400 dark:text-slate-400'}`} />
                                         )}
                                     </Link>
+
+                                    {/* Mega Menu Dropdown anchored cleanly beneath hovered item */}
+                                    {hasMega && hoveredMenu === item.id && (
+                                        <div
+                                            className="absolute top-[calc(100%+10px)] left-0 sm:left-1/2 sm:-translate-x-1/2 w-[92vw] sm:w-[420px] z-50 animate-in fade-in slide-in-from-top-1 duration-200"
+                                            onMouseEnter={() => setHoveredMenu(item.id)}
+                                            onMouseLeave={() => setHoveredMenu(null)}
+                                        >
+                                            <MegaMenu
+                                                data={item.megaMenuData}
+                                                isVisible={true}
+                                                onItemClick={() => setHoveredMenu(null)}
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })}
@@ -165,23 +180,6 @@ export default function Header() {
                             <Menu size={19} className="stroke-[2.2]" />
                         </button>
                     </div>
-
-                    {/* Mega Menu Dropdown attached under capsule */}
-                    {navItems.map((item) => {
-                        const hasMega = Boolean(item.isMegaMenu && item.megaMenuData);
-                        if (!hasMega || hoveredMenu !== item.id) return null;
-
-                        return (
-                            <div
-                                key={`mega-dropdown-${item.id}`}
-                                className="absolute top-[calc(100%+12px)] left-1/2 -translate-x-1/2 w-[95vw] max-w-5xl z-50 shadow-2xl rounded-2xl overflow-hidden border border-slate-200/80 dark:border-white/10 animate-in fade-in duration-200 bg-white dark:bg-[#101726]"
-                                onMouseEnter={() => setHoveredMenu(item.id)}
-                                onMouseLeave={() => setHoveredMenu(null)}
-                            >
-                                <MegaMenu data={item.megaMenuData!} isVisible={true} />
-                            </div>
-                        );
-                    })}
                 </div>
             </header>
 

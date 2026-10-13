@@ -226,19 +226,19 @@ export default function ContactPage() {
                 <section className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-7 items-stretch">
 
                     {/* ── Left Column: Contact Us Glassmorphic Card ── */}
-                    <div className="contact-glass-card rounded-[28px] sm:rounded-[34px] p-6 sm:p-8 flex flex-col justify-between">
+                    <div className="contact-glass-card rounded-[28px] sm:rounded-[32px] p-5 sm:p-6 lg:p-7 flex flex-col justify-between">
                         <div>
-                            <h2 className="contact-heading text-xl sm:text-2xl font-black tracking-tight mb-2.5 uppercase font-heading">
+                            <h2 className="contact-heading text-xl sm:text-2xl font-black tracking-tight mb-1.5 uppercase font-heading">
                                 {contactHeading}
                             </h2>
-                            <p className="contact-subtext text-xs sm:text-[13px] leading-relaxed font-medium mb-4">
+                            <p className="contact-subtext text-xs sm:text-[13px] leading-relaxed font-medium mb-3 text-slate-600 dark:text-slate-300">
                                 {contactSubtitle}
                             </p>
 
                             {/* Proprietor Leadership Card */}
-                            <div className="mb-4 p-3 sm:p-3.5 rounded-2xl bg-white/60 dark:bg-white/[0.04] border border-white/80 dark:border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.04)] flex items-center justify-between gap-3">
-                                <div className="flex items-center gap-3 min-w-0">
-                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#128C7E] via-teal-700 to-[#1B365D] flex items-center justify-center font-black text-white text-xs shadow-md shrink-0">
+                            <div className="mb-3 p-2.5 sm:p-3 rounded-2xl bg-white/60 dark:bg-white/[0.04] border border-white/80 dark:border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.04)] flex items-center justify-between gap-3">
+                                <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#128C7E] via-teal-700 to-[#1B365D] flex items-center justify-center font-black text-white text-xs shadow-md shrink-0">
                                         KH
                                     </div>
                                     <div className="min-w-0">
@@ -258,22 +258,22 @@ export default function ContactPage() {
                             </div>
 
                             {/* Contact Pills */}
-                            <div className="space-y-3.5">
+                            <div className="space-y-2.5">
 
-                                {/* 1. Address Pill */}
+                                {/* 1. Address Pill - Full Address Clearly Visible */}
                                 <div
                                     onClick={() => copyToClipboard(addressValue, 'address')}
-                                    className="contact-pill rounded-2xl p-3 sm:p-3.5 flex items-center gap-3.5 cursor-pointer group transition-all duration-200 hover:scale-[1.02] active:scale-[0.99]"
+                                    className="contact-pill rounded-2xl p-2.5 sm:p-3 flex items-center gap-3 cursor-pointer group transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]"
                                     title="Click to copy address"
                                 >
-                                    <div className="pill-inset-icon-box rounded-xl w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center shrink-0">
-                                        <MapPin3DIcon size={28} />
+                                    <div className="pill-inset-icon-box rounded-xl w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center shrink-0">
+                                        <MapPin3DIcon size={24} />
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                        <div className="pill-label text-[11px] font-bold uppercase tracking-wider mb-0.5">
+                                        <div className="pill-label text-[10px] sm:text-[11px] font-bold uppercase tracking-wider mb-0.5">
                                             {addressLabel}
                                         </div>
-                                        <div className="pill-value text-[11px] sm:text-xs leading-snug font-medium line-clamp-2">
+                                        <div className="pill-value text-xs sm:text-[12.5px] leading-snug font-semibold text-slate-800 dark:text-slate-200">
                                             {addressValue}
                                         </div>
                                     </div>
@@ -285,16 +285,16 @@ export default function ContactPage() {
                                 {/* 2. Email Pill */}
                                 <a
                                     href={`mailto:${emailValue}`}
-                                    className="contact-pill rounded-2xl p-3 sm:p-3.5 flex items-center gap-3.5 group transition-all duration-200 hover:scale-[1.02] active:scale-[0.99]"
+                                    className="contact-pill rounded-2xl p-2.5 sm:p-3 flex items-center gap-3 group transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]"
                                 >
-                                    <div className="pill-inset-icon-box rounded-xl w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center shrink-0">
-                                        <Mail3DIcon size={28} />
+                                    <div className="pill-inset-icon-box rounded-xl w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center shrink-0">
+                                        <Mail3DIcon size={24} />
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                        <div className="pill-label text-[11px] font-bold uppercase tracking-wider mb-0.5">
+                                        <div className="pill-label text-[10px] sm:text-[11px] font-bold uppercase tracking-wider mb-0.5">
                                             {emailLabel}
                                         </div>
-                                        <div className="pill-value text-[11px] sm:text-xs font-medium break-all">
+                                        <div className="pill-value text-xs sm:text-[12.5px] font-semibold break-all text-slate-800 dark:text-slate-200">
                                             {emailValue}
                                         </div>
                                     </div>
@@ -303,16 +303,16 @@ export default function ContactPage() {
                                 {/* 3. Phone Pill */}
                                 <a
                                     href={`tel:${phoneValue.replace(/\s+/g, '')}`}
-                                    className="contact-pill rounded-2xl p-3 sm:p-3.5 flex items-center gap-3.5 group transition-all duration-200 hover:scale-[1.02] active:scale-[0.99]"
+                                    className="contact-pill rounded-2xl p-2.5 sm:p-3 flex items-center gap-3 group transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]"
                                 >
-                                    <div className="pill-inset-icon-box rounded-xl w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center shrink-0">
-                                        <Phone3DIcon size={28} />
+                                    <div className="pill-inset-icon-box rounded-xl w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center shrink-0">
+                                        <Phone3DIcon size={24} />
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                        <div className="pill-label text-[11px] font-bold uppercase tracking-wider mb-0.5">
+                                        <div className="pill-label text-[10px] sm:text-[11px] font-bold uppercase tracking-wider mb-0.5">
                                             {phoneLabel}
                                         </div>
-                                        <div className="pill-value text-[11px] sm:text-xs font-medium">
+                                        <div className="pill-value text-xs sm:text-[12.5px] font-semibold text-slate-800 dark:text-slate-200">
                                             {phoneValue}
                                         </div>
                                     </div>
@@ -323,18 +323,18 @@ export default function ContactPage() {
                                     href={waChatUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="contact-pill rounded-2xl p-3 sm:p-3.5 flex items-center gap-3.5 group transition-all duration-200 hover:scale-[1.02] active:scale-[0.99] border border-emerald-500/30 dark:border-emerald-500/20 hover:border-emerald-500/60"
+                                    className="contact-pill rounded-2xl p-2.5 sm:p-3 flex items-center gap-3 group transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] border border-emerald-500/30 dark:border-emerald-500/20 hover:border-emerald-500/60"
                                     title="Click to chat directly on WhatsApp"
                                 >
-                                    <div className="pill-inset-icon-box rounded-xl w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center shrink-0 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:bg-[#25D366] group-hover:text-white transition-all shadow-inner">
-                                        <MessageCircle size={22} className="text-emerald-600 dark:text-emerald-400 group-hover:text-white transition-colors" />
+                                    <div className="pill-inset-icon-box rounded-xl w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center shrink-0 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:bg-[#25D366] group-hover:text-white transition-all shadow-inner">
+                                        <MessageCircle size={20} className="text-emerald-600 dark:text-emerald-400 group-hover:text-white transition-colors" />
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                        <div className="pill-label text-[11px] font-bold uppercase tracking-wider mb-0.5 text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                                        <div className="pill-label text-[10px] sm:text-[11px] font-bold uppercase tracking-wider mb-0.5 text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
                                             <span>{whatsappLabel}</span>
                                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                         </div>
-                                        <div className="pill-value text-[11px] sm:text-xs font-semibold flex items-center gap-2">
+                                        <div className="pill-value text-xs sm:text-[12.5px] font-bold flex items-center gap-2 text-slate-800 dark:text-slate-200">
                                             <span>{whatsappValue}</span>
                                             <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-extrabold uppercase tracking-wide">
                                                 Message
@@ -342,7 +342,7 @@ export default function ContactPage() {
                                         </div>
                                     </div>
                                     <div className="shrink-0 text-emerald-600 dark:text-emerald-400 opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all pr-1">
-                                        <ArrowUpRight size={16} />
+                                        <ArrowUpRight size={15} />
                                     </div>
                                 </a>
 
@@ -350,19 +350,19 @@ export default function ContactPage() {
                         </div>
 
                         {/* Action Buttons: WhatsApp Direct & Direct Inquiry */}
-                        <div className="pt-6 flex flex-wrap items-center justify-between sm:justify-end gap-3">
+                        <div className="pt-4 flex flex-wrap items-center justify-between sm:justify-end gap-2.5">
                             <a
                                 href={waChatUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="rounded-full px-5 py-2.5 text-[11px] font-bold uppercase tracking-wider transition-all duration-200 hover:scale-105 active:scale-95 inline-flex items-center gap-2 cursor-pointer shadow-sm bg-gradient-to-r from-[#128C7E] to-[#25D366] hover:from-[#0e6e63] hover:to-[#1fa851] text-white"
+                                className="rounded-full px-4 sm:px-5 py-2 sm:py-2.5 text-[11px] font-bold uppercase tracking-wider transition-all duration-200 hover:scale-105 active:scale-95 inline-flex items-center gap-2 cursor-pointer shadow-sm bg-gradient-to-r from-[#128C7E] to-[#25D366] hover:from-[#0e6e63] hover:to-[#1fa851] text-white"
                             >
                                 <MessageCircle size={14} />
                                 <span>Chat on WhatsApp</span>
                             </a>
                             <button
                                 onClick={() => setIsFormOpen(true)}
-                                className="inquiry-btn rounded-full px-5 py-2.5 text-[11px] font-bold uppercase tracking-wider transition-all duration-200 hover:scale-105 active:scale-95 inline-flex items-center gap-2 cursor-pointer shadow-sm"
+                                className="inquiry-btn rounded-full px-4 sm:px-5 py-2 sm:py-2.5 text-[11px] font-bold uppercase tracking-wider transition-all duration-200 hover:scale-105 active:scale-95 inline-flex items-center gap-2 cursor-pointer shadow-sm"
                             >
                                 <MessageSquare size={13} />
                                 <span>Send Direct Inquiry</span>
@@ -370,9 +370,9 @@ export default function ContactPage() {
                         </div>
                     </div>
 
-                    {/* ── Right Column: 3D Beveled Showroom Window ── */}
-                    <div className="showroom-bezel rounded-[28px] sm:rounded-[36px] p-2.5 sm:p-3 h-[360px] sm:h-[420px] flex items-center justify-center overflow-hidden">
-                        <div className="w-full h-full rounded-[22px] sm:rounded-[28px] overflow-hidden relative group">
+                    {/* ── Right Column: 3D Beveled Showroom Window matching Left Height ── */}
+                    <div className="showroom-bezel rounded-[28px] sm:rounded-[36px] p-2.5 sm:p-3 h-full min-h-[460px] md:min-h-[500px] flex items-center justify-center overflow-hidden">
+                        <div className="w-full h-full min-h-[440px] md:min-h-[480px] rounded-[22px] sm:rounded-[28px] overflow-hidden relative group">
                             {/* Light Mode Showroom */}
                             <img
                                 src={showroomLight}

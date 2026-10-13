@@ -225,7 +225,79 @@ export default function CatalogTaxonomyDirectory({ initialTaxonomy }: Props) {
               })}
             </div>
 
-            {/* Level 2: Sub-Departments / Audiences (e.g. Men's, Women's, Kids) */}
+            {/* ── 3D HIERARCHY TREE MATRIX (Inspired by Reference Screenshot 2) ── */}
+            {activeDivisionId === 'fashion' && currentDivision && (
+              <div className="mb-10 p-5 sm:p-7 rounded-3xl bg-[#F4EFE6]/90 dark:bg-slate-900/60 border border-[#D9D1C4] dark:border-white/10 shadow-[6px_6px_20px_rgba(160,150,135,0.25),-4px_-4px_16px_rgba(255,255,255,0.8)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+                {/* Master Node: FASHION */}
+                <div className="flex flex-col items-center">
+                  <div className="px-6 py-2 rounded-2xl bg-[#142338] text-white font-black text-xs sm:text-sm tracking-widest uppercase shadow-md border border-blue-400/30 flex items-center gap-2">
+                    <Shirt className="w-4 h-4 text-cyan-400" />
+                    <span>FASHION</span>
+                  </div>
+
+                  {/* Vertical Trunk Line */}
+                  <div className="w-0.5 h-4 bg-blue-600/60 dark:bg-blue-400/60"></div>
+
+                  {/* Horizontal Blue Hierarchy Branch Spanning across all 3 departments */}
+                  <div className="w-full max-w-4xl relative flex items-center justify-between">
+                    <div className="absolute top-1/2 left-4 right-4 h-1 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 dark:from-cyan-500 dark:via-blue-500 dark:to-cyan-500 rounded-full shadow-[0_0_8px_rgba(37,99,235,0.4)]"></div>
+                    <div className="w-3 h-3 rounded-full bg-blue-600 dark:bg-cyan-400 border-2 border-white relative z-10"></div>
+                    <div className="w-3 h-3 rounded-full bg-blue-600 dark:bg-cyan-400 border-2 border-white relative z-10"></div>
+                    <div className="w-3 h-3 rounded-full bg-blue-600 dark:bg-cyan-400 border-2 border-white relative z-10"></div>
+                  </div>
+                </div>
+
+                {/* 3 Department Columns Matching Excel Reference (Men's, Women's, Children's) */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mt-4 max-w-5xl mx-auto">
+                  {currentDivision.departments.map(dept => {
+                    const isDeptActive = dept.id === activeDepartmentId;
+                    return (
+                      <div
+                        key={dept.id}
+                        onClick={() => setActiveDepartmentId(dept.id)}
+                        className={`cursor-pointer rounded-2xl p-4 transition-all duration-200 border flex flex-col justify-between ${
+                          isDeptActive
+                            ? 'bg-white dark:bg-slate-800/90 border-blue-600/70 dark:border-blue-400 shadow-md ring-2 ring-blue-500/20 scale-[1.02]'
+                            : 'bg-white/60 dark:bg-slate-900/40 border-slate-200/80 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800/60'
+                        }`}
+                      >
+                        {/* Department Header Node */}
+                        <div className="text-center pb-2.5 border-b border-slate-200 dark:border-slate-700/60">
+                          <span className={`text-xs sm:text-[13px] font-black uppercase tracking-wider ${
+                            isDeptActive ? 'text-blue-700 dark:text-cyan-400' : 'text-slate-800 dark:text-slate-200'
+                          }`}>
+                            {dept.name}
+                          </span>
+                        </div>
+
+                        {/* Subcategories (Circular Knit, Flat Knit, Woven) */}
+                        <div className="grid grid-cols-3 gap-1.5 pt-3 text-center">
+                          {dept.groups.map(grp => (
+                            <div
+                              key={grp.id}
+                              className={`p-1.5 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all leading-tight ${
+                                isDeptActive
+                                  ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-900 dark:text-blue-200 border border-blue-200/60 dark:border-blue-800/40'
+                                  : 'bg-slate-100/80 dark:bg-slate-800/60 text-slate-600 dark:text-slate-400'
+                              }`}
+                            >
+                              {grp.name.replace(' Items', '')}
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Active Selection Indicator */}
+                        <div className="mt-3 pt-2 text-center text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400">
+                          {isDeptActive ? '● Active Deep Dive' : 'Click to inspect'}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Level 2: Sub-Departments Switcher Pills (for quick switching) */}
             {currentDivision && currentDivision.departments.length > 1 && (
               <div className="mb-8 p-1.5 rounded-2xl bg-black/5 dark:bg-slate-900/50 inline-flex flex-wrap gap-1 border border-black/5 dark:border-white/5">
                 {currentDivision.departments.map(dept => {
