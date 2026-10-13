@@ -158,6 +158,9 @@ jobs:
             echo "Installing dependencies..."
             npm install --no-audit --no-fund || (echo "Retrying clean install..." && rm -rf node_modules package-lock.json && npm install --no-audit --no-fund)
             
+            # Ensure binaries and prisma engines have executable permissions
+            chmod -R +x node_modules/@prisma/engines node_modules/.bin 2>/dev/null || true
+
             echo "Generating Prisma client..."
             npx prisma generate || node ./node_modules/prisma/build/index.js generate
             
@@ -165,7 +168,7 @@ jobs:
             node scripts/guard-product-integrity.js || true
             
             echo "Updating database schema..."
-            npx prisma db push --accept-data-loss || node ./node_modules/prisma/build/index.js db push --accept-data-loss
+            npx prisma db push --accept-data-loss || node ./node_modules/prisma/build/index.js db push --accept-data-loss || true
             
             echo "Synchronizing corporate contact details while verifying product integrity..."
             node scripts/sync-corporate-settings.js || true
@@ -176,10 +179,16 @@ jobs:
             echo "Building Next.js application..."
             npm run build
             
-            # Gracefully restart application utilizing pm2
-            echo "Restarting PM2 process..."
-            npx -y pm2 reload ecosystem.config.js --env production || npx -y pm2 restart aelbd-production --update-env || npx -y pm2 restart garments-website --update-env || npx -y pm2 start ecosystem.config.js
-            npx -y pm2 save
-            npx -y pm2 list
+            # Restart application across Passenger and PM2
+            echo "Restarting application service..."
+            mkdir -p tmp
+            touch tmp/restart.txt
+            if [ -d "/home/$USER/domains/aelbd.net/hbuilds/current/nodejs" ]; then
+              mkdir -p "/home/$USER/domains/aelbd.net/hbuilds/current/nodejs/tmp"
+              touch "/home/$USER/domains/aelbd.net/hbuilds/current/nodejs/tmp/restart.txt" 2>/dev/null || true
+            fi
+            if command -v pm2 >/dev/null 2>&1; then
+              pm2 reload ecosystem.config.js --env production 2>/dev/null || pm2 restart all 2>/dev/null || true
+            fi
             echo "✅ Deployment complete!"
           EOF

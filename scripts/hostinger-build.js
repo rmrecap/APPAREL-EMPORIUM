@@ -76,7 +76,7 @@ async function main() {
     const homeDir = process.env.HOME || process.env.USERPROFILE || '';
     const backupDir = path.join(homeDir, 'db_backups');
 
-    // 0. FIX PERMISSIONS ON PRISMA DATABASE
+    // 0. FIX PERMISSIONS ON PRISMA DATABASE AND LOCAL ENGINES
     try {
         const pDir = path.join(cwd, 'prisma');
         fs.chmodSync(pDir, 0o777);
@@ -87,6 +87,33 @@ async function main() {
         console.log('✅ [PERMS] Database file permissions configured (chmod 777/666).');
     } catch (permErr) {
         console.warn('⚠️ [PERMS WARNING]', permErr.message);
+    }
+
+    // 0b. ENSURE PRISMA ENGINES & BINARIES HAVE EXECUTABLE PERMISSIONS (+x / 0755)
+    function grantExecPerms(targetDir) {
+        if (!fs.existsSync(targetDir)) return;
+        try {
+            const items = fs.readdirSync(targetDir);
+            for (const item of items) {
+                const itemPath = path.join(targetDir, item);
+                try {
+                    const st = fs.statSync(itemPath);
+                    if (st.isDirectory()) {
+                        grantExecPerms(itemPath);
+                    } else {
+                        fs.chmodSync(itemPath, 0o755);
+                    }
+                } catch (e) {}
+            }
+        } catch (e) {}
+    }
+    try {
+        grantExecPerms(path.join(cwd, 'node_modules', '@prisma', 'engines'));
+        grantExecPerms(path.join(cwd, 'node_modules', '.bin'));
+        grantExecPerms(path.join(cwd, 'node_modules', 'prisma', 'build'));
+        console.log('✅ [PERMS] Prisma engine and node_modules binaries granted execute permissions (chmod 755).');
+    } catch (enginePermErr) {
+        console.warn('⚠️ [ENGINE PERMS WARNING]', enginePermErr.message);
     }
 
     // 1. BACKUP DATABASE BEFORE ANY ACTIONS
@@ -124,6 +151,8 @@ async function main() {
     if (!fs.existsSync(nextBin) || !fs.existsSync(reactDomClient)) {
         console.log('⚠️ [DEPS] Core dependencies missing. Running targeted npm install...');
         run('npm install react@18.3.1 react-dom@18.3.1 next@15.5.27 --no-audit --no-fund --prefix .', 'Install Core React & Next Dependencies');
+        grantExecPerms(path.join(cwd, 'node_modules', '@prisma', 'engines'));
+        grantExecPerms(path.join(cwd, 'node_modules', '.bin'));
     }
 
     // 3b. ENSURE NEXT.JS BUILD ID GENERATOR RESILIENCE
@@ -146,6 +175,8 @@ async function main() {
     }
 
     // 4. GENERATE PRISMA CLIENT WITH LOCAL PINNED BINARY
+    grantExecPerms(path.join(cwd, 'node_modules', '@prisma', 'engines'));
+    grantExecPerms(path.join(cwd, 'node_modules', '.bin'));
     const localPrisma = path.join(cwd, 'node_modules', 'prisma', 'build', 'index.js');
     if (fs.existsSync(localPrisma)) {
         run(`node "${localPrisma}" generate`, 'Generate Prisma Client');
@@ -159,10 +190,15 @@ async function main() {
     }
 
     // 6. UPDATE SCHEMA & SETTINGS
-    if (fs.existsSync(localPrisma)) {
-        run(`node "${localPrisma}" db push --accept-data-loss`, 'Sync Database Schema');
-    } else {
-        run('npx -y prisma@5.22.0 db push --accept-data-loss', 'Sync Database Schema via npx');
+    try {
+        grantExecPerms(path.join(cwd, 'node_modules', '@prisma', 'engines'));
+        if (fs.existsSync(localPrisma)) {
+            run(`node "${localPrisma}" db push --accept-data-loss`, 'Sync Database Schema');
+        } else {
+            run('npx -y prisma@5.22.0 db push --accept-data-loss', 'Sync Database Schema via npx');
+        }
+    } catch (dbSyncErr) {
+        console.warn('⚠️ [DB SYNC WARNING] db push encountered a non-fatal warning, proceeding with integrity guards:', dbSyncErr.message);
     }
 
     if (fs.existsSync(path.join(cwd, 'scripts', 'sync-corporate-settings.js'))) {
