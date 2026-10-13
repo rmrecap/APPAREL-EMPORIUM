@@ -5,6 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import archiver from 'archiver';
 import { PassThrough, Readable } from 'stream';
+import { executeGoogleDriveBackup } from '@/lib/backup-service';
 
 export const dynamic = 'force-dynamic';
 
@@ -227,9 +228,37 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+    // 1. Check Cron / Vault secret authorization header
+    const authHeader = req.headers.get('authorization') || '';
+    const backupToken = req.headers.get('x-backup-token') || req.headers.get('x-cron-secret');
+    const cronSecret = process.env.CRON_SECRET || process.env.API_SECRET_KEY || process.env.AEL_API_SECRET;
+
+    const token = authHeader.replace(/^Bearer\s+/i, '').trim() || backupToken || '';
+    const isCronAuthed = Boolean(cronSecret && token && token === cronSecret);
+
+    if (isCronAuthed) {
+        try {
+            const result = await executeGoogleDriveBackup();
+            return NextResponse.json({
+                success: true,
+                message: 'Backup successfully generated and uploaded to Google Drive.',
+                triggeredBy: 'cron',
+                backup: result.backupFile,
+                cleanup: result.cleanup,
+                database: result.database,
+                manifest: result.manifest,
+                durationMs: result.durationMs,
+            });
+        } catch (err: any) {
+            console.error('Automated cron backup error:', err);
+            return NextResponse.json({ success: false, error: err.message || 'Backup failed' }, { status: 500 });
+        }
+    }
+
+    // 2. Fallback to NextAuth session for manual admin database restore
     const guard = await requireAuth();
     if (!guard.ok || !['DEVELOPER', 'SUPER_ADMIN'].includes(guard.user.role)) {
-        return NextResponse.json({ error: 'Unauthorized: Super Admin or Developer access required to restore backups.' }, { status: 403 });
+        return NextResponse.json({ error: 'Unauthorized: Super Admin or Developer access required to restore backups.' }, { status: 401 });
     }
 
     try {

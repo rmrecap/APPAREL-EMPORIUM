@@ -14,11 +14,17 @@ export const maxDuration = 300; // 5 minutes timeout for large database/media up
 async function authorizeRequest(req: NextRequest): Promise<{ authorized: boolean; reason?: string; isCron?: boolean }> {
     // 1. Check Cron / Webhook Secret Authorization Header
     const authHeader = req.headers.get('authorization') || '';
+    const customHeaderToken = req.headers.get('x-backup-token') || req.headers.get('x-cron-secret') || req.headers.get('x-api-key');
     const cronSecret = process.env.CRON_SECRET || process.env.API_SECRET_KEY || process.env.AEL_API_SECRET;
 
-    if (cronSecret && authHeader) {
-        const token = authHeader.replace(/^Bearer\s+/i, '').trim();
-        if (token === cronSecret) {
+    if (cronSecret) {
+        if (authHeader) {
+            const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+            if (token === cronSecret) {
+                return { authorized: true, isCron: true };
+            }
+        }
+        if (customHeaderToken && customHeaderToken === cronSecret) {
             return { authorized: true, isCron: true };
         }
     }

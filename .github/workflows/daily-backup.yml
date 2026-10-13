@@ -20,10 +20,22 @@ jobs:
           
           RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$APP_URL/api/admin/backup/gdrive" \
             -H "Authorization: Bearer $CRON_SECRET" \
+            -H "x-backup-token: $CRON_SECRET" \
             -H "Content-Type: application/json")
 
           HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
           BODY=$(echo "$RESPONSE" | sed '$d')
+
+          # If /api/admin/backup/gdrive returned 401 or 404, fallback to /api/backup
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "Retrying via /api/backup endpoint..."
+            RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$APP_URL/api/backup" \
+              -H "Authorization: Bearer $CRON_SECRET" \
+              -H "x-backup-token: $CRON_SECRET" \
+              -H "Content-Type: application/json")
+            HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
+            BODY=$(echo "$RESPONSE" | sed '$d')
+          fi
 
           echo "HTTP Status: $HTTP_STATUS"
           echo "Response Body: $BODY"
