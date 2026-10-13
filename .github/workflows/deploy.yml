@@ -8,19 +8,37 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to Hostinger via Native OpenSSH
+      - name: Deploy to Hostinger via SSH
         env:
           SSH_HOST: ${{ secrets.HOSTINGER_HOST }}
           SSH_USER: ${{ secrets.HOSTINGER_USERNAME }}
           SSH_PASS: ${{ secrets.HOSTINGER_PASSWORD }}
-          SSH_PORT: ${{ secrets.HOSTINGER_PORT }}
+          SSH_PORT: ${{ secrets.HOSTINGER_PORT || '65002' }}
+          SSH_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
         run: |
-          sudo apt-get update -qq && sudo apt-get install -y -qq sshpass
-          export SSHPASS="$SSH_PASS"
+          PORT="${SSH_PORT:-65002}"
+          echo "Target Host: $SSH_USER@$SSH_HOST:$PORT"
+
+          # Choose authentication method: SSH Key (Preferred) or sshpass (Fallback)
+          if [ -n "$SSH_KEY" ]; then
+            echo "🔑 Authenticating via ED25519/RSA SSH Key..."
+            mkdir -p ~/.ssh
+            chmod 700 ~/.ssh
+            echo "$SSH_KEY" | tr -d '\r' > ~/.ssh/deploy_key
+            chmod 600 ~/.ssh/deploy_key
+            SSH_EXEC="ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -p $PORT $SSH_USER@$SSH_HOST"
+          else
+            echo "🔐 Authenticating via Password (sshpass fallback)..."
+            sudo apt-get update -qq && sudo apt-get install -y -qq sshpass
+            export SSHPASS="$SSH_PASS"
+            SSH_EXEC="sshpass -e ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -p $PORT $SSH_USER@$SSH_HOST"
+          fi
+
           # Reset any stuck processes from prior timed-out jobs
-          sshpass -e ssh -o StrictHostKeyChecking=no -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" "killall -9 node npm ts-node prisma 2>/dev/null || true" || true
-          sleep 3
-          sshpass -e ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" "bash -s" << 'EOF'
+          $SSH_EXEC "killall -9 node npm ts-node prisma 2>/dev/null || true" || true
+          sleep 2
+
+          $SSH_EXEC "bash -s" << 'EOF'
             export PATH=$PATH:/usr/local/bin:/opt/alt/alt-nodejs22/root/usr/bin:/opt/alt/alt-nodejs20/root/usr/bin
             if [ -s "$HOME/.nvm/nvm.sh" ]; then source "$HOME/.nvm/nvm.sh"; fi
 
