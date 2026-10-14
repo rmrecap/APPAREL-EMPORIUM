@@ -176,7 +176,10 @@ jobs:
             echo "Synchronizing corporate contact details while verifying product integrity..."
             node scripts/sync-corporate-settings.js || true
 
-            echo "Updating MegaMenu categories to strict 3-pillar structure..."
+            echo "Synchronizing categories and product taxonomy..."
+            node scripts/synchronize-categories-and-products.js || true
+
+            echo "Updating MegaMenu categories to 4-pillar structure..."
             node scripts/update-megamenu.js || true
 
             echo "Running Post-migration Product Integrity Guard..."

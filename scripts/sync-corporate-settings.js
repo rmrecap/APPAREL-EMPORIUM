@@ -50,7 +50,8 @@ async function main() {
         { key: 'website_url', value: 'https://www.aelbd.net', group: 'general' },
         { key: 'contact_address', value: 'House # 03 (2nd Floor), Road # 12, Sector # 13, Uttara Model Town, Dhaka- 1230, Bangladesh', group: 'contact' },
         { key: 'contact_phone', value: '+88 02 4895 5519, 096 6691 2038', group: 'contact' },
-        { key: 'contact_email', value: 'kamal@aelbd.net', group: 'contact' }
+        { key: 'contact_email', value: 'kamal@aelbd.net', group: 'contact' },
+        { key: 'company_tagline', value: 'A Window of Fashion, Home Textile, Footwear & Accessories', group: 'general' }
     ];
 
     for (const setting of corporateSettings) {
@@ -62,43 +63,57 @@ async function main() {
         console.log(`✓ Set ${setting.key}: "${setting.value}"`);
     }
 
-    console.log('=== Enforcing Strict 3-Pillar MegaMenu Structure ===');
+    console.log('=== Enforcing Synchronized 4-Pillar MegaMenu Structure ===');
     const megaMenuJson = JSON.stringify([
       {
-        title: 'KNIT',
+        title: 'FASHION',
         sections: [
           {
             header: '',
             links: [
-              { label: 'Menswear', url: '/products?category=knitwear-mens' },
-              { label: 'Womenswear', url: '/products?category=knitwear-womens' },
-              { label: 'Kidswear', url: '/products?category=knitwear-kids' }
+              { label: "Men's Fashion", url: '/products?category=mens-fashion' },
+              { label: "Women's Fashion", url: '/products?category=womens-fashion' },
+              { label: "Children's Fashion", url: '/products?category=childrens-fashion' }
             ]
           }
         ]
       },
       {
-        title: 'WOVEN',
+        title: 'HOME TEXTILES',
         sections: [
           {
             header: '',
             links: [
-              { label: 'Men', url: '/products?category=woven-mens' },
-              { label: 'Women', url: '/products?category=woven-womens' },
-              { label: 'Kids', url: '/products?category=woven-kids' }
+              { label: 'Towels', url: '/products?category=towel' },
+              { label: 'Bedding', url: '/products?category=bedding' },
+              { label: 'Curtains', url: '/products?category=curtain' }
             ]
           }
         ]
       },
       {
-        title: 'SWEATER',
+        title: 'FOOTWEAR',
         sections: [
           {
             header: '',
             links: [
-              { label: 'Men', url: '/products?category=sweater-mens' },
-              { label: 'Women', url: '/products?category=sweater-womens' },
-              { label: 'Kids', url: '/products?category=sweater-kids' }
+              { label: 'Basic Espadrille', url: '/products?category=basic-espadrilles' },
+              { label: 'Fashion Espadrille', url: '/products?category=fashion-espadrilles' }
+            ]
+          }
+        ]
+      },
+      {
+        title: 'ACCESSORIES',
+        sections: [
+          {
+            header: '',
+            links: [
+              { label: 'Scarf', url: '/products?category=scarves' },
+              { label: 'Hat & Caps', url: '/products?category=hats-caps' },
+              { label: 'Gloves', url: '/products?category=gloves' },
+              { label: 'Socks', url: '/products?category=socks' },
+              { label: 'Gift Box', url: '/products?category=gift-box' }
             ]
           }
         ]

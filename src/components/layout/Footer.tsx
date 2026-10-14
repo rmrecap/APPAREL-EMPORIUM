@@ -88,14 +88,18 @@ export default function Footer() {
                             {/* Brand Header */}
                             <div className="flex items-start justify-between gap-3">
                                 <div>
-                                    <div className="flex items-center gap-2">
-                                        <Building2 className="w-5 h-5 text-amber-400 dark:text-cyan-400" />
-                                        <h3 className="text-white font-black text-lg tracking-tight font-heading">
-                                            {companyName}
-                                        </h3>
+                                    <div className="flex items-center gap-2 mb-1.5">
+                                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white shadow-[0_2px_8px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,1)] border border-slate-200">
+                                            <span className="text-[#DC2626] text-base sm:text-lg font-black tracking-tight font-heading">
+                                                APPAREL
+                                            </span>
+                                            <span className="text-black text-base sm:text-lg font-black tracking-tight font-heading">
+                                                EMPORIUM
+                                            </span>
+                                        </div>
                                     </div>
-                                    <p className="text-[11px] text-slate-400 font-medium mt-0.5">
-                                        100% Export Oriented Garments Buying House
+                                    <p className="text-xs text-slate-300 font-semibold mt-1 tracking-tight">
+                                        A Window of Fashion, Home Textile, Footwear &amp; Accessories
                                     </p>
                                 </div>
                                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">

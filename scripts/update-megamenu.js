@@ -3,40 +3,54 @@ const prisma = new PrismaClient();
 
 const megaMenuJson = JSON.stringify([
   {
-    title: 'KNIT',
+    title: 'FASHION',
     sections: [
       {
         header: '',
         links: [
-          { label: 'Menswear', url: '/products?category=knitwear-mens' },
-          { label: 'Womenswear', url: '/products?category=knitwear-womens' },
-          { label: 'Kidswear', url: '/products?category=knitwear-kids' }
+          { label: "Men's Fashion", url: '/products?category=mens-fashion' },
+          { label: "Women's Fashion", url: '/products?category=womens-fashion' },
+          { label: "Children's Fashion", url: '/products?category=childrens-fashion' }
         ]
       }
     ]
   },
   {
-    title: 'WOVEN',
+    title: 'HOME TEXTILES',
     sections: [
       {
         header: '',
         links: [
-          { label: 'Men', url: '/products?category=woven-mens' },
-          { label: 'Women', url: '/products?category=woven-womens' },
-          { label: 'Kids', url: '/products?category=woven-kids' }
+          { label: 'Towels', url: '/products?category=towel' },
+          { label: 'Bedding', url: '/products?category=bedding' },
+          { label: 'Curtains', url: '/products?category=curtain' }
         ]
       }
     ]
   },
   {
-    title: 'SWEATER',
+    title: 'FOOTWEAR',
     sections: [
       {
         header: '',
         links: [
-          { label: 'Men', url: '/products?category=sweater-mens' },
-          { label: 'Women', url: '/products?category=sweater-womens' },
-          { label: 'Kids', url: '/products?category=sweater-kids' }
+          { label: 'Basic Espadrille', url: '/products?category=basic-espadrilles' },
+          { label: 'Fashion Espadrille', url: '/products?category=fashion-espadrilles' }
+        ]
+      }
+    ]
+  },
+  {
+    title: 'ACCESSORIES',
+    sections: [
+      {
+        header: '',
+        links: [
+          { label: 'Scarf', url: '/products?category=scarves' },
+          { label: 'Hat & Caps', url: '/products?category=hats-caps' },
+          { label: 'Gloves', url: '/products?category=gloves' },
+          { label: 'Socks', url: '/products?category=socks' },
+          { label: 'Gift Box', url: '/products?category=gift-box' }
         ]
       }
     ]

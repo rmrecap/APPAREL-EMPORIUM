@@ -699,6 +699,201 @@ export function buildCategoryPrismaFilter(
   categories: CategoryFilterCandidate[]
 ): any {
   const norm = targetSlug.toLowerCase().trim();
+
+  // 1. FOOTWEAR DIVISION & SUBCATEGORIES
+  if (norm === 'footwear' || norm === 'shoes') {
+    return { divisionType: 'Footwear' };
+  }
+  if (norm === 'basic-espadrilles' || norm === 'basic-espadrille') {
+    return {
+      divisionType: 'Footwear',
+      OR: [
+        { subCategory: { contains: 'basic' } },
+        { name: { contains: 'Canvas' } },
+        { name: { contains: 'Classic' } },
+        { name: { contains: 'Minimalist' } },
+        { category: { slug: { contains: 'basic' } } }
+      ]
+    };
+  }
+  if (norm === 'fashion-espadrilles' || norm === 'fashion-espadrille') {
+    return {
+      divisionType: 'Footwear',
+      OR: [
+        { subCategory: { contains: 'fashion' } },
+        { name: { contains: 'Striped' } },
+        { name: { contains: 'Printed' } },
+        { name: { contains: 'Nautical' } },
+        { name: { contains: 'Graphic' } },
+        { category: { slug: { contains: 'fashion' } } }
+      ]
+    };
+  }
+  if (norm === 'womens-footwear' || norm.startsWith('womens-footwear')) {
+    return {
+      divisionType: 'Footwear',
+      department: 'Womenswear'
+    };
+  }
+  if (norm === 'mens-espadrilles' || norm.startsWith('mens-espadrilles')) {
+    return {
+      divisionType: 'Footwear',
+      department: 'Menswear'
+    };
+  }
+
+  // 2. HOME TEXTILES DIVISION & SUBCATEGORIES
+  if (norm === 'hometextiles' || norm === 'home-textiles') {
+    return { divisionType: 'Home Textiles' };
+  }
+  if (norm === 'towel' || norm === 'towels' || norm === 'home-terry-towels') {
+    return {
+      divisionType: 'Home Textiles',
+      OR: [
+        { name: { contains: 'Towel' } },
+        { category: { slug: 'towel' } },
+        { subCategory: 'towel' }
+      ]
+    };
+  }
+  if (norm === 'bedding' || norm === 'home-bedding-linen') {
+    return {
+      divisionType: 'Home Textiles',
+      OR: [
+        { name: { contains: 'Bed' } },
+        { name: { contains: 'Sheet' } },
+        { category: { slug: 'bedding' } },
+        { subCategory: 'bedding' }
+      ]
+    };
+  }
+  if (norm === 'curtain' || norm === 'curtains' || norm === 'home-curtains-drapes') {
+    return {
+      divisionType: 'Home Textiles',
+      OR: [
+        { name: { contains: 'Curtain' } },
+        { name: { contains: 'Drape' } },
+        { category: { slug: 'curtain' } },
+        { subCategory: 'curtain' }
+      ]
+    };
+  }
+
+  // 3. ACCESSORIES DIVISION & SUBCATEGORIES
+  if (norm === 'accessories' || norm === 'fashion-accessories') {
+    return { divisionType: 'Accessories' };
+  }
+  if (norm === 'scarves' || norm === 'scarf' || norm === 'acc-scarves') {
+    return {
+      divisionType: 'Accessories',
+      OR: [
+        { name: { contains: 'Scarf' } },
+        { subCategory: 'scarves' },
+        { category: { slug: 'scarves' } }
+      ]
+    };
+  }
+  if (norm === 'hats-caps' || norm === 'hats' || norm === 'caps' || norm === 'acc-caps') {
+    return {
+      divisionType: 'Accessories',
+      OR: [
+        { name: { contains: 'Cap' } },
+        { name: { contains: 'Hat' } },
+        { subCategory: 'hats-caps' },
+        { category: { slug: 'hats-caps' } }
+      ]
+    };
+  }
+  if (norm === 'gloves' || norm === 'acc-gloves') {
+    return {
+      divisionType: 'Accessories',
+      OR: [
+        { name: { contains: 'Glove' } },
+        { subCategory: 'gloves' },
+        { category: { slug: 'gloves' } }
+      ]
+    };
+  }
+  if (norm === 'socks' || norm === 'acc-socks') {
+    return {
+      divisionType: 'Accessories',
+      OR: [
+        { name: { contains: 'Socks' } },
+        { subCategory: 'socks' },
+        { category: { slug: 'socks' } }
+      ]
+    };
+  }
+  if (norm === 'gift-box' || norm === 'acc-packaging') {
+    return {
+      divisionType: 'Accessories',
+      OR: [
+        { name: { contains: 'Box' } },
+        { subCategory: 'gift-box' },
+        { category: { slug: 'gift-box' } }
+      ]
+    };
+  }
+
+  // 4. FASHION DIVISION MAIN PILLARS & GROUPS
+  if (norm === 'fashion' || norm === 'apparel' || norm === 'garments') {
+    return { divisionType: { in: ['Knit', 'Woven', 'Sweater'] } };
+  }
+
+  // Men's Fashion Umbrella & Groups
+  if (norm === 'mens-fashion') {
+    return { department: 'Menswear', divisionType: { in: ['Knit', 'Woven', 'Sweater'] } };
+  }
+  if (norm === 'men-circular-knit' || norm === 'knitwear-mens' || norm === 'men-knitwear' || norm === 'men-knit-fashion') {
+    return { department: 'Menswear', divisionType: 'Knit' };
+  }
+  if (norm === 'men-flat-knit' || norm === 'sweater-mens' || norm === 'men-sweater' || norm === 'men-sweater-fashion') {
+    return { department: 'Menswear', divisionType: 'Sweater' };
+  }
+  if (norm === 'men-woven' || norm === 'woven-mens' || norm === 'men-woven-fashion') {
+    return { department: 'Menswear', divisionType: 'Woven' };
+  }
+
+  // Women's Fashion Umbrella & Groups
+  if (norm === 'womens-fashion') {
+    return { department: 'Womenswear', divisionType: { in: ['Knit', 'Woven', 'Sweater'] } };
+  }
+  if (norm === 'women-circular-knit' || norm === 'knitwear-womens' || norm === 'women-knitwear' || norm === 'women-knit-fashion') {
+    return { department: 'Womenswear', divisionType: 'Knit' };
+  }
+  if (norm === 'women-flat-knit' || norm === 'sweater-womens' || norm === 'women-sweater' || norm === 'women-sweater-fashion') {
+    return { department: 'Womenswear', divisionType: 'Sweater' };
+  }
+  if (norm === 'women-woven' || norm === 'woven-womens' || norm === 'women-woven-fashion') {
+    return { department: 'Womenswear', divisionType: 'Woven' };
+  }
+
+  // Children's Fashion Umbrella & Groups
+  if (norm === 'childrens-fashion' || norm === 'kids-fashion') {
+    return { department: 'Kidswear', divisionType: { in: ['Knit', 'Woven', 'Sweater'] } };
+  }
+  if (norm === 'kids-circular-knit' || norm === 'knitwear-kids' || norm === 'kids-knitwear' || norm === 'kids-knit-fashion') {
+    return { department: 'Kidswear', divisionType: 'Knit' };
+  }
+  if (norm === 'kids-flat-knit' || norm === 'sweater-kids' || norm === 'kids-sweater' || norm === 'kids-sweater-fashion') {
+    return { department: 'Kidswear', divisionType: 'Sweater' };
+  }
+  if (norm === 'kids-woven' || norm === 'woven-kids' || norm === 'kids-woven-fashion') {
+    return { department: 'Kidswear', divisionType: 'Woven' };
+  }
+
+  // Standalone Production Lines (When gender isn't specified)
+  if (norm === 'circular-knit' || norm === 'knit' || norm === 'knitwear') {
+    return { divisionType: 'Knit' };
+  }
+  if (norm === 'flat-knit' || norm === 'sweater' || norm === 'sweaters') {
+    return { divisionType: 'Sweater' };
+  }
+  if (norm === 'woven') {
+    return { divisionType: 'Woven' };
+  }
+
+  // 5. GRANULAR ITEM-LEVEL SLUGS (e.g. mens-t-shirt, womens-sweatshirt, kids-knit-romper)
   const taxonomySlugs = getAllDescendantSlugs(norm);
 
   // Collect DB descendant slugs
@@ -732,208 +927,43 @@ export function buildCategoryPrismaFilter(
     { tags: { contains: norm } },
   ];
 
-  // 1. Fashion Umbrella
-  if (norm === 'fashion' || norm === 'apparel' || norm === 'garments') {
-    orConditions.push(
-      { divisionType: { in: ['Knit', 'Woven', 'Sweater', 'knit', 'woven', 'sweater'] } },
-      { department: { in: ['Menswear', 'Womenswear', 'Kidswear', 'Men', 'Women', 'Kids'] } },
-      { category: { name: { contains: 'shirt' } } },
-      { category: { name: { contains: 'sweat' } } },
-      { category: { name: { contains: 'knit' } } },
-      { category: { name: { contains: 'woven' } } },
-      { category: { name: { contains: 'polo' } } },
-      { category: { name: { contains: 'dress' } } },
-      { category: { name: { contains: 'fashion' } } },
-      { category: { name: { contains: 'apparel' } } }
-    );
-    return { OR: orConditions };
+  // Specific item text matches
+  if (norm.includes('t-shirt') || norm.includes('tshirt')) {
+    orConditions.push({ name: { contains: 'T-Shirt' } }, { name: { contains: 'Tee' } });
+  } else if (norm.includes('polo')) {
+    orConditions.push({ name: { contains: 'Polo' } });
+  } else if (norm.includes('sweatshirt') || norm.includes('hoodie')) {
+    orConditions.push({ name: { contains: 'Sweatshirt' } }, { name: { contains: 'Hoodie' } });
+  } else if (norm.includes('dress')) {
+    orConditions.push({ name: { contains: 'Dress' } });
+  } else if (norm.includes('pant') || norm.includes('jeans') || norm.includes('chino')) {
+    orConditions.push({ name: { contains: 'Pant' } }, { name: { contains: 'Jeans' } }, { name: { contains: 'Chino' } });
   }
-
-  // 2. Sweatshirt / Hoodie matching
-  if (norm.includes('sweatshirt') || norm.includes('hoodie')) {
-    orConditions.push(
-      { name: { contains: 'Sweatshirt' } },
-      { name: { contains: 'sweatshirt' } },
-      { name: { contains: 'Hoodie' } },
-      { name: { contains: 'hoodie' } },
-      { subCategory: { contains: 'sweatshirt' } },
-      { subCategory: { contains: 'hoodie' } },
-      { category: { name: { contains: 'sweatshirt' } } },
-      { category: { slug: { contains: 'sweatshirt' } } },
-      { category: { name: { contains: 'hoodie' } } },
-      { category: { slug: { contains: 'hoodie' } } }
-    );
-  }
-
-  // 3. T-Shirt / Tee matching (exclude 'sweat' since 'sweatshirt' contains 'tshirt')
-  const isTshirtQuery = !norm.includes('sweat') && (norm.includes('t-shirt') || norm.includes('tshirt') || norm.endsWith('tee') || norm.includes('tee-') || norm.includes('t-shirts'));
-  if (isTshirtQuery) {
-    orConditions.push(
-      { name: { contains: 'T-Shirt' } },
-      { name: { contains: 't-shirt' } },
-      { name: { contains: 'Tee' } },
-      { name: { contains: 'tee' } },
-      { subCategory: { contains: 't-shirt' } },
-      { category: { name: { contains: 't-shirt' } } },
-      { category: { slug: { contains: 't-shirt' } } },
-      { category: { slug: { contains: 'tshirt' } } }
-    );
-  }
-
-  // 4. Polo
-  if (norm.includes('polo')) {
-    orConditions.push(
-      { name: { contains: 'Polo' } },
-      { name: { contains: 'polo' } },
-      { subCategory: { contains: 'polo' } },
-      { category: { name: { contains: 'polo' } } },
-      { category: { slug: { contains: 'polo' } } }
-    );
-  }
-
-  // 5. Dress
-  if (norm.includes('dress')) {
-    orConditions.push(
-      { name: { contains: 'Dress' } },
-      { name: { contains: 'dress' } },
-      { subCategory: { contains: 'dress' } },
-      { category: { name: { contains: 'dress' } } }
-    );
-  }
-
-  // 6. Towel / Home Textiles
-  if (norm.includes('towel') || norm.includes('hometextiles')) {
-    orConditions.push(
-      { name: { contains: 'Towel' } },
-      { name: { contains: 'towel' } },
-      { category: { name: { contains: 'towel' } } },
-      { category: { slug: { contains: 'towel' } } },
-      { divisionType: 'Home Textiles' }
-    );
-  }
-
-  // 7. Footwear / Espadrille
-  if (norm.includes('footwear') || norm.includes('espadrille') || norm.includes('shoes')) {
-    orConditions.push(
-      { name: { contains: 'Espadrille' } },
-      { name: { contains: 'espadrille' } },
-      { category: { name: { contains: 'espadrille' } } },
-      { category: { slug: { contains: 'espadrille' } } },
-      { divisionType: 'Footwear' }
-    );
-  }
-
-  // 8. Accessories
-  if (norm.includes('accessories') || norm.includes('scarf') || norm.includes('hat') || norm.includes('glove') || norm.includes('socks')) {
-    orConditions.push(
-      { divisionType: 'Accessories' },
-      { category: { name: { contains: 'accessories' } } },
-      { category: { slug: { contains: 'accessories' } } }
-    );
-  }
-
-  // Circular Knit matching
-  if (norm.includes('circular-knit') || norm.includes('knit')) {
-    orConditions.push(
-      { divisionType: { in: ['Knit', 'knit'] } },
-      { category: { name: { contains: 'knit' } } },
-      { category: { slug: { contains: 'knit' } } },
-      { subCategory: { contains: 'knit' } },
-      { name: { contains: 'T-Shirt' } },
-      { name: { contains: 'Polo' } },
-      { name: { contains: 'Hoodie' } },
-      { name: { contains: 'Sweatshirt' } },
-      { name: { contains: 'Jogger' } }
-    );
-  }
-
-  // Flat Knit matching (Sweaters, Cardigans, Pullovers)
-  if (norm.includes('flat-knit') || norm.includes('sweater')) {
-    orConditions.push(
-      { divisionType: { in: ['Sweater', 'sweater'] } },
-      { category: { name: { contains: 'sweater' } } },
-      { category: { slug: { contains: 'sweater' } } },
-      { subCategory: { contains: 'sweater' } },
-      { name: { contains: 'Sweater' } },
-      { name: { contains: 'Cardigan' } },
-      { name: { contains: 'Pullover' } },
-      { name: { contains: 'Jumper' } },
-      { name: { contains: 'Poncho' } }
-    );
-  }
-
-  // Woven matching
-  if (norm.includes('woven')) {
-    orConditions.push(
-      { divisionType: { in: ['Woven', 'woven'] } },
-      { category: { name: { contains: 'woven' } } },
-      { category: { slug: { contains: 'woven' } } },
-      { subCategory: { contains: 'woven' } },
-      { name: { contains: 'Shirt' } },
-      { name: { contains: 'Blazer' } },
-      { name: { contains: 'Jacket' } },
-      { name: { contains: 'Pant' } },
-      { name: { contains: 'Chino' } },
-      { name: { contains: 'Denim' } }
-    );
-  }
-
-  const isExplicitWomen = norm.includes('women');
-  const isExplicitMen = norm.includes('men') && !norm.includes('women');
-  const isExplicitKids = norm.includes('kids') || norm.includes('children');
 
   const baseFilter = { OR: orConditions };
 
-  if (isExplicitKids) {
+  // Gender boundary enforcement for granular queries
+  if (norm.startsWith('kids-') || norm.startsWith('baby-') || norm.includes('child')) {
     return {
       AND: [
         baseFilter,
-        {
-          OR: [
-            { name: { contains: 'Kids' } },
-            { name: { contains: 'kids' } },
-            { name: { contains: 'Child' } },
-            { name: { contains: 'children' } },
-            { category: { name: { contains: 'kids' } } },
-            { category: { slug: { contains: 'kids' } } },
-            { subCategory: { contains: 'kids' } },
-            { department: 'Kidswear' }
-          ]
-        }
+        { department: 'Kidswear' }
       ]
     };
   }
-
-  if (isExplicitWomen) {
+  if (norm.startsWith('womens-') || norm.includes('women')) {
     return {
       AND: [
         baseFilter,
-        {
-          OR: [
-            { name: { contains: 'Women' } },
-            { name: { contains: 'women' } },
-            { category: { name: { contains: 'women' } } },
-            { category: { slug: { contains: 'women' } } },
-            { subCategory: { contains: 'women' } },
-          ]
-        }
+        { department: 'Womenswear' }
       ]
     };
   }
-
-  if (isExplicitMen) {
+  if (norm.startsWith('mens-') || (norm.includes('men') && !norm.includes('women'))) {
     return {
       AND: [
         baseFilter,
-        {
-          NOT: [
-            { name: { contains: 'Women' } },
-            { name: { contains: 'women' } },
-            { category: { name: { contains: 'women' } } },
-            { category: { slug: { contains: 'women' } } },
-            { subCategory: { contains: 'women' } },
-          ]
-        }
+        { department: 'Menswear' }
       ]
     };
   }
