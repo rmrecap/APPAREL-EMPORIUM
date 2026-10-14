@@ -19,6 +19,138 @@ interface Props {
   initialTaxonomy: TaxonomyDivision[];
 }
 
+type DivisionTreeData = {
+  rootLabel: string;
+  badgeLabel: string;
+  pillars: Array<{
+    title: string;
+    subcategories: Array<{ label: string; slug: string }>;
+  }>;
+};
+
+const DIVISION_TREES: Record<string, DivisionTreeData> = {
+  fashion: {
+    rootLabel: 'PRODUCTS (APPAREL)',
+    badgeLabel: 'Core Export Garments',
+    pillars: [
+      {
+        title: 'KNIT',
+        subcategories: [
+          { label: 'Menswear', slug: 'knitwear-mens' },
+          { label: 'Womenswear', slug: 'knitwear-womens' },
+          { label: 'Kidswear', slug: 'knitwear-kids' },
+        ],
+      },
+      {
+        title: 'WOVEN',
+        subcategories: [
+          { label: 'Men', slug: 'woven-mens' },
+          { label: 'Women', slug: 'woven-womens' },
+          { label: 'Kids', slug: 'woven-kids' },
+        ],
+      },
+      {
+        title: 'SWEATER',
+        subcategories: [
+          { label: 'Men', slug: 'sweater-mens' },
+          { label: 'Women', slug: 'sweater-womens' },
+          { label: 'Kids', slug: 'sweater-kids' },
+        ],
+      },
+    ],
+  },
+  hometextiles: {
+    rootLabel: 'HOME TEXTILES',
+    badgeLabel: 'Home & Bedding Sourcing',
+    pillars: [
+      {
+        title: 'TERRY TOWELS',
+        subcategories: [
+          { label: 'Bath Towels & Mats', slug: 'towel' },
+          { label: 'Hand & Kitchen Towels', slug: 'towel' },
+          { label: 'Pool & Beach Towels', slug: 'towel' },
+        ],
+      },
+      {
+        title: 'BEDDING & LINEN',
+        subcategories: [
+          { label: 'Bed Sheets & Sets', slug: 'bedding' },
+          { label: 'Duvet Covers', slug: 'bedding' },
+          { label: 'Pillow Cases', slug: 'bedding' },
+        ],
+      },
+      {
+        title: 'CURTAINS & DRAPES',
+        subcategories: [
+          { label: 'Window Curtains', slug: 'curtain' },
+          { label: 'Sheer Drapes', slug: 'curtain' },
+          { label: 'Decorative Valances', slug: 'curtain' },
+        ],
+      },
+    ],
+  },
+  footwear: {
+    rootLabel: 'EXPORT FOOTWEAR',
+    badgeLabel: 'Leather & Casual Footwear',
+    pillars: [
+      {
+        title: "MEN'S FOOTWEAR",
+        subcategories: [
+          { label: 'Casual & Formal Shoes', slug: 'footwear' },
+          { label: 'Sneakers & Sport Shoes', slug: 'footwear' },
+          { label: 'Sandals & Slides', slug: 'footwear' },
+        ],
+      },
+      {
+        title: "WOMEN'S FOOTWEAR",
+        subcategories: [
+          { label: 'Flats & Loafers', slug: 'footwear' },
+          { label: 'Casual Sneakers', slug: 'footwear' },
+          { label: 'Heels & Sandals', slug: 'footwear' },
+        ],
+      },
+      {
+        title: "KIDS' FOOTWEAR",
+        subcategories: [
+          { label: 'School Shoes', slug: 'footwear' },
+          { label: 'Casual Sneakers', slug: 'footwear' },
+          { label: 'Slip-ons & Sandals', slug: 'footwear' },
+        ],
+      },
+    ],
+  },
+  accessories: {
+    rootLabel: 'FASHION ACCESSORIES',
+    badgeLabel: 'Export Accessories & Trims',
+    pillars: [
+      {
+        title: 'HEADWEAR & CAPS',
+        subcategories: [
+          { label: 'Baseball & Snapback Caps', slug: 'fashion-accessories' },
+          { label: 'Beanies & Winter Caps', slug: 'fashion-accessories' },
+          { label: 'Bucket & Sun Hats', slug: 'fashion-accessories' },
+        ],
+      },
+      {
+        title: 'SCARVES & GLOVES',
+        subcategories: [
+          { label: 'Woven Winter Scarves', slug: 'fashion-accessories' },
+          { label: 'Knitted Gloves & Mittens', slug: 'fashion-accessories' },
+          { label: 'Fashion Bandanas & Wraps', slug: 'fashion-accessories' },
+        ],
+      },
+      {
+        title: 'SOCKS & TRIMS',
+        subcategories: [
+          { label: 'Crew & Athletic Socks', slug: 'fashion-accessories' },
+          { label: 'Ankle & No-show Socks', slug: 'fashion-accessories' },
+          { label: 'Belts & Fashion Accessories', slug: 'fashion-accessories' },
+        ],
+      },
+    ],
+  },
+};
+
 export default function CatalogTaxonomyDirectory({ initialTaxonomy }: Props) {
   const [taxonomy] = useState<TaxonomyDivision[]>(initialTaxonomy);
   const [activeDivisionId, setActiveDivisionId] = useState<string>('fashion');
@@ -202,174 +334,79 @@ export default function CatalogTaxonomyDirectory({ initialTaxonomy }: Props) {
               })}
             </div>
 
-            {/* ── CORE TREE DIAGRAM (Exact match to Screenshot 2 reference: KNIT, WOVEN, SWEATER) ── */}
-            {activeDivisionId === 'fashion' ? (
-              <div className="w-full max-w-5xl mx-auto py-2 sm:py-4">
-                {/* 1. ROOT NODE: PRODUCTS (Centered 3D Embossed Pill) */}
-                <div className="flex flex-col items-center">
-                  <div className="px-6 py-2 rounded-xl bg-gradient-to-b from-[#1E293B] to-[#0F172A] dark:from-blue-600 dark:to-blue-700 text-white font-black text-xs sm:text-sm uppercase tracking-widest shadow-[0_10px_25px_rgba(15,23,42,0.25),inset_0_1px_0_rgba(255,255,255,0.2)] border border-slate-700/60 dark:border-blue-400/30 flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
-                    <span>PRODUCTS</span>
-                  </div>
-
-                  {/* Vertical trunk line from PRODUCTS to Master Arrow */}
-                  <div className="w-0.5 h-4 sm:h-5 bg-gradient-to-b from-blue-600 to-blue-500 dark:from-blue-400 dark:to-cyan-400"></div>
-
-                  {/* Master Horizontal Double-Arrow Line (Spanning across the 3 Pillars) */}
-                  <div className="w-full relative flex items-center justify-between px-6 sm:px-16 my-0.5">
-                    <div className="w-full h-[3px] bg-gradient-to-r from-blue-600 via-indigo-500 to-blue-600 dark:from-blue-400 dark:via-cyan-400 dark:to-blue-400 relative rounded-full shadow-xs">
-                      {/* Left Arrowhead */}
-                      <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[4px] border-t-transparent border-b-[4px] border-b-transparent border-r-[7px] border-r-blue-600 dark:border-r-blue-400"></div>
-                      
-                      {/* Left Pillar Connector Node */}
-                      <div className="absolute left-[16.6%] top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-blue-600 dark:bg-cyan-400 border-2 border-white dark:border-slate-900 shadow-xs"></div>
-
-                      {/* Center Node on Master Line */}
-                      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-indigo-600 dark:bg-cyan-300 border-2 border-white dark:border-slate-900 shadow-xs"></div>
-                      
-                      {/* Right Pillar Connector Node */}
-                      <div className="absolute left-[83.3%] top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-blue-600 dark:bg-cyan-400 border-2 border-white dark:border-slate-900 shadow-xs"></div>
-
-                      {/* Right Arrowhead */}
-                      <div className="absolute -right-1 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[4px] border-t-transparent border-b-[4px] border-b-transparent border-l-[7px] border-l-blue-600 dark:border-l-blue-400"></div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 2. THREE PILLAR COLUMNS: KNIT | WOVEN | SWEATER (Strictly 3 Columns, 9 Items Total) */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 mt-1">
-                  
-                  {/* ── PILLAR 1: KNIT ── */}
+            {/* ── CORE TREE DIAGRAM (Balanced 3-Pillar 3D Architecture for All Divisions) ── */}
+            {(() => {
+              const currentTree = DIVISION_TREES[activeDivisionId] || DIVISION_TREES['fashion'];
+              return (
+                <div className="w-full max-w-5xl mx-auto py-2 sm:py-4">
+                  {/* 1. ROOT NODE (Centered 3D Embossed Pill with Gold Accent) */}
                   <div className="flex flex-col items-center">
-                    <div className="w-0.5 h-4 bg-blue-600/70 dark:bg-cyan-400/70"></div>
-                    
-                    <div className="w-full rounded-2xl bg-white/90 dark:bg-[#111A2E]/90 border border-slate-200/90 dark:border-white/10 p-4 sm:p-5 shadow-[0_12px_28px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,0.9)] dark:shadow-[0_15px_35px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)] transition-all">
-                      {/* Pillar Header with 3D Pill */}
-                      <div className="text-center pb-3 mb-3 border-b border-slate-200/80 dark:border-slate-800">
-                        <span className="inline-block px-4 py-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-xs sm:text-[13px] uppercase tracking-wider shadow-sm">
-                          KNIT
-                        </span>
-                      </div>
+                    <div className="px-6 py-2 rounded-xl bg-gradient-to-b from-[#142338] to-[#0B1522] dark:from-blue-600 dark:to-blue-700 text-white font-black text-xs sm:text-sm uppercase tracking-widest shadow-[0_10px_25px_rgba(20,35,56,0.28),inset_0_1px_0_rgba(255,255,255,0.25)] border border-[#C5A880]/40 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-[#C5A880] dark:bg-cyan-300 animate-pulse"></span>
+                      <span>{currentTree.rootLabel}</span>
+                    </div>
 
-                      {/* 3 Clean Subcategories (No Granular Bullets) */}
-                      <div className="space-y-2.5">
-                        {[
-                          { label: 'Menswear', slug: 'knitwear-mens' },
-                          { label: 'Womenswear', slug: 'knitwear-womens' },
-                          { label: 'Kidswear', slug: 'knitwear-kids' },
-                        ].map((sub, sIdx) => (
-                          <Link
-                            key={sIdx}
-                            href={`/products?category=${encodeURIComponent(sub.slug)}`}
-                            className="p-3 rounded-xl bg-gradient-to-b from-white to-slate-50/80 dark:from-slate-800/90 dark:to-slate-900/90 border border-slate-200/90 dark:border-slate-700/70 hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-[0_8px_18px_rgba(37,99,235,0.12)] hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-between group shadow-2xs"
-                          >
-                            <span className="text-xs sm:text-[13px] font-bold text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-cyan-400 transition-colors">
-                              {sub.label}
-                            </span>
-                            <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600 dark:group-hover:text-cyan-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0" />
-                          </Link>
-                        ))}
+                    {/* Vertical trunk line from ROOT to Master Arrow */}
+                    <div className="w-0.5 h-4 sm:h-5 bg-gradient-to-b from-[#142338] to-[#243B5C] dark:from-blue-400 dark:to-cyan-400"></div>
+
+                    {/* Master Horizontal Double-Arrow Line (Spanning across the 3 Pillars) */}
+                    <div className="w-full relative flex items-center justify-between px-6 sm:px-16 my-0.5">
+                      <div className="w-full h-[3px] bg-gradient-to-r from-[#142338] via-[#2E4A70] to-[#142338] dark:from-blue-400 dark:via-cyan-400 dark:to-blue-400 relative rounded-full shadow-xs">
+                        {/* Left Arrowhead */}
+                        <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[4px] border-t-transparent border-b-[4px] border-b-transparent border-r-[7px] border-r-[#142338] dark:border-r-blue-400"></div>
+                        
+                        {/* Left Pillar Connector Node (Warm Gold/Amber) */}
+                        <div className="absolute left-[16.6%] top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-[#C5A880] dark:bg-cyan-400 border-2 border-white dark:border-slate-900 shadow-sm"></div>
+
+                        {/* Center Node on Master Line */}
+                        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-[#B45309] dark:bg-cyan-300 border-2 border-white dark:border-slate-900 shadow-sm"></div>
+                        
+                        {/* Right Pillar Connector Node */}
+                        <div className="absolute left-[83.3%] top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-[#C5A880] dark:bg-cyan-400 border-2 border-white dark:border-slate-900 shadow-sm"></div>
+
+                        {/* Right Arrowhead */}
+                        <div className="absolute -right-1 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[4px] border-t-transparent border-b-[4px] border-b-transparent border-l-[7px] border-l-[#142338] dark:border-l-blue-400"></div>
                       </div>
                     </div>
                   </div>
 
-                  {/* ── PILLAR 2: WOVEN ── */}
-                  <div className="flex flex-col items-center">
-                    <div className="w-0.5 h-4 bg-indigo-600/70 dark:bg-cyan-300/70"></div>
-                    
-                    <div className="w-full rounded-2xl bg-white/90 dark:bg-[#111A2E]/90 border border-slate-200/90 dark:border-white/10 p-4 sm:p-5 shadow-[0_12px_28px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,0.9)] dark:shadow-[0_15px_35px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)] transition-all">
-                      {/* Pillar Header with 3D Pill */}
-                      <div className="text-center pb-3 mb-3 border-b border-slate-200/80 dark:border-slate-800">
-                        <span className="inline-block px-4 py-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-sky-600 text-white font-black text-xs sm:text-[13px] uppercase tracking-wider shadow-sm">
-                          WOVEN
-                        </span>
-                      </div>
-
-                      {/* 3 Clean Subcategories (No Granular Bullets) */}
-                      <div className="space-y-2.5">
-                        {[
-                          { label: 'Men', slug: 'woven-mens' },
-                          { label: 'Women', slug: 'woven-womens' },
-                          { label: 'Kids', slug: 'woven-kids' },
-                        ].map((sub, sIdx) => (
-                          <Link
-                            key={sIdx}
-                            href={`/products?category=${encodeURIComponent(sub.slug)}`}
-                            className="p-3 rounded-xl bg-gradient-to-b from-white to-slate-50/80 dark:from-slate-800/90 dark:to-slate-900/90 border border-slate-200/90 dark:border-slate-700/70 hover:border-indigo-500 dark:hover:border-cyan-400 hover:shadow-[0_8px_18px_rgba(99,102,241,0.12)] hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-between group shadow-2xs"
-                          >
-                            <span className="text-xs sm:text-[13px] font-bold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-cyan-400 transition-colors">
-                              {sub.label}
+                  {/* 2. THREE PILLAR COLUMNS (Strictly 3 Columns, 9 Items Total per Division) */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 mt-1">
+                    {currentTree.pillars.map((pillar, pIdx) => (
+                      <div key={pIdx} className="flex flex-col items-center">
+                        {/* Vertical line down to Pillar */}
+                        <div className="w-0.5 h-4 bg-[#142338]/80 dark:bg-cyan-400/70"></div>
+                        
+                        <div className="w-full rounded-2xl bg-white dark:bg-[#111A2E] border-2 border-[#E2D9C8] dark:border-white/10 p-4 sm:p-5 shadow-[0_14px_30px_rgba(20,35,56,0.06),inset_0_1px_0_rgba(255,255,255,0.95)] dark:shadow-[0_15px_35px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.06)] transition-all">
+                          {/* Pillar Header with 3D Embossed Pill */}
+                          <div className="text-center pb-3 mb-3 border-b border-[#E8E0D2] dark:border-slate-800">
+                            <span className="inline-block px-4 py-1.5 rounded-xl bg-gradient-to-b from-[#142338] to-[#0B1522] dark:from-blue-600 dark:to-blue-700 text-white font-black text-xs sm:text-[13px] uppercase tracking-wider shadow-[0_3px_8px_rgba(20,35,56,0.22),inset_0_1px_0_rgba(255,255,255,0.2)] border border-[#C5A880]/30">
+                              {pillar.title}
                             </span>
-                            <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-cyan-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0" />
-                          </Link>
-                        ))}
+                          </div>
+
+                          {/* 3 Clean Subcategories (No Granular Bullets) */}
+                          <div className="space-y-2.5">
+                            {pillar.subcategories.map((sub, sIdx) => (
+                              <Link
+                                key={sIdx}
+                                href={`/products?category=${encodeURIComponent(sub.slug)}`}
+                                className="p-3 rounded-xl bg-gradient-to-b from-white to-[#FAF6F0] dark:from-slate-800/90 dark:to-slate-900/90 border border-[#E5DEC8] dark:border-slate-700/80 hover:border-[#142338] dark:hover:border-blue-400 hover:shadow-[0_8px_18px_rgba(20,35,56,0.12)] hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-between group shadow-2xs"
+                              >
+                                <span className="text-xs sm:text-[13px] font-bold text-slate-800 dark:text-slate-200 group-hover:text-[#142338] dark:group-hover:text-cyan-400 transition-colors">
+                                  {sub.label}
+                                </span>
+                                <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#C5A880] dark:group-hover:text-cyan-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0" />
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    ))}
                   </div>
-
-                  {/* ── PILLAR 3: SWEATER ── */}
-                  <div className="flex flex-col items-center">
-                    <div className="w-0.5 h-4 bg-sky-600/70 dark:bg-cyan-400/70"></div>
-                    
-                    <div className="w-full rounded-2xl bg-white/90 dark:bg-[#111A2E]/90 border border-slate-200/90 dark:border-white/10 p-4 sm:p-5 shadow-[0_12px_28px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,0.9)] dark:shadow-[0_15px_35px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)] transition-all">
-                      {/* Pillar Header with 3D Pill */}
-                      <div className="text-center pb-3 mb-3 border-b border-slate-200/80 dark:border-slate-800">
-                        <span className="inline-block px-4 py-1.5 rounded-xl bg-gradient-to-r from-sky-600 to-teal-600 text-white font-black text-xs sm:text-[13px] uppercase tracking-wider shadow-sm">
-                          SWEATER
-                        </span>
-                      </div>
-
-                      {/* 3 Clean Subcategories (No Granular Bullets) */}
-                      <div className="space-y-2.5">
-                        {[
-                          { label: 'Men', slug: 'sweater-mens' },
-                          { label: 'Women', slug: 'sweater-womens' },
-                          { label: 'Kids', slug: 'sweater-kids' },
-                        ].map((sub, sIdx) => (
-                          <Link
-                            key={sIdx}
-                            href={`/products?category=${encodeURIComponent(sub.slug)}`}
-                            className="p-3 rounded-xl bg-gradient-to-b from-white to-slate-50/80 dark:from-slate-800/90 dark:to-slate-900/90 border border-slate-200/90 dark:border-slate-700/70 hover:border-sky-500 dark:hover:border-cyan-400 hover:shadow-[0_8px_18px_rgba(14,165,233,0.12)] hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-between group shadow-2xs"
-                          >
-                            <span className="text-xs sm:text-[13px] font-bold text-slate-800 dark:text-slate-200 group-hover:text-sky-600 dark:group-hover:text-cyan-400 transition-colors">
-                              {sub.label}
-                            </span>
-                            <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-sky-600 dark:group-hover:text-cyan-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0" />
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
                 </div>
-              </div>
-            ) : (
-              /* ── OTHER DIVISIONS (Home Textiles, Footwear, Accessories) ── */
-              <div className="w-full max-w-4xl mx-auto py-2 sm:py-4">
-                <div className="flex flex-col items-center mb-6">
-                  <div className="px-5 py-1.5 rounded-lg bg-[#142338] dark:bg-blue-600 text-white font-extrabold text-xs sm:text-sm uppercase tracking-widest shadow-xs">
-                    {currentDivision.name}
-                  </div>
-                  <div className="w-0.5 h-4 bg-blue-600 dark:bg-cyan-400"></div>
-                  <div className="w-48 h-[2px] bg-blue-600 dark:bg-cyan-400"></div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {currentDivision.departments.flatMap(dept => dept.groups).map(grp => (
-                    <Link
-                      key={grp.id}
-                      href={`/products?category=${encodeURIComponent(grp.slug)}`}
-                      className="p-3.5 rounded-xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 hover:border-blue-500 hover:bg-blue-50/30 dark:hover:bg-slate-700/50 transition-all flex items-center justify-between group shadow-xs"
-                    >
-                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-cyan-400 transition-colors">
-                        {grp.name}
-                      </span>
-                      <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
+              );
+            })()}
           </div>
         )}
 

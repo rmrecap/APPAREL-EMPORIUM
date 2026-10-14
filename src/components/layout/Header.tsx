@@ -135,7 +135,7 @@ export default function Header() {
                                     {/* Mega Menu Dropdown anchored cleanly beneath hovered item */}
                                     {hasMega && hoveredMenu === item.id && (
                                         <div
-                                            className="absolute top-[calc(100%+12px)] left-1/2 -translate-x-1/2 w-[92vw] sm:w-[400px] z-50 animate-in fade-in slide-in-from-top-1 duration-200"
+                                            className="absolute top-[calc(100%+8px)] left-1/2 -translate-x-1/2 w-[92vw] sm:w-[440px] z-[9999] animate-in fade-in zoom-in-95 duration-150"
                                             onMouseEnter={() => setHoveredMenu(item.id)}
                                             onMouseLeave={() => setHoveredMenu(null)}
                                         >
