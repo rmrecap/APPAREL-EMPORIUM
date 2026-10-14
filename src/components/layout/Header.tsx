@@ -103,7 +103,8 @@ export default function Header() {
                     <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
                         {navItems.map((item) => {
                             const isProducts = item.label.toLowerCase() === 'products';
-                            const hasMega = Boolean((item.isMegaMenu || isProducts) && (item.megaMenuData || isProducts));
+                            const isProductsPage = pathname.startsWith('/products');
+                            const hasMega = Boolean((item.isMegaMenu || isProducts) && (item.megaMenuData || isProducts) && !(isProducts && isProductsPage));
                             const isActive = pathname === item.url || (item.url !== '/' && pathname.startsWith(item.url));
                             const linkTarget = item.target && item.target !== '_self' ? item.target : undefined;
 

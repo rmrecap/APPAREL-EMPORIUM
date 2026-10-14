@@ -7,6 +7,7 @@ import { extractApiKey, verifyApiKey } from '@/lib/api-auth';
 import { normalizeIncomingImages } from '@/lib/image-parser';
 import { resolveOrCreateCategory } from '@/lib/category-resolver';
 import { buildCategoryPrismaFilter } from '@/lib/catalog-taxonomy';
+import { autoClassifyProductTaxonomy } from '@/lib/product-classifier';
 
 export const dynamic = 'force-dynamic';
 
@@ -275,6 +276,20 @@ export async function POST(req: NextRequest) {
         const finalIsActive = isActive !== undefined ? Boolean(isActive) : defaultAutoPublish;
         const finalStatus = status || (finalIsActive ? 'PUBLISHED' : 'DRAFT');
 
+        // Automatic Intelligent Classification & Discipline Protection
+        const classified = autoClassifyProductTaxonomy({
+            name: productTitle,
+            title: productTitle,
+            category: typeof category === 'string' ? category : resolvedCategory.name,
+            categoryName: resolvedCategory.name,
+            department: department,
+            divisionType: divisionType,
+            subCategory: subCategory,
+            description: description,
+            shortDescription: shortDescription,
+            tags: tags,
+        });
+
         // ৬. ডাটাবেসে সেভ করা (Prisma Create / Upsert)
         const productData = {
             name: productTitle,
@@ -283,9 +298,9 @@ export async function POST(req: NextRequest) {
             sku: finalSku,
             styleNo: styleNo || finalSku,
             categoryId: resolvedCategoryId,
-            department: department || 'Menswear',
-            subCategory: subCategory || (typeof category === 'string' ? category : 'General'),
-            divisionType: divisionType || 'Knit',
+            department: classified.department,
+            subCategory: subCategory || classified.subCategory,
+            divisionType: classified.divisionType,
             brand: brand || 'Apparel Emporium',
             fabricComposition: fabricComposition || null,
             fabricConstruction: fabricConstruction || null,

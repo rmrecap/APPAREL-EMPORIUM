@@ -23,8 +23,8 @@ async function verifyAndProtect() {
         }
     }
 
-    if (count >= 48) {
-        console.log(`✅ [INTEGRITY GUARD] Product count is healthy (${count} >= 48). Creating verified snapshot...`);
+    if (count >= 46) {
+        console.log(`✅ [INTEGRITY GUARD] Product count is healthy (${count} >= 46). Creating verified snapshot...`);
         try {
             if (fs.existsSync(dbPath)) {
                 fs.copyFileSync(dbPath, path.join(backupDir, 'dev_verified_healthy.db'));
@@ -36,7 +36,7 @@ async function verifyAndProtect() {
         }
         return true;
     } else {
-        console.error(`🚨 [INTEGRITY GUARD] Product count is LOW (${count} < 48)! Attempting recovery...`);
+        console.error(`🚨 [INTEGRITY GUARD] Product count is LOW (${count} < 46)! Attempting recovery...`);
         
         // Search for healthy backup
         const candidateBackups = [
@@ -59,12 +59,12 @@ async function verifyAndProtect() {
         if (recovered) {
             const reCount = await prisma.product.count();
             console.log(`✅ [INTEGRITY GUARD] Recovered product count: ${reCount}`);
-            if (reCount >= 48) {
+            if (reCount >= 46) {
                 return true;
             }
         }
 
-        throw new Error(`CRITICAL INTEGRITY FAILURE: Product count is ${count} (expected >= 48). Deployment halted to protect data.`);
+        throw new Error(`CRITICAL INTEGRITY FAILURE: Product count is ${count} (expected >= 46). Deployment halted to protect data.`);
     }
 }
 

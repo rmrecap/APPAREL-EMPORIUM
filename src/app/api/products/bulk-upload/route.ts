@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { autoClassifyProductTaxonomy } from '@/lib/product-classifier';
 
 export const dynamic = 'force-dynamic';
 
@@ -55,13 +56,30 @@ export async function POST(request: Request) {
 
                 const slug = String(p.Name).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.random().toString(36).substring(2, 6);
 
+                const classified = autoClassifyProductTaxonomy({
+                    name: String(p.Name),
+                    title: String(p.Name),
+                    category: String(p.Category),
+                    categoryName: category.name,
+                    department: p.Department,
+                    divisionType: p.DivisionType || p.Division,
+                    subCategory: p.SubCategory,
+                    description: p.Description || p.ShortDescription,
+                    shortDescription: p.ShortDescription,
+                    tags: p.Tags,
+                });
+
                 await prisma.product.create({
                     data: {
                         name: String(p.Name),
+                        title: String(p.Name),
                         slug,
                         shortDescription: String(p.ShortDescription),
                         description: p.Description ? String(p.Description) : String(p.ShortDescription),
                         categoryId: category.id,
+                        divisionType: classified.divisionType,
+                        department: classified.department,
+                        subCategory: classified.subCategory,
                         images: '["/images/placeholder-product.svg"]', // Default
                         specifications: JSON.stringify(specifications),
                         isActive: true,

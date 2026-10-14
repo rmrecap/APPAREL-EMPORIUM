@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { extractApiKey, verifyApiKey } from '@/lib/api-auth';
+import { autoClassifyProductTaxonomy } from '@/lib/product-classifier';
 
 export const dynamic = 'force-dynamic';
 
@@ -83,6 +84,18 @@ export async function PUT(
             ? JSON.stringify(body.additionalCategories)
             : (body.additionalCategories || null);
 
+        const classified = autoClassifyProductTaxonomy({
+            name: name,
+            title: name,
+            category: body.category,
+            department: body.department,
+            divisionType: body.divisionType,
+            subCategory: body.subCategory,
+            description: body.description,
+            shortDescription: body.shortDescription,
+            tags: body.tags,
+        });
+
         const updateData: any = {
             ...(name && { name, title: name }),
             ...(body.slug && { slug: body.slug }),
@@ -91,9 +104,9 @@ export async function PUT(
             ...(body.shortDescription !== undefined && { shortDescription: body.shortDescription || '' }),
             ...(body.categoryId && { categoryId: body.categoryId }),
             ...(body.additionalCategories !== undefined && { additionalCategories: additionalCats }),
-            ...(body.department !== undefined && { department: body.department }),
-            ...(body.subCategory !== undefined && { subCategory: body.subCategory }),
-            ...(body.divisionType !== undefined && { divisionType: body.divisionType }),
+            department: body.department || classified.department,
+            subCategory: body.subCategory || classified.subCategory,
+            divisionType: body.divisionType || classified.divisionType,
             ...(body.brand !== undefined && { brand: body.brand }),
             ...(body.fabricComposition !== undefined && { fabricComposition: body.fabricComposition }),
             ...(body.fabricConstruction !== undefined && { fabricConstruction: body.fabricConstruction }),
