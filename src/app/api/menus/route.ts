@@ -87,7 +87,16 @@ export async function GET(req: Request) {
 
         const tree = buildTree(sanitizedItems, null);
 
-        return NextResponse.json({ success: true, menus: tree, flat: sanitizedItems });
+        return NextResponse.json(
+            { success: true, menus: tree, flat: sanitizedItems },
+            {
+                headers: {
+                    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+                    'Pragma': 'no-cache',
+                    'Expires': '0',
+                }
+            }
+        );
     } catch (error: any) {
         console.error("Menus GET Error:", error);
         return NextResponse.json({ error: "Failed to fetch menus" }, { status: 500 });

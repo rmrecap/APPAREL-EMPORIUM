@@ -1,4 +1,4 @@
-import { google, drive_v3 } from 'googleapis';
+import type { drive_v3 } from 'googleapis';
 import fs from 'fs';
 import path from 'path';
 
@@ -68,9 +68,11 @@ export function isGoogleDriveConfigured(): {
 
 /**
  * Initializes and returns an authenticated Google Drive API client (v3).
- * Supports both OAuth2 (Refresh Token) and Service Account credentials.
+ * Uses dynamic import so heavy googleapis is not held in memory at startup.
  */
-export function getGoogleDriveClient(): drive_v3.Drive {
+export async function getGoogleDriveClient(): Promise<drive_v3.Drive> {
+    const { google } = await import('googleapis');
+
     // 1. Check Service Account Key JSON / File
     if (process.env.GOOGLE_SERVICE_ACCOUNT_KEY_JSON || process.env.GOOGLE_SERVICE_ACCOUNT_FILE) {
         let auth;
@@ -163,7 +165,7 @@ export async function uploadBackupToDrive({
         throw new Error(`Target backup file does not exist on disk: ${filePath}`);
     }
 
-    const drive = getGoogleDriveClient();
+    const drive = await getGoogleDriveClient();
     const targetFolderId = folderId || process.env.GOOGLE_DRIVE_FOLDER_ID;
 
     const requestBody: drive_v3.Schema$File = {
@@ -220,7 +222,7 @@ export async function listDriveBackups(folderId?: string): Promise<{
         };
     }
 
-    const drive = getGoogleDriveClient();
+    const drive = await getGoogleDriveClient();
     const targetFolderId = (folderId || process.env.GOOGLE_DRIVE_FOLDER_ID || '').trim();
 
     let q = `trashed = false and mimeType != 'application/vnd.google-apps.folder'`;
@@ -267,7 +269,7 @@ export async function listDriveBackups(folderId?: string): Promise<{
  * Retrieves file metadata from Google Drive by file ID.
  */
 export async function getDriveFileMetadata(fileId: string): Promise<DriveBackupFile> {
-    const drive = getGoogleDriveClient();
+    const drive = await getGoogleDriveClient();
     const res = await drive.files.get({
         fileId,
         fields: 'id, name, size, createdTime, modifiedTime, webViewLink',
@@ -293,7 +295,7 @@ export async function downloadDriveFile(
     fileId: string,
     destFilePath: string
 ): Promise<{ filePath: string; sizeBytes: number }> {
-    const drive = getGoogleDriveClient();
+    const drive = await getGoogleDriveClient();
     const dir = path.dirname(destFilePath);
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
@@ -335,7 +337,7 @@ export async function cleanOldBackupsFromDrive(
     deletedFiles: Array<{ id: string; name: string; modifiedTime?: string }>;
     cutoffDate: string;
 }> {
-    const drive = getGoogleDriveClient();
+    const drive = await getGoogleDriveClient();
     const targetFolderId = folderId || process.env.GOOGLE_DRIVE_FOLDER_ID;
 
     const cutoffDate = new Date();
@@ -405,7 +407,7 @@ export async function getLatestBackupStatus(folderId?: string): Promise<{
     }
 
     try {
-        const drive = getGoogleDriveClient();
+        const drive = await getGoogleDriveClient();
         const targetFolderId = folderId || process.env.GOOGLE_DRIVE_FOLDER_ID;
 
         let q = `trashed = false and mimeType != 'application/vnd.google-apps.folder'`;

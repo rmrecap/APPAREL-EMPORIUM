@@ -24,6 +24,36 @@ const SAFE_CATEGORY_SELECT = {
     image: true,
 } as const;
 
+// Memory-optimized fields for catalog, cards, and admin table view.
+// Excludes heavy blobs (full descriptions, specifications, certifications, variants) unless explicitly requested.
+const OPTIMIZED_PRODUCT_LIST_SELECT = {
+    id: true,
+    name: true,
+    slug: true,
+    shortDescription: true,
+    categoryId: true,
+    images: true,
+    isFeatured: true,
+    isActive: true,
+    tags: true,
+    priceDisplay: true,
+    minOrder: true,
+    priceRange: true,
+    createdAt: true,
+    updatedAt: true,
+    sku: true,
+    styleNo: true,
+    title: true,
+    department: true,
+    subCategory: true,
+    divisionType: true,
+    brand: true,
+    isHumanVerified: true,
+    status: true,
+    category: { select: SAFE_CATEGORY_SELECT },
+} as const;
+
+
 export async function OPTIONS() {
     return new NextResponse(null, {
         status: 200,
@@ -79,14 +109,18 @@ export async function GET(req: NextRequest) {
             ];
         }
 
+        const isFullRequested = searchParams.get('full') === 'true';
+
         const [products, total] = await Promise.all([
             prisma.product.findMany({
                 where,
-                include: { category: { select: SAFE_CATEGORY_SELECT } },
+                ...(isFullRequested
+                    ? { include: { category: { select: SAFE_CATEGORY_SELECT } } }
+                    : { select: OPTIMIZED_PRODUCT_LIST_SELECT }),
                 skip,
                 take: limit,
                 orderBy: { createdAt: 'desc' },
-            }),
+            } as any),
             prisma.product.count({ where }),
         ]);
 

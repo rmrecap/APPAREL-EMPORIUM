@@ -118,7 +118,7 @@ export default function ProductFilter({ categories }: ProductFilterProps) {
         } else {
             const match = categories.find(c => c.slug.includes(gender));
             if (match) handleCategorySelect(match.slug);
-            else applyFilters(undefined, undefined, undefined, gender);
+            else applyFilters(gender);
         }
     };
 
@@ -245,7 +245,7 @@ export default function ProductFilter({ categories }: ProductFilterProps) {
                     {search && (
                         <button
                             type="button"
-                            onClick={() => { setSearch(''); applyFilters(undefined, undefined, undefined, ''); }}
+                            onClick={() => { setSearch(''); applyFilters(undefined, ''); }}
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                         >
                             <X size={12} />

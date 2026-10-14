@@ -1,9 +1,16 @@
+const fs = require('fs');
+const path = require('path');
+
+// Auto-detect standalone server.js to save 150-200MB RAM, fallback to next binary if not yet built
+const standaloneServer = path.join(__dirname, '.next', 'standalone', 'server.js');
+const useStandalone = fs.existsSync(standaloneServer);
+
 module.exports = {
   apps: [
     {
       name: 'aelbd-production',
-      script: 'node_modules/next/dist/bin/next',
-      args: 'start -p 3000',
+      script: useStandalone ? standaloneServer : 'node_modules/next/dist/bin/next',
+      args: useStandalone ? '' : 'start -p 3000',
       instances: 1,
       exec_mode: 'fork',
       autorestart: true,
@@ -12,7 +19,7 @@ module.exports = {
       min_uptime: '15s',
       exp_backoff_restart_delay: 2000,
       watch: false,
-      max_memory_restart: '700M',
+      max_memory_restart: '500M',
       env_production: {
         NODE_ENV: 'production',
         PORT: 3000,
@@ -21,4 +28,5 @@ module.exports = {
     },
   ],
 };
+
 

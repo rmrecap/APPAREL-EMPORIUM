@@ -39,12 +39,12 @@ export default function Header() {
 
     useEffect(() => {
         if (isAdminPath) return; // Don't fetch if not showing
-        fetch('/api/menus?location=main')
+        fetch('/api/menus?location=main', { cache: 'no-store' })
             .then(res => res.ok ? res.json() : null)
             .then(data => data && data.success && setMenus(data.menus))
             .catch(() => { });
 
-        fetch('/api/menus?location=mobile')
+        fetch('/api/menus?location=mobile', { cache: 'no-store' })
             .then(res => res.ok ? res.json() : null)
             .then(data => data && data.success && setMobileMenus(data.menus))
             .catch(() => { });

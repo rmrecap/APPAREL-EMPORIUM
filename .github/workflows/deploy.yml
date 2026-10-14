@@ -189,10 +189,13 @@ jobs:
             echo "Restarting application service..."
             mkdir -p tmp
             touch tmp/restart.txt
-            if [ -d "/home/$USER/domains/aelbd.net/hbuilds/current/nodejs" ]; then
-              mkdir -p "/home/$USER/domains/aelbd.net/hbuilds/current/nodejs/tmp"
-              touch "/home/$USER/domains/aelbd.net/hbuilds/current/nodejs/tmp/restart.txt" 2>/dev/null || true
-            fi
+            mkdir -p "/home/$USER/domains/aelbd.net/hbuilds/current/nodejs/tmp" 2>/dev/null || true
+            touch "/home/$USER/domains/aelbd.net/hbuilds/current/nodejs/tmp/restart.txt" 2>/dev/null || true
+            mkdir -p "/home/$USER/domains/aelbd.net/public_html/tmp" 2>/dev/null || true
+            touch "/home/$USER/domains/aelbd.net/public_html/tmp/restart.txt" 2>/dev/null || true
+            mkdir -p "/home/$USER/domains/aelbd.net/tmp" 2>/dev/null || true
+            touch "/home/$USER/domains/aelbd.net/tmp/restart.txt" 2>/dev/null || true
+
             if command -v pm2 >/dev/null 2>&1; then
               pm2 reload ecosystem.config.js --env production 2>/dev/null || pm2 restart all 2>/dev/null || true
             fi
