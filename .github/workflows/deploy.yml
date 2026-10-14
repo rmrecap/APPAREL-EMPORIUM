@@ -140,6 +140,9 @@ jobs:
             if ! grep -q "API_SECRET_KEY" .env; then
               echo 'API_SECRET_KEY="ael_secret_key_2026_xyz"' >> .env
             fi
+            if ! grep -q "CRON_SECRET" .env; then
+              echo 'CRON_SECRET="ael_secret_key_2026_xyz"' >> .env
+            fi
             if ! grep -q "EXTERNAL_API_KEY" .env; then
               echo 'EXTERNAL_API_KEY="ae_1y7wso8ijykx7rbc"' >> .env
             else
@@ -172,6 +175,9 @@ jobs:
             
             echo "Synchronizing corporate contact details while verifying product integrity..."
             node scripts/sync-corporate-settings.js || true
+
+            echo "Updating MegaMenu categories to strict 3-pillar structure..."
+            node scripts/update-megamenu.js || true
 
             echo "Running Post-migration Product Integrity Guard..."
             node scripts/guard-product-integrity.js

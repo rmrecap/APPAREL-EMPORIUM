@@ -23,6 +23,7 @@ import {
     Sparkles,
     Layers
 } from 'lucide-react';
+import { PRODUCT_MEGA_COLUMNS } from './MegaMenu';
 
 type MenuItem = {
     id: string;
@@ -119,10 +120,9 @@ export default function MobileNav({ menus, isOpen, onClose }: MobileNavProps) {
         ? (settings.header_logo_dark || settings.logo_dark || '/logo.jpg')
         : (settings.header_logo_light || settings.logo_light || '/logo.jpg');
 
-    const renderMegaMenuItems = (dataStr: string | null) => {
-        if (!dataStr) return null;
+    const renderMegaMenuItems = (_dataStr: string | null) => {
         try {
-            const columns = JSON.parse(dataStr);
+            const columns = PRODUCT_MEGA_COLUMNS;
             return (
                 <div className="space-y-3 pt-2">
                     {columns.map((col: any, idx: number) => (

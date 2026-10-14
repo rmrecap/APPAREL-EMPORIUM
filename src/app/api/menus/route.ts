@@ -21,19 +21,73 @@ export async function GET(req: Request) {
             orderBy: { order: 'asc' },
         });
 
+        const STRICT_PRODUCT_MEGA_JSON = JSON.stringify([
+            {
+                title: 'KNIT',
+                sections: [
+                    {
+                        header: '',
+                        links: [
+                            { label: 'Menswear', url: '/products?category=knitwear-mens' },
+                            { label: 'Womenswear', url: '/products?category=knitwear-womens' },
+                            { label: 'Kidswear', url: '/products?category=knitwear-kids' }
+                        ]
+                    }
+                ]
+            },
+            {
+                title: 'WOVEN',
+                sections: [
+                    {
+                        header: '',
+                        links: [
+                            { label: 'Men', url: '/products?category=woven-mens' },
+                            { label: 'Women', url: '/products?category=woven-womens' },
+                            { label: 'Kids', url: '/products?category=woven-kids' }
+                        ]
+                    }
+                ]
+            },
+            {
+                title: 'SWEATER',
+                sections: [
+                    {
+                        header: '',
+                        links: [
+                            { label: 'Men', url: '/products?category=sweater-mens' },
+                            { label: 'Women', url: '/products?category=sweater-womens' },
+                            { label: 'Kids', url: '/products?category=sweater-kids' }
+                        ]
+                    }
+                ]
+            }
+        ]);
+
+        const sanitizedItems = items.map(item => {
+            const isProducts = item.url === '/products' || item.label?.toLowerCase() === 'products' || item.label?.toLowerCase() === 'categories';
+            if (isProducts || item.isMegaMenu) {
+                return {
+                    ...item,
+                    isMegaMenu: true,
+                    megaMenuData: STRICT_PRODUCT_MEGA_JSON
+                };
+            }
+            return item;
+        });
+
         // Build nested tree structure
-        const buildTree = (items: any[], parentId: string | null = null): any[] => {
-            return items
+        const buildTree = (itemList: any[], parentId: string | null = null): any[] => {
+            return itemList
                 .filter(item => item.parentId === parentId)
                 .map(item => ({
                     ...item,
-                    children: buildTree(items, item.id)
+                    children: buildTree(itemList, item.id)
                 }));
         };
 
-        const tree = buildTree(items, null);
+        const tree = buildTree(sanitizedItems, null);
 
-        return NextResponse.json({ success: true, menus: tree, flat: items });
+        return NextResponse.json({ success: true, menus: tree, flat: sanitizedItems });
     } catch (error: any) {
         console.error("Menus GET Error:", error);
         return NextResponse.json({ error: "Failed to fetch menus" }, { status: 500 });

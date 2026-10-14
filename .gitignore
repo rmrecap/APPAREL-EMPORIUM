@@ -25,6 +25,7 @@ tmp/
 verify_cats.js
 check-*.js
 update-*.js
+!scripts/update-megamenu.js
 seed-*.js
 manage-*.js
 

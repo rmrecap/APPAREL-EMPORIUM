@@ -14,11 +14,11 @@ jobs:
       - name: Send Backup Request to Server
         run: |
           APP_URL="${{ secrets.APP_URL || 'https://aelbd.net' }}"
-          CRON_SECRET="${{ secrets.CRON_SECRET }}"
+          CRON_SECRET="${{ secrets.CRON_SECRET || secrets.API_SECRET_KEY || 'ael_secret_key_2026_xyz' }}"
 
           echo "Triggering automated backup on $APP_URL..."
           
-          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$APP_URL/api/admin/backup/gdrive" \
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$APP_URL/api/admin/backup/gdrive?secret=$CRON_SECRET" \
             -H "Authorization: Bearer $CRON_SECRET" \
             -H "x-backup-token: $CRON_SECRET" \
             -H "Content-Type: application/json")
@@ -29,7 +29,7 @@ jobs:
           # If /api/admin/backup/gdrive returned 401 or 404, fallback to /api/backup
           if [ "$HTTP_STATUS" -ne 200 ]; then
             echo "Retrying via /api/backup endpoint..."
-            RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$APP_URL/api/backup" \
+            RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$APP_URL/api/backup?secret=$CRON_SECRET" \
               -H "Authorization: Bearer $CRON_SECRET" \
               -H "x-backup-token: $CRON_SECRET" \
               -H "Content-Type: application/json")

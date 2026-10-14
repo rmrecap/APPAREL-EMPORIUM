@@ -62,6 +62,63 @@ async function main() {
         console.log(`✓ Set ${setting.key}: "${setting.value}"`);
     }
 
+    console.log('=== Enforcing Strict 3-Pillar MegaMenu Structure ===');
+    const megaMenuJson = JSON.stringify([
+      {
+        title: 'KNIT',
+        sections: [
+          {
+            header: '',
+            links: [
+              { label: 'Menswear', url: '/products?category=knitwear-mens' },
+              { label: 'Womenswear', url: '/products?category=knitwear-womens' },
+              { label: 'Kidswear', url: '/products?category=knitwear-kids' }
+            ]
+          }
+        ]
+      },
+      {
+        title: 'WOVEN',
+        sections: [
+          {
+            header: '',
+            links: [
+              { label: 'Men', url: '/products?category=woven-mens' },
+              { label: 'Women', url: '/products?category=woven-womens' },
+              { label: 'Kids', url: '/products?category=woven-kids' }
+            ]
+          }
+        ]
+      },
+      {
+        title: 'SWEATER',
+        sections: [
+          {
+            header: '',
+            links: [
+              { label: 'Men', url: '/products?category=sweater-mens' },
+              { label: 'Women', url: '/products?category=sweater-womens' },
+              { label: 'Kids', url: '/products?category=sweater-kids' }
+            ]
+          }
+        ]
+      }
+    ]);
+
+    await prisma.menuItem.updateMany({
+      where: {
+        OR: [
+          { label: { in: ['Products', 'Categories', 'products', 'categories'] } },
+          { url: '/products' },
+          { isMegaMenu: true }
+        ]
+      },
+      data: {
+        isMegaMenu: true,
+        megaMenuData: megaMenuJson
+      }
+    });
+
     console.log('=== Checking Product Integrity After Settings Update ===');
     const finalProductCount = await prisma.product.count();
     console.log(`Final product count: ${finalProductCount}`);
