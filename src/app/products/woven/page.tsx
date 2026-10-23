@@ -58,8 +58,8 @@ export default async function WovenCategoryPage() {
         },
         {
             label: 'Production Lead Time',
-            value: '60 - 90 Days',
-            description: 'From lab-dip & fit approval to FOB Chittagong port dispatch.',
+            value: '45 - 60 Days',
+            description: 'From lab-dip & fit approval to FOB Chittagong port container loading.',
         },
         {
             label: 'Minimum Order Quantity',
@@ -68,9 +68,57 @@ export default async function WovenCategoryPage() {
         },
         {
             label: 'Audits & Compliance',
-            value: 'BSCI, SEDEX (SMETA), OEKO-TEX',
+            value: 'BSCI, SEDEX (SMETA), OEKO-TEX, WRAP',
             description: 'Fully certified Tier-1 partner factories with zero audit duplication.',
         },
+    ];
+
+    const manufacturingSpecsTable = [
+        {
+            parameter: 'Fabric Compositions',
+            specification: '100% Combed Cotton, CVC (60/40, 80/20), TC (65/35), Cotton-Elastane (98/2), Lyocell/Tencel, Linen blends',
+            buyerNote: 'Mill-sourced or imported greige fabric with full Oeko-Tex certification.'
+        },
+        {
+            parameter: 'Fabric Weaves & Weights',
+            specification: 'Twill, Plain Poplin, Oxford, Herringbone, Satin, Rigid & Stretch Denim (8.5 oz to 14.5 oz), 120 GSM to 380 GSM',
+            buyerNote: 'Precision 4-point fabric inspection conducted prior to cutting.'
+        },
+        {
+            parameter: 'Minimum Order Quantity (MOQ)',
+            specification: '1,000 pcs per style for in-stock fabrics; 2,500 – 3,000 pcs for custom woven mill runs',
+            buyerNote: 'Flexible color/size breakdown (typically 2-3 colorways per style).'
+        },
+        {
+            parameter: 'Sampling Lead Time',
+            specification: 'Proto / Fit Sample: 5 – 7 days; Salesman Sample (SMS) in actual fabric: 15 days',
+            buyerNote: 'Full CAD pattern grading & 3D virtual fit simulation available.'
+        },
+        {
+            parameter: 'Bulk Production Lead Time',
+            specification: '45 – 60 days from final PPS (Pre-Production Sample) & trim approval',
+            buyerNote: 'Express fast-track options available for repeating retail programs.'
+        },
+        {
+            parameter: 'Denim & Special Washes',
+            specification: 'Enzyme Stone Wash, Bleach Wash, Ozone Eco-Wash, Whiskers, Hand Sanding, Resin 3D Crinkle, Acid Wash',
+            buyerNote: 'Eco-certified laundry facilities using closed-loop zero-discharge water recycling.'
+        },
+        {
+            parameter: 'Quality Inspection Benchmark',
+            specification: 'AQL 1.5 Major Defects / AQL 2.5 Minor Defects (MIL-STD-105E)',
+            buyerNote: 'Pre-production, In-line, and Final Random Inspection (FRI) reports supplied.'
+        },
+        {
+            parameter: 'Social & Technical Audits',
+            specification: 'amfori BSCI (Grade A/B), SEDEX SMETA (4-Pillar), OEKO-TEX Standard 100, WRAP, RSC Accord Safety',
+            buyerNote: 'Dual certified facilities eliminate buyer audit re-inspection fees.'
+        },
+        {
+            parameter: 'Incoterms & Shipping Ports',
+            specification: 'FOB Chittagong Port (BDCGP) / Mongla Port, CIF European & US Ports, Air Courier DDP',
+            buyerNote: 'Direct ocean carrier booking with Maersk, MSC, Hapag-Lloyd, and CMA CGM.'
+        }
     ];
 
     const manufacturingPoints = [
@@ -88,16 +136,16 @@ export default async function WovenCategoryPage() {
             answer: 'We manufacture full ranges of woven apparel including men’s, women’s, and children’s denim jeans, casual and dress shirts, chinos, cargo pants, shorts, padded jackets, twill outerwear, and formal trousers.',
         },
         {
-            question: 'What is the standard MOQ for woven garments production in Bangladesh?',
-            answer: 'Our standard MOQ for woven apparel ranges from 1,000 to 3,000 pieces per style depending on fabric availability (mill-made vs in-stock yarn). Smaller trial quantities can be accommodated for established buyers.',
+            question: 'What is the standard MOQ and lead time for woven garments in Bangladesh?',
+            answer: 'Our standard MOQ ranges from 1,000 to 3,000 pieces per style. Bulk production lead time is 45 to 60 days following PPS and trim approval, with proto sampling delivered within 5 to 7 days.',
         },
         {
-            question: 'How fast can you deliver proto samples and size sets for woven styles?',
-            answer: 'Proto samples and tech-pack mockups are developed within 7 to 10 days using available fabrics. Salesman samples (SMS) in actual production fabric and trims require 15 to 20 days.',
+            question: 'What quality control standards are applied during woven production?',
+            answer: 'Every order undergoes strict 4-point fabric inspection prior to spreading, in-line process audits, and final AQL 1.5/2.5 random inspections before packing into export master cartons.',
         },
         {
             question: 'Are your woven manufacturing partner factories BSCI and SEDEX audited?',
-            answer: 'Yes, 100% of our partner factories in Bangladesh are strictly vetted and hold valid BSCI, SEDEX (SMETA 4-pillar), WRAP, and OEKO-TEX Standard 100 certifications, ensuring ethical labor and eco-friendly processing.',
+            answer: 'Yes, 100% of our partner factories in Bangladesh hold valid BSCI, SEDEX (SMETA 4-pillar), WRAP, and OEKO-TEX Standard 100 certifications, ensuring ethical labor and zero audit duplication for buyers.',
         },
     ];
 
@@ -109,6 +157,7 @@ export default async function WovenCategoryPage() {
             subheading="Source high-grade woven apparel (casual shirts, denim jeans, chinos, trousers, jackets) from ethically audited, BSCI & SEDEX compliant partner factories in Bangladesh."
             description="Apparel Emporium delivers end-to-end woven garment sourcing solutions for international fashion brands, department stores, and private label importers. From technical weave development to high-tech denim washes and strict AQL 1.5 quality control, our dedicated manufacturing network guarantees consistency and competitive pricing."
             specHighlights={specHighlights}
+            manufacturingSpecsTable={manufacturingSpecsTable}
             manufacturingPoints={manufacturingPoints}
             faqs={faqs}
             products={products}

@@ -123,45 +123,94 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
         },
     };
 
-    const isComplianceGuide = post.slug === 'bsci-vs-sedex-compliance-standards-guide';
-
-    const faqSchema = isComplianceGuide ? {
-        '@context': 'https://schema.org',
-        '@type': 'FAQPage',
-        'mainEntity': [
+    const blogFaqsBySlug: Record<string, Array<{ question: string; answer: string }>> = {
+        'bsci-vs-sedex-compliance-standards-guide': [
             {
-                '@type': 'Question',
-                'name': 'What is the main difference between BSCI and SEDEX (SMETA)?',
-                'acceptedAnswer': {
-                    '@type': 'Answer',
-                    'text': 'BSCI is a brand-driven auditing framework governed by amfori with letter grades (A-E) across 13 performance areas, popular among European retailers. SEDEX is an online collaborative data-sharing platform utilizing SMETA audits (2-Pillar or 4-Pillar), allowing manufacturers to share audit results with unlimited global buyers without duplicate audits.'
-                }
+                question: 'What is the main difference between BSCI and SEDEX (SMETA)?',
+                answer: 'BSCI is a brand-driven auditing framework governed by amfori with letter grades (A-E) across 13 performance areas, popular among European retailers. SEDEX is an online collaborative data-sharing platform utilizing SMETA audits (2-Pillar or 4-Pillar), allowing manufacturers to share audit results with unlimited global buyers without duplicate audits.'
             },
             {
-                '@type': 'Question',
-                'name': 'Do garment factories in Bangladesh hold both BSCI and SEDEX audits?',
-                'acceptedAnswer': {
-                    '@type': 'Answer',
-                    'text': 'Yes. Leading export garment manufacturing factories in Bangladesh maintain dual certifications for both BSCI and SEDEX SMETA, alongside OEKO-TEX Standard 100, RSC building safety, and ISO 9001 quality management.'
-                }
+                question: 'Do garment factories in Bangladesh hold both BSCI and SEDEX audits?',
+                answer: 'Yes. Leading export garment manufacturing factories in Bangladesh maintain dual certifications for both BSCI and SEDEX SMETA, alongside OEKO-TEX Standard 100, RSC building safety, and ISO 9001 quality management.'
             },
             {
-                '@type': 'Question',
-                'name': 'How does SEDEX eliminate duplicate audits for overseas buyers?',
-                'acceptedAnswer': {
-                    '@type': 'Answer',
-                    'text': 'Under SEDEX, suppliers upload their third-party SMETA audit reports and Corrective Action Plans (CAPR) directly to the SEDEX platform. Any registered buyer globally can access and verify the audit, avoiding redundant thousands-of-dollars audit inspection fees.'
-                }
+                question: 'How does SEDEX eliminate duplicate audits for overseas buyers?',
+                answer: 'Under SEDEX, suppliers upload their third-party SMETA audit reports and Corrective Action Plans (CAPR) directly to the SEDEX platform. Any registered buyer globally can access and verify the audit, avoiding redundant thousands-of-dollars audit inspection fees.'
             },
             {
-                '@type': 'Question',
-                'name': 'How does Apparel Emporium ensure social compliance for buyers?',
-                'acceptedAnswer': {
-                    '@type': 'Answer',
-                    'text': 'Apparel Emporium partners exclusively with pre-screened BSCI and SEDEX compliant factories in Bangladesh. Our in-house technical compliance officers conduct preliminary factory floor inspections, review wage disbursements, and ensure full adherence to international labour and safety standards.'
-                }
+                question: 'How does Apparel Emporium ensure social compliance for buyers?',
+                answer: 'Apparel Emporium partners exclusively with pre-screened BSCI and SEDEX compliant factories in Bangladesh. Our in-house technical compliance officers conduct preliminary factory floor inspections, review wage disbursements, and ensure full adherence to international labour and safety standards.'
+            }
+        ],
+        'higg-vs-smeta-social-audit-standard-fashion-supply-chain': [
+            {
+                question: 'What is the primary difference between Higg Index and SEDEX SMETA?',
+                answer: 'The Higg Index (Higg FEM) evaluates environmental sustainability metrics like carbon emissions, water consumption, and chemical usage. SEDEX SMETA focuses on human rights, labor laws, occupational health and safety, and business ethics. Leading fashion brands utilize both frameworks to achieve comprehensive ESG compliance.'
+            },
+            {
+                question: 'Can a factory replace a SMETA audit with Higg FEM?',
+                answer: 'No. Higg FEM does not assess labor standards or wage disclosures. To cover social compliance, brands either use SMETA or the Higg Facility Social & Labor Module (Higg FSLM/SLCP). SMETA 4-Pillar remains the most widely recognized third-party social audit for retail compliance globally.'
+            },
+            {
+                question: 'Do Bangladesh garment factories have verified Higg FEM scores?',
+                answer: 'Yes. Bangladesh is home to over 200 LEED-certified green garment factories and hundreds of export facilities that undergo annual Higg FEM verification, demonstrating exceptional water recycling and energy efficiency.'
+            },
+            {
+                question: 'How does Apparel Emporium assist buyers with Higg and SMETA verification?',
+                answer: 'Apparel Emporium connects overseas buyers directly with verified suppliers in Bangladesh that maintain active SEDEX memberships and verified Higg Index profiles, providing transparent documentation before orders begin.'
+            }
+        ],
+        'how-sedex-membership-reduces-supplier-audit-duplication': [
+            {
+                question: 'What is audit duplication in apparel manufacturing?',
+                answer: 'Audit duplication occurs when multiple global buyers independently commission separate third-party audits on the same factory within weeks of each other, testing identical labor and safety standards and costing thousands of dollars in redundant fees.'
+            },
+            {
+                question: 'How does the SEDEX collaborative platform prevent redundant audits?',
+                answer: 'A supplier conducts one standardized SMETA audit and uploads the report and Corrective Action Plan Report (CAPR) to the SEDEX platform. Any registered global buyer can view and verify this audit with supplier permission, eliminating the need to commission a separate inspection.'
+            },
+            {
+                question: 'How much money and time does SEDEX save global fashion brands?',
+                answer: 'Brands typically save $1,500 to $2,500 per supplier audit and accelerate production onboarding from 4-8 weeks down to 24-48 hours, allowing orders to proceed straight to sampling and manufacturing.'
+            },
+            {
+                question: 'Do Apparel Emporium partner factories share existing SEDEX audits?',
+                answer: 'Yes. All our manufacturing partners in Bangladesh maintain active SEDEX profiles with current SMETA 4-Pillar audits that can be linked directly with your buyer account on the SEDEX Advance platform.'
+            }
+        ],
+        'apparel-sourcing-company-bangladesh-buyer-guide': [
+            {
+                question: 'Why source knitwear, woven, and sweaters from Bangladesh?',
+                answer: 'Bangladesh offers unrivaled vertical supply chain integration, duty-free market access to major global markets, advanced Shima Seiki computerized knitting, state-of-the-art sustainable denim laundries, and highly competitive FOB pricing.'
+            },
+            {
+                question: 'What is the standard production lead time for garment orders in Bangladesh?',
+                answer: 'Standard bulk production lead time is 45 to 60 days from final sample and trim approval. Initial proto samples and tech-pack mockups are turned around within 5 to 7 days.'
+            },
+            {
+                question: 'What are typical MOQs when working with a Bangladesh buying house?',
+                answer: 'Apparel Emporium accommodates MOQs starting from 1,000 pieces per style for circular knitwear and woven items, and 1,200 pieces for sweaters, with flexible color and size breakdowns.'
+            },
+            {
+                question: 'What quality assurance standards are maintained prior to export?',
+                answer: 'Every order is inspected to strict AQL 1.5 Major / 2.5 Minor benchmarks under MIL-STD-105E. Quality control covers 4-point fabric inspection, in-line process monitoring, needle detection, and final container loading inspection at Chittagong Port.'
             }
         ]
+    };
+
+    const currentFaqs = blogFaqsBySlug[post.slug] || null;
+
+    const faqSchema = currentFaqs ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        'mainEntity': currentFaqs.map((item) => ({
+            '@type': 'Question',
+            'name': item.question,
+            'acceptedAnswer': {
+                '@type': 'Answer',
+                'text': item.answer
+            }
+        }))
     } : null;
 
     return (

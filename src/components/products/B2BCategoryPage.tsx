@@ -3,7 +3,13 @@ import Link from 'next/link';
 import ProductGrid from '@/components/products/ProductGrid';
 import AtelierDecorations3D from '@/components/products/AtelierDecorations3D';
 import { Product } from '@/types';
-import { ShieldCheck, Award, Factory, ArrowRight, CheckCircle2, Clock, Box, HelpCircle } from 'lucide-react';
+import { ShieldCheck, Award, Factory, ArrowRight, CheckCircle2, Clock, Box, HelpCircle, FileText, CheckCheck, Sliders, ExternalLink } from 'lucide-react';
+
+export interface B2BManufacturingSpecItem {
+    parameter: string;
+    specification: string;
+    buyerNote: string;
+}
 
 export interface B2BCategoryPageProps {
     slug: string;
@@ -16,6 +22,7 @@ export interface B2BCategoryPageProps {
         value: string;
         description: string;
     }[];
+    manufacturingSpecsTable: B2BManufacturingSpecItem[];
     manufacturingPoints: string[];
     faqs: {
         question: string;
@@ -31,6 +38,7 @@ export default function B2BCategoryPage({
     subheading,
     description,
     specHighlights,
+    manufacturingSpecsTable,
     manufacturingPoints,
     faqs,
     products,
@@ -38,7 +46,7 @@ export default function B2BCategoryPage({
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
     const canonicalUrl = `${baseUrl}/products/${slug}`;
 
-    // Structured Data: BreadcrumbList + FAQPage
+    // Structured Data: BreadcrumbList + CollectionPage + FAQPage
     const schemaData = {
         '@context': 'https://schema.org',
         '@graph': [
@@ -125,13 +133,16 @@ export default function B2BCategoryPage({
                     {/* Trust Badges */}
                     <div className="flex flex-wrap items-center gap-3 pt-2">
                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                            <ShieldCheck className="w-4 h-4" /> BSCI &amp; SEDEX Certified
+                            <ShieldCheck className="w-4 h-4" /> BSCI &amp; SEDEX SMETA Audited
                         </span>
                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                            <Award className="w-4 h-4" /> OEKO-TEX Standard 100
+                            <Award className="w-4 h-4" /> OEKO-TEX Standard 100 / GOTS
                         </span>
                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
                             <Factory className="w-4 h-4" /> Direct Bangladesh Factory Pricing
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                            <CheckCheck className="w-4 h-4" /> AQL 1.5 / 2.5 Inspection
                         </span>
                     </div>
                 </div>
@@ -209,6 +220,50 @@ export default function B2BCategoryPage({
                     </div>
                 </div>
 
+                {/* ── CONCRETE B2B MANUFACTURING SPECIFICATIONS TABLE ── */}
+                <div className="mb-14 bg-white dark:bg-dark-surface rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
+                            <Sliders className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h2 className="text-2xl font-black text-slate-900 dark:text-white">
+                                {categoryName} B2B Manufacturing Specifications &amp; Quality Parameters
+                            </h2>
+                            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                                Verified manufacturing parameters, production lead times, and global buyer standards.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left text-sm border-collapse">
+                            <thead>
+                                <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+                                    <th className="py-3 px-4 font-bold text-slate-700 dark:text-slate-200">Manufacturing Parameter</th>
+                                    <th className="py-3 px-4 font-bold text-slate-700 dark:text-slate-200">Specification Details</th>
+                                    <th className="py-3 px-4 font-bold text-slate-700 dark:text-slate-200">Buyer &amp; Quality Benchmark</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                                {manufacturingSpecsTable.map((item, index) => (
+                                    <tr key={index} className="hover:bg-slate-50/60 dark:hover:bg-slate-900/30 transition-colors">
+                                        <td className="py-3.5 px-4 font-semibold text-slate-900 dark:text-white whitespace-nowrap">
+                                            {item.parameter}
+                                        </td>
+                                        <td className="py-3.5 px-4 text-slate-700 dark:text-slate-300 font-medium">
+                                            {item.specification}
+                                        </td>
+                                        <td className="py-3.5 px-4 text-xs text-slate-500 dark:text-slate-400">
+                                            {item.buyerNote}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 {/* ── LIVE PRODUCT CATALOG SECTION ── */}
                 <div className="mb-14">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
@@ -252,7 +307,7 @@ export default function B2BCategoryPage({
                 </div>
 
                 {/* ── B2B BUYER FAQS ── */}
-                <div className="bg-white dark:bg-dark-surface p-6 sm:p-10 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div className="mb-14 bg-white dark:bg-dark-surface p-6 sm:p-10 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
                             <HelpCircle className="w-5 h-5" />
@@ -275,7 +330,7 @@ export default function B2BCategoryPage({
                             >
                                 <summary className="flex cursor-pointer items-center justify-between gap-4 font-bold text-slate-900 dark:text-white text-sm sm:text-base">
                                     <span>{faq.question}</span>
-                                    <span className="transition group-open:rotate-180 text-blue-600">
+                                    <span className="transition group-open:rotate-180 text-blue-600 font-bold">
                                         &darr;
                                     </span>
                                 </summary>
@@ -284,6 +339,77 @@ export default function B2BCategoryPage({
                                 </p>
                             </details>
                         ))}
+                    </div>
+                </div>
+
+                {/* ── RELATED B2B SOURCING & COMPLIANCE GUIDES ── */}
+                <div className="p-6 sm:p-8 rounded-3xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
+                    <div className="flex items-center justify-between mb-5">
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <FileText className="w-5 h-5 text-blue-600" />
+                            Related Sourcing &amp; Social Compliance Guides
+                        </h3>
+                        <Link href="/blog" className="text-xs font-semibold text-blue-600 hover:underline">
+                            View All Guides &rarr;
+                        </Link>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Link
+                            href="/blog/bsci-vs-sedex-compliance-standards-guide"
+                            className="p-4 rounded-2xl bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 hover:border-blue-500 transition-colors shadow-sm block group"
+                        >
+                            <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+                                Compliance &amp; Audits
+                            </span>
+                            <h4 className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors mt-1">
+                                BSCI vs SEDEX (SMETA): Apparel Compliance Guide for Global Buyers [2026] &rarr;
+                            </h4>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                                4-pillar SMETA audit checklists, zero audit duplication, and certified partner factories in Bangladesh.
+                            </p>
+                        </Link>
+                        <Link
+                            href="/blog/higg-vs-smeta-social-audit-standard-fashion-supply-chain"
+                            className="p-4 rounded-2xl bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 hover:border-blue-500 transition-colors shadow-sm block group"
+                        >
+                            <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
+                                ESG &amp; Sustainability
+                            </span>
+                            <h4 className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors mt-1">
+                                Higg vs SMETA: Which Social Audit Standard is Better for Fashion Supply Chains [2026] &rarr;
+                            </h4>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                                Compare Higg FEM/FSLM with Sedex SMETA to optimize ethical sourcing and environmental compliance.
+                            </p>
+                        </Link>
+                        <Link
+                            href="/blog/how-sedex-membership-reduces-supplier-audit-duplication"
+                            className="p-4 rounded-2xl bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 hover:border-blue-500 transition-colors shadow-sm block group"
+                        >
+                            <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
+                                Supply Chain Cost Savings
+                            </span>
+                            <h4 className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors mt-1">
+                                How SEDEX Membership &amp; SMETA Audits Reduce Supplier Audit Duplication for Global Brands &rarr;
+                            </h4>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                                Eliminate redundant auditing costs and accelerate shipment lead times through shared audit registries.
+                            </p>
+                        </Link>
+                        <Link
+                            href="/blog/apparel-sourcing-company-bangladesh-buyer-guide"
+                            className="p-4 rounded-2xl bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 hover:border-blue-500 transition-colors shadow-sm block group"
+                        >
+                            <span className="text-[11px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">
+                                Sourcing Strategy
+                            </span>
+                            <h4 className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors mt-1">
+                                Apparel Sourcing in Bangladesh: Complete B2B Guide to Knitwear, Woven &amp; Sweater Manufacturing [2026] &rarr;
+                            </h4>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                                End-to-end buyer playbook on MOQ negotiations, tech-pack development, and Chittagong container dispatch.
+                            </p>
+                        </Link>
                     </div>
                 </div>
             </div>

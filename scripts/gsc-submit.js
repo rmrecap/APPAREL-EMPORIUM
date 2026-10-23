@@ -76,6 +76,9 @@ async function main() {
         'https://aelbd.net/products/knitwear',
         'https://aelbd.net/products/sweater',
         'https://aelbd.net/blog/bsci-vs-sedex-compliance-standards-guide',
+        'https://aelbd.net/blog/higg-vs-smeta-social-audit-standard-fashion-supply-chain',
+        'https://aelbd.net/blog/how-sedex-membership-reduces-supplier-audit-duplication',
+        'https://aelbd.net/blog/apparel-sourcing-company-bangladesh-buyer-guide',
     ];
 
     let successCount = 0;

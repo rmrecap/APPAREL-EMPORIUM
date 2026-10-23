@@ -73,6 +73,54 @@ export default async function SweaterCategoryPage() {
         },
     ];
 
+    const manufacturingSpecsTable = [
+        {
+            parameter: 'Knitting Gauge Range',
+            specification: 'Coarse gauge: 3GG, 5GG, 7GG (chunky winter knits, cardigans, cable pullovers); Fine gauge: 12GG, 14GG (corporate sweaters, lightweight vests)',
+            buyerNote: 'Fully computerized flatbed Stoll (CMS) and Shima Seiki (SVR/SSG) machines.'
+        },
+        {
+            parameter: 'Yarn Compositions',
+            specification: '100% Cotton, 50/50 Cotton/Acrylic, 100% Cashmere-like Acrylic, Merino Wool Blends, Lambswool, Mohair, Chenille, Alpaca blends',
+            buyerNote: 'High yarn twist stability and anti-pilling treatments (tested to ISO 12945-2).'
+        },
+        {
+            parameter: 'Minimum Order Quantity (MOQ)',
+            specification: '1,200 – 1,500 pcs per style for running in-stock yarns; 2,500 pcs for custom dyed/spun blends',
+            buyerNote: 'Flexible color breakdowns (e.g. 500 pcs per colorway).'
+        },
+        {
+            parameter: 'Sampling Lead Time',
+            specification: 'Yarn swatch & stitch tension: 3 – 5 days; Proto / Fit Sample: 7 – 10 days; Salesman Sample (SMS): 15 – 20 days',
+            buyerNote: 'Experienced sweater programmers delivering precision computer stitch files.'
+        },
+        {
+            parameter: 'Bulk Production Lead Time',
+            specification: '45 – 60 days from final yarn lot & linking approval (up to 70 days for imported custom wool)',
+            buyerNote: 'Scheduled container loading at Chittagong port with moisture-controlled packaging.'
+        },
+        {
+            parameter: 'Stitch & Pattern Capabilities',
+            specification: 'Full Jacquard, Intarsia, Cable Knit, Fisherman Rib, Pointelle, Tuck Stitch, Milano Rib, Plating, Dip-Dye Washes',
+            buyerNote: 'Clean linking with calibrated gauges (no seam ridges or puckering).'
+        },
+        {
+            parameter: 'Needle Safety & QA Protocols',
+            specification: 'Dual-pass 9-point conveyorized metal detection (ferrous 1.0mm, non-ferrous 1.2mm, stainless 1.5mm)',
+            buyerNote: 'Zero metal tolerance; strict needle reconstruction records kept for each workstation.'
+        },
+        {
+            parameter: 'Quality Inspection Standards',
+            specification: 'AQL 1.5 Major Defects / AQL 2.5 Minor Defects (MIL-STD-105E)',
+            buyerNote: 'Dimensional stability, loop formation, weight per dozen, and wash test validation.'
+        },
+        {
+            parameter: 'Factory Social Audits',
+            specification: 'amfori BSCI (A/B), SEDEX SMETA 4-Pillar, WRAP Certified, OEKO-TEX Standard 100, RSC Accord Safety',
+            buyerNote: 'Shared SEDEX reports prevent duplicate third-party audit expenses.'
+        }
+    ];
+
     const manufacturingPoints = [
         'Advanced automated Jacquard, Intarsia, Cable, and Tuck stitch programming',
         'Specialized linking machines with calibrated gauges for clean neckbands and shoulder joins',
@@ -88,8 +136,8 @@ export default async function SweaterCategoryPage() {
             answer: 'Our partner facilities are equipped with computerized flat knitting machines from world-class makers Stoll (Germany) and Shima Seiki (Japan), capable of complex intarsia, multi-color jacquards, and structured rib textures.',
         },
         {
-            question: 'What are the MOQ requirements for sweater manufacturing in Bangladesh?',
-            answer: 'For standard in-stock yarns (e.g. 100% acrylic or cotton-acrylic), MOQs start from 1,200 to 2,000 pieces per style. For custom-spun or custom-dyed wool yarns, MOQs are typically 2,500 to 3,000 pieces.',
+            question: 'What are the MOQ and lead time requirements for sweater manufacturing in Bangladesh?',
+            answer: 'For standard running yarns (cotton, cotton-acrylic, acrylic), MOQs start from 1,200 to 1,500 pieces per style. Bulk production lead time is 45 to 60 days following PPS and trim approvals.',
         },
         {
             question: 'How do you prevent needle breakage and guarantee buyer safety?',
@@ -109,6 +157,7 @@ export default async function SweaterCategoryPage() {
             subheading="Source fine to coarse gauge sweaters (3GG to 14GG pullovers, cardigans, turtlenecks, cable knits) manufactured with automated Stoll and Shima Seiki flat knitting in Bangladesh."
             description="Sweater manufacturing requires deep technical mastery in yarn tension, linking, and wash formulation. Apparel Emporium partners with Bangladesh’s premier sweater manufacturers to supply luxury-feel pullovers, holiday jacquards, and workwear cardigans to major retail brands worldwide."
             specHighlights={specHighlights}
+            manufacturingSpecsTable={manufacturingSpecsTable}
             manufacturingPoints={manufacturingPoints}
             faqs={faqs}
             products={products}
