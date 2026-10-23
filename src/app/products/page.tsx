@@ -8,15 +8,32 @@ import { X } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 
+import { redirect } from 'next/navigation';
+
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
     searchParams,
 }: {
-    searchParams: { category?: string; q?: string; page?: string };
+    searchParams: { category?: string; q?: string; page?: string; product?: string; fabric?: string; moq?: string; sort?: string };
 }): Promise<Metadata> {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
+    
+    // Stop Query Parameter Bloat: Force noindex, follow on search, pagination, product query, or filters
+    const hasQueryBloat = Boolean(searchParams.q || searchParams.page || searchParams.product || searchParams.fabric || searchParams.moq || searchParams.sort);
+
     if (searchParams.category) {
+        const catSlug = searchParams.category.toLowerCase();
+        if (['woven', 'knitwear', 'sweater'].includes(catSlug)) {
+            return {
+                title: `${catSlug.charAt(0).toUpperCase() + catSlug.slice(1)} Sourcing & Export Manufacturing | AELBD`,
+                alternates: {
+                    canonical: `/products/${catSlug}`,
+                },
+                robots: hasQueryBloat ? { index: false, follow: true } : { index: true, follow: true },
+            };
+        }
+
         let cat = null;
         try {
             cat = await prisma.category.findUnique({
@@ -30,23 +47,27 @@ export async function generateMetadata({
                 title: `${cat.name} Sourcing & Export Manufacturing | AELBD`,
                 description: cat.description || `Source export-quality ${cat.name.toLowerCase()} manufactured in certified Bangladesh garment factories. Custom tech-pack development, private label, and volume production.`,
                 alternates: {
-                    canonical: `/products?category=${encodeURIComponent(cat.slug)}`,
+                    canonical: `/products`,
                 },
+                robots: hasQueryBloat ? { index: false, follow: true } : { index: true, follow: true },
                 openGraph: {
                     title: `${cat.name} Sourcing & Export Manufacturing | AELBD`,
                     description: `Custom ${cat.name.toLowerCase()} production and export sourcing in Bangladesh.`,
-                    url: `${baseUrl}/products?category=${encodeURIComponent(cat.slug)}`,
+                    url: `${baseUrl}/products`,
                     images: ['/logo.jpg'],
                 }
             };
         }
     }
 
-    if (searchParams.q) {
+    if (hasQueryBloat) {
         return {
-            title: `Search: "${searchParams.q}" | Apparel Catalog | AELBD`,
-            description: `Browse garment manufacturing catalog search results for ${searchParams.q}.`,
+            title: searchParams.q ? `Search: "${searchParams.q}" | Apparel Catalog | AELBD` : 'Export Garments & Apparel Catalog | AELBD Bangladesh',
+            description: searchParams.q ? `Browse garment manufacturing catalog search results for ${searchParams.q}.` : 'Export apparel catalog filtered results.',
             robots: { index: false, follow: true },
+            alternates: {
+                canonical: '/products',
+            },
         };
     }
 
@@ -55,6 +76,10 @@ export async function generateMetadata({
         description: 'Explore our B2B ready-to-export garments catalog: custom knitwear, woven garments, denim, sweaters, and apparel accessories manufactured in Bangladesh.',
         alternates: {
             canonical: '/products',
+        },
+        robots: {
+            index: true,
+            follow: true,
         },
         openGraph: {
             title: 'Export Garments & Apparel Catalog | AELBD Bangladesh',
@@ -68,9 +93,14 @@ export async function generateMetadata({
 export default async function ProductsPage({
     searchParams,
 }: {
-    searchParams: { category?: string; q?: string; page?: string; fabric?: string; moq?: string; sort?: string }
+    searchParams: { category?: string; q?: string; page?: string; product?: string; fabric?: string; moq?: string; sort?: string }
 }) {
-    const { category, q, page, fabric, moq, sort } = searchParams;
+    const { category, q, page, product, fabric, moq, sort } = searchParams;
+
+    // 301 Redirect clean B2B category parameters to their dedicated SEO routes
+    if (category && ['woven', 'knitwear', 'sweater'].includes(category.toLowerCase())) {
+        redirect(`/products/${category.toLowerCase()}`);
+    }
 
     // Fetch categories for sidebar
     const categories = await prisma.category.findMany({

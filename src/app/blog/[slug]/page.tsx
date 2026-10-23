@@ -11,23 +11,32 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     const post = await prisma.blogPost.findUnique({ where: { slug: params.slug } });
     if (!post) return { title: 'Post Not Found' };
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
+
+    const effectiveTitle = params.slug === 'bsci-vs-sedex-compliance-standards-guide'
+        ? 'BSCI vs SEDEX (SMETA): Apparel Compliance Guide for Global Buyers [2026]'
+        : (post.seoTitle || `${post.title} | Apparel Emporium Blog`);
+
+    const effectiveDescription = params.slug === 'bsci-vs-sedex-compliance-standards-guide'
+        ? 'Complete BSCI vs SEDEX (SMETA) compliance guide for global apparel buyers. Compare 4-pillar SMETA audit checklists, eliminate duplicate audits, and source from certified garment factories in Bangladesh.'
+        : (post.seoDescription || post.excerpt || post.content.replace(/<[^>]*>/g, '').substring(0, 160));
+
     return {
-        title: `${post.title} | Apparel Emporium Blog`,
-        description: post.excerpt || post.content.replace(/<[^>]*>/g, '').substring(0, 160),
+        title: effectiveTitle,
+        description: effectiveDescription,
         alternates: {
             canonical: `/blog/${post.slug}`,
         },
         openGraph: {
-            title: post.title,
-            description: post.excerpt || '',
+            title: effectiveTitle,
+            description: effectiveDescription,
             url: `${baseUrl}/blog/${post.slug}`,
             images: post.coverImage ? [{ url: post.coverImage }] : [],
             type: 'article',
         },
         twitter: {
             card: 'summary_large_image',
-            title: post.title,
-            description: post.excerpt || '',
+            title: effectiveTitle,
+            description: effectiveDescription,
             images: post.coverImage ? [post.coverImage] : [],
         },
     };
@@ -114,15 +123,46 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
         },
     };
 
-    const breadcrumbSchema = {
+    const isComplianceGuide = post.slug === 'bsci-vs-sedex-compliance-standards-guide';
+
+    const faqSchema = isComplianceGuide ? {
         '@context': 'https://schema.org',
-        '@type': 'BreadcrumbList',
-        'itemListElement': [
-            { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': baseUrl },
-            { '@type': 'ListItem', 'position': 2, 'name': 'Blog', 'item': `${baseUrl}/blog` },
-            { '@type': 'ListItem', 'position': 3, 'name': post.title, 'item': `${baseUrl}/blog/${post.slug}` },
-        ],
-    };
+        '@type': 'FAQPage',
+        'mainEntity': [
+            {
+                '@type': 'Question',
+                'name': 'What is the main difference between BSCI and SEDEX (SMETA)?',
+                'acceptedAnswer': {
+                    '@type': 'Answer',
+                    'text': 'BSCI is a brand-driven auditing framework governed by amfori with letter grades (A-E) across 13 performance areas, popular among European retailers. SEDEX is an online collaborative data-sharing platform utilizing SMETA audits (2-Pillar or 4-Pillar), allowing manufacturers to share audit results with unlimited global buyers without duplicate audits.'
+                }
+            },
+            {
+                '@type': 'Question',
+                'name': 'Do garment factories in Bangladesh hold both BSCI and SEDEX audits?',
+                'acceptedAnswer': {
+                    '@type': 'Answer',
+                    'text': 'Yes. Leading export garment manufacturing factories in Bangladesh maintain dual certifications for both BSCI and SEDEX SMETA, alongside OEKO-TEX Standard 100, RSC building safety, and ISO 9001 quality management.'
+                }
+            },
+            {
+                '@type': 'Question',
+                'name': 'How does SEDEX eliminate duplicate audits for overseas buyers?',
+                'acceptedAnswer': {
+                    '@type': 'Answer',
+                    'text': 'Under SEDEX, suppliers upload their third-party SMETA audit reports and Corrective Action Plans (CAPR) directly to the SEDEX platform. Any registered buyer globally can access and verify the audit, avoiding redundant thousands-of-dollars audit inspection fees.'
+                }
+            },
+            {
+                '@type': 'Question',
+                'name': 'How does Apparel Emporium ensure social compliance for buyers?',
+                'acceptedAnswer': {
+                    '@type': 'Answer',
+                    'text': 'Apparel Emporium partners exclusively with pre-screened BSCI and SEDEX compliant factories in Bangladesh. Our in-house technical compliance officers conduct preliminary factory floor inspections, review wage disbursements, and ensure full adherence to international labour and safety standards.'
+                }
+            }
+        ]
+    } : null;
 
     return (
         <div className="bg-light-bg dark:bg-dark-bg min-h-screen pt-28 pb-16">
@@ -134,6 +174,12 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
             />
+            {faqSchema && (
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+                />
+            )}
             <div className="container mx-auto px-4 max-w-7xl">
 
                 {/* Breadcrumb */}
@@ -206,6 +252,64 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                                     ].join(' ')}
                                     dangerouslySetInnerHTML={{ __html: post.content }}
                                 />
+
+                                {/* ── HIGH VISIBILITY B2B SOURCING CTA ── */}
+                                <div className="my-10 p-7 sm:p-9 rounded-3xl bg-gradient-to-br from-[#142338] to-[#1E3A5F] text-white shadow-2xl relative overflow-hidden border border-blue-400/20">
+                                    <div className="relative z-10 max-w-2xl">
+                                        <span className="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30 mb-4">
+                                            Audited &amp; Compliant Sourcing in Bangladesh
+                                        </span>
+                                        <h3 className="text-2xl sm:text-3xl font-black font-heading mb-3 text-white">
+                                            Source with 100% BSCI &amp; SEDEX Compliance
+                                        </h3>
+                                        <p className="text-blue-100/90 text-sm sm:text-base leading-relaxed mb-6 font-medium">
+                                            Looking for zero-audit-duplication manufacturing in Bangladesh? Apparel Emporium connects global buyers directly with ethically vetted partner factories across Woven, Knitwear, and Sweaters with transparent pricing and AQL 1.5 quality assurance.
+                                        </p>
+
+                                        {/* Action Buttons */}
+                                        <div className="flex flex-wrap items-center gap-3 mb-6">
+                                            <Link
+                                                href="/request-quote"
+                                                className="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm transition-all shadow-lg shadow-amber-500/25 inline-flex items-center gap-2"
+                                            >
+                                                Request Sourcing Quote &rarr;
+                                            </Link>
+                                            <Link
+                                                href="/contact"
+                                                className="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-sm transition-colors inline-flex items-center gap-2"
+                                            >
+                                                Speak to Sourcing Team
+                                            </Link>
+                                        </div>
+
+                                        {/* Core Product Categories Quick Links */}
+                                        <div className="border-t border-white/10 pt-5">
+                                            <p className="text-xs uppercase tracking-wider text-blue-200/70 font-semibold mb-3">
+                                                Explore Core Export Product Categories:
+                                            </p>
+                                            <div className="flex flex-wrap gap-2.5">
+                                                <Link
+                                                    href="/products/woven"
+                                                    className="px-3.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-xs font-semibold text-white border border-white/10 transition-colors"
+                                                >
+                                                    Woven Garments &rarr;
+                                                </Link>
+                                                <Link
+                                                    href="/products/knitwear"
+                                                    className="px-3.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-xs font-semibold text-white border border-white/10 transition-colors"
+                                                >
+                                                    Knitwear &amp; Jersey &rarr;
+                                                </Link>
+                                                <Link
+                                                    href="/products/sweater"
+                                                    className="px-3.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-xs font-semibold text-white border border-white/10 transition-colors"
+                                                >
+                                                    Export Sweaters &rarr;
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 {/* Tags display */}
                                 {(post as any).tags && (

@@ -84,8 +84,12 @@ const organizationSchema = {
                 '@type': 'ImageObject',
                 '@id': `${baseUrl}/#logo`,
                 'url': `${baseUrl}/logo.jpg`,
-                'caption': 'Apparel Emporium Ltd.'
+                'caption': 'Apparel Emporium Ltd. - Bangladesh Garments Buying House'
             },
+            'sameAs': [
+                'https://www.linkedin.com/company/apparel-emporium',
+                'https://www.facebook.com/ApparelEmporiumBD'
+            ],
             'contactPoint': [
                 {
                     '@type': 'ContactPoint',
@@ -108,11 +112,19 @@ const organizationSchema = {
             '@id': `${baseUrl}/#website`,
             'url': baseUrl,
             'name': 'Apparel Emporium',
-            'description': 'Export-Oriented Garments Buying House and Sourcing Partner in Bangladesh',
+            'description': 'Export-Oriented Readymade Garments Buying House and Sourcing Partner in Bangladesh',
             'publisher': {
                 '@id': `${baseUrl}/#organization`
             },
-            'inLanguage': 'en-US'
+            'inLanguage': 'en-US',
+            'potentialAction': {
+                '@type': 'SearchAction',
+                'target': {
+                    '@type': 'EntryPoint',
+                    'urlTemplate': `${baseUrl}/products?q={search_term_string}`
+                },
+                'query-input': 'required name=search_term_string'
+            }
         }
     ]
 };

@@ -5,10 +5,11 @@ DirectoryIndex ""
 <IfModule mod_rewrite.c>
     RewriteEngine On
     
-    # Optional: Force HTTPS (uncomment if SSL is active and you want to force it)
-    # RewriteCond %{HTTPS} off
-    # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
-    
+    # Enforce HTTPS & 301 Redirect www.aelbd.net to https://aelbd.net
+    RewriteCond %{HTTP_HOST} ^www\.aelbd\.net$ [NC,OR]
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://aelbd.net/$1 [L,R=301]
+
     # Mitigate CVE-2025-29927: prevent external spoofing of internal Next.js middleware header
     <IfModule mod_headers.c>
         RequestHeader unset x-middleware-subrequest

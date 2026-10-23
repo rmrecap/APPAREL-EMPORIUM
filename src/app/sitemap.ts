@@ -58,12 +58,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.7,
     }));
 
-    const categoryRoutes = categories.map((cat) => ({
-        url: `${baseUrl}/products?category=${encodeURIComponent(cat.slug)}`,
+    // Dedicated B2B Core Category Routes (Clean URLs)
+    const coreCategoryPages = [
+        { route: '/products/woven', priority: 0.9, changeFrequency: 'weekly' as const },
+        { route: '/products/knitwear', priority: 0.9, changeFrequency: 'weekly' as const },
+        { route: '/products/sweater', priority: 0.9, changeFrequency: 'weekly' as const },
+    ];
+
+    const categoryRoutes = coreCategoryPages.map((cat) => ({
+        url: `${baseUrl}${cat.route}`,
         lastModified: new Date(),
-        changeFrequency: 'weekly' as const,
-        priority: 0.8,
+        changeFrequency: cat.changeFrequency,
+        priority: cat.priority,
     }));
 
-    return [...staticRoutes, ...productRoutes, ...blogRoutes, ...categoryRoutes];
+    return [...staticRoutes, ...categoryRoutes, ...productRoutes, ...blogRoutes];
 }

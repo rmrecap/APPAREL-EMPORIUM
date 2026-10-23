@@ -10,6 +10,14 @@ export async function middleware(req: NextRequest) {
         return new NextResponse('Access Denied: Malformed Subrequest Header', { status: 403 });
     }
 
+    // ── PRIORITY 0.5: Enforce Canonical Domain (301 Redirect www to non-www) ──
+    const host = req.headers.get('host') || '';
+    if (host.toLowerCase().startsWith('www.')) {
+        const cleanHost = host.replace(/^www\./i, '');
+        const redirectUrl = new URL(req.nextUrl.pathname + req.nextUrl.search, `https://${cleanHost}`);
+        return NextResponse.redirect(redirectUrl, { status: 301 });
+    }
+
     const path = req.nextUrl.pathname;
     const method = req.method;
 
@@ -132,17 +140,21 @@ export async function middleware(req: NextRequest) {
         }
     }
 
-    // 5. Generate Response with Security Headers
+    // 5. Generate Response with Security Headers & SEO Query Protection
     const res = NextResponse.next();
     res.headers.set('X-Frame-Options', 'DENY');
     res.headers.set('X-Content-Type-Options', 'nosniff');
     res.headers.set('X-XSS-Protection', '1; mode=block');
     res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
-    // Optional maintenance mode check (could fetch from setting edge config)
-    // if (!isAdminRoute && isMaintenanceMode) {
-    //     return new NextResponse('Site under maintenance', { status: 503 });
-    // }
+    // Prevent search parameter bloat from indexing in Google
+    if (
+        req.nextUrl.searchParams.has('q') ||
+        req.nextUrl.searchParams.has('page') ||
+        req.nextUrl.searchParams.has('product')
+    ) {
+        res.headers.set('X-Robots-Tag', 'noindex, follow');
+    }
 
     return res;
 }
