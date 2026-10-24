@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { Calendar, User, Clock, ArrowLeft, Facebook, Twitter, Linkedin, LinkIcon } from 'lucide-react';
+import B2BLeadMagnetSection from '@/components/leads/B2BLeadMagnetSection';
 
 export const dynamic = 'force-dynamic';
 
@@ -359,6 +360,13 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                                         </div>
                                     </div>
                                 </div>
+
+                                {/* ── B2B FACTORY COMPLIANCE & LINE SHEET LEAD MAGNET ── */}
+                                <B2BLeadMagnetSection
+                                    sourcePage={`/blog/${post.slug}`}
+                                    title="Request 2026 Factory Compliance Profile & Line Sheet"
+                                    subtitle="Direct access to verified BSCI & SMETA audit certificates, manufacturing capacity schedules, and FOB export price matrices."
+                                />
 
                                 {/* Tags display */}
                                 {(post as any).tags && (

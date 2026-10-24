@@ -18,8 +18,10 @@ import {
     ExternalLink,
     HelpCircle,
     Copy,
-    Zap
+    Zap,
+    Globe
 } from 'lucide-react';
+import Link from 'next/link';
 
 interface CustomScriptItem {
     name: string;
@@ -639,6 +641,25 @@ export default function TrackingPage() {
                     </div>
                 </div>
             )}
+
+            {/* Google Search Console & Instant Indexing Direct Link */}
+            <div className="mb-6 p-5 rounded-2xl bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white shadow-md border border-blue-700/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-primary shrink-0">
+                        <Globe className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                        <h4 className="font-bold text-sm text-white">Live Google Search Console &amp; Instant Indexing Suite</h4>
+                        <p className="text-xs text-blue-200">View real-time clicks, impressions, top buyer queries, and 1-click URL indexing in the SEO Manager.</p>
+                    </div>
+                </div>
+                <Link
+                    href="/executive-portal-aelbd/seo"
+                    className="px-4 py-2 bg-primary hover:bg-primary/90 text-white text-xs font-bold rounded-xl transition shadow-sm shrink-0 flex items-center gap-1.5"
+                >
+                    Open Live GSC Tracker &rarr;
+                </Link>
+            </div>
 
             {/* Smart Script & Code Importer Box */}
             <div className="mb-8 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800/80 dark:to-gray-900 border border-blue-200 dark:border-gray-700 p-5 rounded-2xl shadow-sm">

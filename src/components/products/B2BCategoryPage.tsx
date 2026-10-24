@@ -4,6 +4,7 @@ import ProductGrid from '@/components/products/ProductGrid';
 import AtelierDecorations3D from '@/components/products/AtelierDecorations3D';
 import { Product } from '@/types';
 import { ShieldCheck, Award, Factory, ArrowRight, CheckCircle2, Clock, Box, HelpCircle, FileText, CheckCheck, Sliders, ExternalLink } from 'lucide-react';
+import B2BLeadMagnetSection from '@/components/leads/B2BLeadMagnetSection';
 
 export interface B2BManufacturingSpecItem {
     parameter: string;
@@ -341,6 +342,14 @@ export default function B2BCategoryPage({
                         ))}
                     </div>
                 </div>
+
+                {/* ── B2B FACTORY COMPLIANCE & LINE SHEET LEAD MAGNET ── */}
+                <B2BLeadMagnetSection
+                    sourcePage={`/products/${slug}`}
+                    defaultCategory={slug as any}
+                    title={`Request 2026 ${categoryName} Factory Profile & Line Sheet`}
+                    subtitle={`Direct access to verified social audits, machine lists, yarn counts, and wholesale FOB price sheets for ${categoryName.toLowerCase()}.`}
+                />
 
                 {/* ── RELATED B2B SOURCING & COMPLIANCE GUIDES ── */}
                 <div className="p-6 sm:p-8 rounded-3xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">

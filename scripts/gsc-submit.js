@@ -69,6 +69,7 @@ async function main() {
     const priorityUrls = [
         'https://aelbd.net/',
         'https://aelbd.net/products',
+        'https://aelbd.net/global-sourcing',
         'https://aelbd.net/about',
         'https://aelbd.net/contact',
         'https://aelbd.net/request-quote',
