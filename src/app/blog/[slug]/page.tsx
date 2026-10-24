@@ -59,9 +59,10 @@ function getReadingTime(html: string): number {
 }
 
 export default async function BlogPostPage({ params }: PageProps) {
-    const resolvedParams = await Promise.resolve(params);
-    const slug = resolvedParams?.slug;
-    if (!slug) notFound();
+    try {
+        const resolvedParams = await Promise.resolve(params);
+        const slug = resolvedParams?.slug;
+        if (!slug) notFound();
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
     const [post, recentPosts] = await Promise.all([
@@ -442,7 +443,6 @@ export default async function BlogPostPage({ params }: PageProps) {
                                         ))}
                                         {/* Copy link button */}
                                         <button
-                                            onClick={undefined}
                                             title="Copy link"
                                             className="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
                                             id="copy-link-btn"
@@ -471,11 +471,11 @@ export default async function BlogPostPage({ params }: PageProps) {
                                 {/* ── AUTHOR BIO ─────────────────────────── */}
                                 <div className="mt-12 p-6 bg-primary/5 dark:bg-primary/10 rounded-2xl border border-primary/20 flex items-center gap-5">
                                     <div className="w-16 h-16 bg-primary text-white rounded-2xl flex items-center justify-center text-2xl font-black shrink-0">
-                                        {post.author.name?.charAt(0)?.toUpperCase() || 'A'}
+                                        {post.author?.name?.charAt(0)?.toUpperCase() || 'A'}
                                     </div>
                                     <div>
                                         <p className="text-xs font-bold uppercase tracking-widest text-primary mb-1">Written by</p>
-                                        <p className="font-bold text-gray-900 dark:text-white text-lg">{post.author.name}</p>
+                                        <p className="font-bold text-gray-900 dark:text-white text-lg">{post.author?.name || 'Editorial Team'}</p>
                                         <p className="text-sm text-gray-500 dark:text-gray-400">
                                             Content team at <strong>Apparel Emporium</strong> — covering garments sourcing, trade compliance, and sustainable manufacturing.
                                         </p>
@@ -577,4 +577,19 @@ export default async function BlogPostPage({ params }: PageProps) {
             </div>
         </div>
     );
+    } catch (err: any) {
+        if (err?.message === 'NEXT_NOT_FOUND' || err?.digest === 'NEXT_NOT_FOUND' || (typeof err?.digest === 'string' && err.digest.includes('NEXT_NOT_FOUND'))) {
+            throw err;
+        }
+        console.error('[BLOG RENDER EXCEPTION]:', err);
+        return (
+            <div className="min-h-screen bg-slate-900 text-white p-8 flex items-center justify-center">
+                <div className="max-w-xl w-full bg-slate-800 border border-amber-500/30 rounded-2xl p-6">
+                    <h2 className="text-xl font-bold text-amber-400 mb-3">Diagnostic Blog Error</h2>
+                    <p className="text-sm text-gray-300 font-mono mb-2">{err?.name}: {err?.message}</p>
+                    <pre className="text-xs text-red-300 bg-slate-950 p-4 rounded overflow-auto max-h-48">{err?.stack}</pre>
+                </div>
+            </div>
+        );
+    }
 }

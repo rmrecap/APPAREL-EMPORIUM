@@ -108,36 +108,44 @@ const posts = [
 
 async function syncPosts() {
     console.log('=== Synchronizing Blog Posts ===');
-    const adminUser = await prisma.user.findFirst({
+    const adminUser = (await prisma.user.findFirst({
         where: { role: { in: ['SUPER_ADMIN', 'ADMIN', 'DEVELOPER'] } }
-    });
-    const defaultAuthorId = adminUser ? adminUser.id : null;
+    })) || (await prisma.user.findFirst());
+    const validAuthorId = adminUser ? adminUser.id : null;
+    console.log('Using valid author ID:', validAuthorId || 'None');
 
     for (const post of posts) {
-        const { id, createdAt, updatedAt, author, ...postData } = post;
-        if (!postData.authorId && defaultAuthorId) {
-            postData.authorId = defaultAuthorId;
+        try {
+            const { id, createdAt, updatedAt, author, ...postData } = post;
+            const targetAuthorId = validAuthorId || postData.authorId;
+            const publishedDate = postData.publishedAt ? new Date(postData.publishedAt) : new Date();
+
+            await prisma.blogPost.upsert({
+                where: { slug: postData.slug },
+                update: {
+                    title: postData.title,
+                    content: postData.content,
+                    excerpt: postData.excerpt,
+                    coverImage: postData.coverImage,
+                    authorId: targetAuthorId,
+                    isPublished: true,
+                    seoTitle: postData.seoTitle,
+                    seoDescription: postData.seoDescription,
+                    publishedAt: publishedDate,
+                },
+                create: {
+                    ...postData,
+                    authorId: targetAuthorId,
+                    isPublished: true,
+                    publishedAt: publishedDate,
+                }
+            });
+            console.log('✓ Successfully synced post:', postData.slug);
+        } catch (postErr) {
+            console.error('❌ Error syncing post ' + post.slug + ':', postErr.message);
         }
-        await prisma.blogPost.upsert({
-            where: { slug: postData.slug },
-            update: {
-                title: postData.title,
-                content: postData.content,
-                excerpt: postData.excerpt,
-                coverImage: postData.coverImage,
-                isPublished: postData.isPublished,
-                seoTitle: postData.seoTitle,
-                seoDescription: postData.seoDescription,
-                publishedAt: postData.publishedAt ? new Date(postData.publishedAt) : new Date(),
-            },
-            create: {
-                ...postData,
-                publishedAt: postData.publishedAt ? new Date(postData.publishedAt) : new Date(),
-            }
-        });
-        console.log('✓ Synced post:', postData.slug);
     }
-    console.log('✅ All blog posts synchronized successfully.');
+    console.log('✅ All blog posts synchronization routine completed.');
 }
 
 syncPosts()
