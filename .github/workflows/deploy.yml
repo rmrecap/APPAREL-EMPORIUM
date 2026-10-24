@@ -224,10 +224,27 @@ jobs:
               cp prisma/dev.db "/home/$USER/domains/aelbd.net/public_html/prisma/" 2>/dev/null || true
               cp .env "/home/$USER/domains/aelbd.net/public_html/" 2>/dev/null || true
               cp package.json "/home/$USER/domains/aelbd.net/public_html/" 2>/dev/null || true
+              cp server.js "/home/$USER/domains/aelbd.net/public_html/" 2>/dev/null || true
               cp .htaccess "/home/$USER/domains/aelbd.net/public_html/" 2>/dev/null || true
               mkdir -p "/home/$USER/domains/aelbd.net/public_html/tmp"
               touch "/home/$USER/domains/aelbd.net/public_html/tmp/restart.txt"
             fi
+
+            # Sync to hbuilds/current if it exists (Hostinger auto-deployment root)
+            for HB in "/home/$USER/domains/aelbd.net/hbuilds/current/nodejs" "/home/$USER/domains/aelbd.net/hbuilds/current"; do
+              if [ -d "$HB" ]; then
+                echo "Syncing production build to $HB..."
+                cp -r .next "$HB/" 2>/dev/null || true
+                cp -rn public "$HB/" 2>/dev/null || true
+                mkdir -p "$HB/prisma"
+                cp prisma/dev.db "$HB/prisma/" 2>/dev/null || true
+                cp .env "$HB/" 2>/dev/null || true
+                cp package.json "$HB/" 2>/dev/null || true
+                cp server.js "$HB/" 2>/dev/null || true
+                mkdir -p "$HB/tmp"
+                touch "$HB/tmp/restart.txt"
+              fi
+            done
 
             # Process diagnostics and robust restart
             echo "=== RUNNING PROCESSES BEFORE RESTART ==="
@@ -265,6 +282,8 @@ jobs:
             echo "=== VERIFYING LOCAL HTTP SERVER RESPONSE ==="
             LOCAL_CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:3000/blog/bsci-vs-sedex-compliance-standards-guide" 2>/dev/null || echo "FAILED")
             echo "Local HTTP response code for blog post: $LOCAL_CODE"
+            PUBLIC_CODE=$(curl -s -o /dev/null -w "%{http_code}" "https://aelbd.net/blog/bsci-vs-sedex-compliance-standards-guide" 2>/dev/null || echo "FAILED")
+            echo "Public HTTPS response code for blog post: $PUBLIC_CODE"
 
             if [ "$LOCAL_CODE" != "200" ]; then
               echo "=== RECENT PM2 ERROR LOGS ==="

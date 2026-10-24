@@ -10,8 +10,8 @@ module.exports = {
     {
       name: 'aelbd-production',
       cwd: __dirname,
-      script: useStandalone ? standaloneServer : 'node_modules/next/dist/bin/next',
-      args: useStandalone ? '' : 'start -p 3000',
+      script: useStandalone ? standaloneServer : 'server.js',
+      args: '',
       instances: 1,
       exec_mode: 'fork',
       autorestart: true,
