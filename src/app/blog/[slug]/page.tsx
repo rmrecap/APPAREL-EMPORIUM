@@ -7,17 +7,25 @@ import B2BLeadMagnetSection from '@/components/leads/B2BLeadMagnetSection';
 
 export const dynamic = 'force-dynamic';
 
+type PageProps = {
+    params: Promise<{ slug: string }> | { slug: string };
+};
+
 // ── Dynamic SEO Metadata ────────────────────────────────────────────────────
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-    const post = await prisma.blogPost.findUnique({ where: { slug: params.slug } });
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+    const resolvedParams = await Promise.resolve(params);
+    const slug = resolvedParams?.slug;
+    if (!slug) return { title: 'Post Not Found' };
+
+    const post = await prisma.blogPost.findUnique({ where: { slug } });
     if (!post) return { title: 'Post Not Found' };
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
 
-    const effectiveTitle = params.slug === 'bsci-vs-sedex-compliance-standards-guide'
+    const effectiveTitle = slug === 'bsci-vs-sedex-compliance-standards-guide'
         ? 'BSCI vs SEDEX (SMETA): Apparel Compliance Guide for Global Buyers [2026]'
         : (post.seoTitle || `${post.title} | Apparel Emporium Blog`);
 
-    const effectiveDescription = params.slug === 'bsci-vs-sedex-compliance-standards-guide'
+    const effectiveDescription = slug === 'bsci-vs-sedex-compliance-standards-guide'
         ? 'Complete BSCI vs SEDEX (SMETA) compliance guide for global apparel buyers. Compare 4-pillar SMETA audit checklists, eliminate duplicate audits, and source from certified garment factories in Bangladesh.'
         : (post.seoDescription || post.excerpt || post.content.replace(/<[^>]*>/g, '').substring(0, 160));
 
@@ -50,15 +58,19 @@ function getReadingTime(html: string): number {
     return Math.max(1, Math.ceil(words / 200));
 }
 
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
+export default async function BlogPostPage({ params }: PageProps) {
+    const resolvedParams = await Promise.resolve(params);
+    const slug = resolvedParams?.slug;
+    if (!slug) notFound();
+
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
     const [post, recentPosts] = await Promise.all([
         prisma.blogPost.findUnique({
-            where: { slug: params.slug },
+            where: { slug },
             include: { author: { select: { name: true, avatar: true, email: true } } }
         }),
         prisma.blogPost.findMany({
-            where: { isPublished: true, slug: { not: params.slug } },
+            where: { isPublished: true, slug: { not: slug } },
             orderBy: { publishedAt: 'desc' },
             take: 4,
             select: { id: true, slug: true, title: true, excerpt: true, coverImage: true, publishedAt: true }
@@ -122,6 +134,31 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             '@type': 'WebPage',
             '@id': `${baseUrl}/blog/${post.slug}`,
         },
+    };
+
+    const breadcrumbSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        'itemListElement': [
+            {
+                '@type': 'ListItem',
+                'position': 1,
+                'name': 'Home',
+                'item': baseUrl,
+            },
+            {
+                '@type': 'ListItem',
+                'position': 2,
+                'name': 'Blog',
+                'item': `${baseUrl}/blog`,
+            },
+            {
+                '@type': 'ListItem',
+                'position': 3,
+                'name': post.title,
+                'item': `${baseUrl}/blog/${post.slug}`,
+            },
+        ],
     };
 
     const blogFaqsBySlug: Record<string, Array<{ question: string; answer: string }>> = {
@@ -273,10 +310,10 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                                 <div className="flex flex-wrap items-center gap-5 mb-8 pb-8 border-b border-gray-100 dark:border-gray-800">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold text-sm">
-                                            {post.author.name?.charAt(0)?.toUpperCase() || 'A'}
+                                            {post.author?.name?.charAt(0)?.toUpperCase() || 'A'}
                                         </div>
                                         <div>
-                                            <p className="font-bold text-gray-900 dark:text-white text-sm">{post.author.name}</p>
+                                            <p className="font-bold text-gray-900 dark:text-white text-sm">{post.author?.name || 'Editorial Team'}</p>
                                             <p className="text-xs text-gray-500">Author</p>
                                         </div>
                                     </div>

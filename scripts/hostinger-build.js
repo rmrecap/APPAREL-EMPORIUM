@@ -150,7 +150,7 @@ async function main() {
     const reactDomClient = path.join(cwd, 'node_modules', 'react-dom', 'client.js');
     if (!fs.existsSync(nextBin) || !fs.existsSync(reactDomClient)) {
         console.log('⚠️ [DEPS] Core dependencies missing. Running targeted npm install...');
-        run('npm install react@18.3.1 react-dom@18.3.1 next@15.5.27 --no-audit --no-fund --prefix .', 'Install Core React & Next Dependencies');
+        run('npm install react@18.3.1 react-dom@18.3.1 next@15.5.28 --no-audit --no-fund --prefix .', 'Install Core React & Next Dependencies');
         grantExecPerms(path.join(cwd, 'node_modules', '@prisma', 'engines'));
         grantExecPerms(path.join(cwd, 'node_modules', '.bin'));
     }
@@ -207,6 +207,10 @@ async function main() {
 
     if (fs.existsSync(path.join(cwd, 'scripts', 'update-megamenu.js'))) {
         run('node scripts/update-megamenu.js', 'Synchronize MegaMenu Structure');
+    }
+
+    if (fs.existsSync(path.join(cwd, 'scripts', 'sync-blog-posts.js'))) {
+        run('node scripts/sync-blog-posts.js', 'Synchronize Blog Posts');
     }
 
     // 7. POST-MIGRATION PRODUCT INTEGRITY GUARD

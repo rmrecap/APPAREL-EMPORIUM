@@ -190,6 +190,9 @@ jobs:
             echo "Updating MegaMenu categories to 4-pillar structure..."
             node scripts/update-megamenu.js || true
 
+            echo "Synchronizing blog posts..."
+            node scripts/sync-blog-posts.js || true
+
             echo "Running Post-migration Product Integrity Guard..."
             node scripts/guard-product-integrity.js
             
