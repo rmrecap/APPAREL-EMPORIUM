@@ -49,6 +49,11 @@ jobs:
             export PATH=$PATH:/usr/local/bin:/opt/alt/alt-nodejs22/root/usr/bin:/opt/alt/alt-nodejs20/root/usr/bin
             if [ -s "$HOME/.nvm/nvm.sh" ]; then source "$HOME/.nvm/nvm.sh"; fi
 
+            echo "=== CURRENT NODE/NEXT PROCESSES ==="
+            ps -ef | grep -E "node|pm2|next" | grep -v grep || true
+            echo "=== DOMAIN DIRS ==="
+            ls -la "/home/$USER/domains/aelbd.net" 2>/dev/null || true
+
             # Determine directory automatically
             DEPLOY_DIR=""
             for CANDIDATE in \
@@ -208,6 +213,20 @@ jobs:
               mkdir -p .next/standalone/prisma
               cp -rn prisma/dev.db .next/standalone/prisma/ 2>/dev/null || true
               cp .env .next/standalone/.env 2>/dev/null || true
+            fi
+
+            # Sync production build to public_html (in case Apache/Passenger serves from public_html)
+            if [ -d "/home/$USER/domains/aelbd.net/public_html" ] && [ "$DEPLOY_DIR" != "/home/$USER/domains/aelbd.net/public_html" ]; then
+              echo "Syncing production build to public_html for Passenger/Apache..."
+              cp -r .next "/home/$USER/domains/aelbd.net/public_html/" 2>/dev/null || true
+              cp -rn public "/home/$USER/domains/aelbd.net/public_html/" 2>/dev/null || true
+              mkdir -p "/home/$USER/domains/aelbd.net/public_html/prisma"
+              cp prisma/dev.db "/home/$USER/domains/aelbd.net/public_html/prisma/" 2>/dev/null || true
+              cp .env "/home/$USER/domains/aelbd.net/public_html/" 2>/dev/null || true
+              cp package.json "/home/$USER/domains/aelbd.net/public_html/" 2>/dev/null || true
+              cp .htaccess "/home/$USER/domains/aelbd.net/public_html/" 2>/dev/null || true
+              mkdir -p "/home/$USER/domains/aelbd.net/public_html/tmp"
+              touch "/home/$USER/domains/aelbd.net/public_html/tmp/restart.txt"
             fi
 
             # Process diagnostics and robust restart
