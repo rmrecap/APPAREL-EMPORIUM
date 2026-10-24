@@ -261,6 +261,24 @@ jobs:
             pkill -9 -u "$USER" -f 'node|pm2|next' 2>/dev/null || true
             sleep 3
 
+            echo "=== DIRECT TEST OF NEXT START ==="
+            node -e '
+            const net = require("net");
+            const s = net.createServer();
+            s.once("error", (e) => console.log("TCP BIND ERROR on 127.0.0.1:3000:", e.message));
+            s.listen(3000, "127.0.0.1", () => {
+              console.log("✅ TCP BIND 127.0.0.1:3000 SUCCESSFUL!");
+              s.close();
+            });
+            '
+            node node_modules/next/dist/bin/next start -p 3000 -H 127.0.0.1 > /tmp/next_direct.log 2>&1 &
+            DIRECT_PID=$!
+            sleep 6
+            echo "--- NEXT DIRECT LOG OUTPUT ---"
+            cat /tmp/next_direct.log || true
+            kill -9 $DIRECT_PID 2>/dev/null || true
+            sleep 2
+
             echo "=== RESTARTING APPLICATION VIA PM2 & PASSENGER ==="
             mkdir -p tmp
             touch tmp/restart.txt
