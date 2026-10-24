@@ -34,8 +34,8 @@ export async function middleware(req: NextRequest) {
     }
 
     // ── PRIORITY 2: External API & Backup routes bypass middleware session auth ─
-    // /api/external/*, /api/admin/backup/*, /api/diagnostic/*, and /api/admin/gsc/* have their own route-level token & secret verification.
-    if (path.startsWith('/api/external/') || path.startsWith('/api/admin/backup/') || path.startsWith('/api/backup/') || path.startsWith('/api/admin/gsc/') || path.startsWith('/api/diagnostic/')) {
+    // /api/external/*, /api/admin/backup/*, and /api/admin/gsc/* have their own route-level token & secret verification.
+    if (path.startsWith('/api/external/') || path.startsWith('/api/admin/backup/') || path.startsWith('/api/backup/') || path.startsWith('/api/admin/gsc/')) {
         return NextResponse.next();
     }
 

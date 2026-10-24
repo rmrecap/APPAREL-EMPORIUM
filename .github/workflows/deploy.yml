@@ -197,7 +197,7 @@ jobs:
             node scripts/guard-product-integrity.js
             
             echo "Building Next.js application..."
-            npm run build
+            npm run build || { echo "❌ FATAL: Next.js build failed!"; exit 1; }
             
             # Sync standalone static assets and database if standalone build was generated
             if [ -d ".next/standalone" ]; then

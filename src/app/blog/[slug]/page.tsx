@@ -65,46 +65,45 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 // ── Reading time estimate ───────────────────────────────────────────────────
-function getReadingTime(html: string): number {
-    const plainText = html.replace(/<[^>]*>/g, '');
+function getReadingTime(html?: string | null): number {
+    const plainText = (html || '').replace(/<[^>]*>/g, '');
     const words = plainText.trim().split(/\s+/).filter(Boolean).length;
     return Math.max(1, Math.ceil(words / 200));
 }
 
 export default async function BlogPostPage({ params }: PageProps) {
+    const resolvedParams = await Promise.resolve(params);
+    const slug = resolvedParams?.slug;
+    if (!slug) notFound();
+
+    let decodedSlug = slug;
     try {
-        const resolvedParams = await Promise.resolve(params);
-        const slug = resolvedParams?.slug;
-        if (!slug) notFound();
+        decodedSlug = decodeURIComponent(slug);
+    } catch { }
 
-        let decodedSlug = slug;
-        try {
-            decodedSlug = decodeURIComponent(slug);
-        } catch { }
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
+    const [post, recentPosts] = await Promise.all([
+        prisma.blogPost.findFirst({
+            where: {
+                OR: [
+                    { slug },
+                    { slug: decodedSlug }
+                ]
+            },
+            include: { author: { select: { name: true, avatar: true, email: true } } }
+        }),
+        prisma.blogPost.findMany({
+            where: {
+                isPublished: true,
+                slug: { notIn: [slug, decodedSlug] }
+            },
+            orderBy: { publishedAt: 'desc' },
+            take: 4,
+            select: { id: true, slug: true, title: true, excerpt: true, coverImage: true, publishedAt: true }
+        }),
+    ]);
 
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
-        const [post, recentPosts] = await Promise.all([
-            prisma.blogPost.findFirst({
-                where: {
-                    OR: [
-                        { slug },
-                        { slug: decodedSlug }
-                    ]
-                },
-                include: { author: { select: { name: true, avatar: true, email: true } } }
-            }),
-            prisma.blogPost.findMany({
-                where: {
-                    isPublished: true,
-                    slug: { notIn: [slug, decodedSlug] }
-                },
-                orderBy: { publishedAt: 'desc' },
-                take: 4,
-                select: { id: true, slug: true, title: true, excerpt: true, coverImage: true, publishedAt: true }
-            }),
-        ]);
-
-        if (!post || !post.isPublished) notFound();
+    if (!post || !post.isPublished) notFound();
 
     const readingTime = getReadingTime(post.content);
     const publishedDate = post.publishedAt
@@ -527,7 +526,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-bold text-sm text-gray-900 dark:text-white group-hover:text-primary transition-colors line-clamp-2 leading-tight mb-1">
-                                                    {rp.title}
+                                                    {rp.title || 'Recent Article'}
                                                 </p>
                                                 <p className="text-xs text-gray-400 flex items-center gap-1">
                                                     <Calendar size={10} />
@@ -581,19 +580,4 @@ export default async function BlogPostPage({ params }: PageProps) {
             </div>
         </div>
     );
-    } catch (err: any) {
-        if (err?.message === 'NEXT_NOT_FOUND' || err?.digest === 'NEXT_NOT_FOUND' || (typeof err?.digest === 'string' && err.digest.includes('NEXT_NOT_FOUND'))) {
-            throw err;
-        }
-        console.error('[BLOG RENDER EXCEPTION]:', err);
-        return (
-            <div className="min-h-screen bg-slate-900 text-white p-8 flex items-center justify-center">
-                <div className="max-w-xl w-full bg-slate-800 border border-amber-500/30 rounded-2xl p-6">
-                    <h2 className="text-xl font-bold text-amber-400 mb-3">Diagnostic Blog Error</h2>
-                    <p className="text-sm text-gray-300 font-mono mb-2">{err?.name}: {err?.message}</p>
-                    <pre className="text-xs text-red-300 bg-slate-950 p-4 rounded overflow-auto max-h-48">{err?.stack}</pre>
-                </div>
-            </div>
-        );
-    }
 }
