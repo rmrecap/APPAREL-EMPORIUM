@@ -1,6 +1,6 @@
 process.env.NODE_ENV = 'production';
 process.env.PORT = process.env.PORT || '3000';
-process.env.HOSTNAME = process.env.HOSTNAME || '0.0.0.0';
+process.env.HOSTNAME = '127.0.0.1';
 
 console.log(`[BOOT] Environment: PORT=${process.env.PORT}, HOSTNAME=${process.env.HOSTNAME}, NODE_ENV=${process.env.NODE_ENV}`);
 

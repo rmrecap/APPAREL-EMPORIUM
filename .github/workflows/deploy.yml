@@ -269,8 +269,8 @@ jobs:
             node -e '
             const http = require("http");
             const s = http.createServer((q, r) => { r.statusCode = 200; r.end("TEST_PORT_3000_OK"); });
-            s.listen(3000, "0.0.0.0", () => {
-              console.log("✅ Node successfully bound to 0.0.0.0:3000!");
+            s.listen(3000, "127.0.0.1", () => {
+              console.log("✅ Node successfully bound to 127.0.0.1:3000!");
               http.get("http://127.0.0.1:3000", res => {
                 let d = "";
                 res.on("data", c => d += c);
