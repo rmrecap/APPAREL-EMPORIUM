@@ -262,9 +262,34 @@ jobs:
             sleep 3
             fuser -k 3000/tcp 2>/dev/null || true
 
-            # Truncate application logs
-            > pm2-out.log 2>/dev/null || true
-            > pm2-error.log 2>/dev/null || true
+            # Clean stale application logs
+            rm -f pm2-out*.log pm2-error*.log .next/standalone/pm2-out*.log .next/standalone/pm2-error*.log ~/.pm2/logs/* 2>/dev/null || true
+
+            echo "=== TESTING LOCAL PORT 3000 BINDING ==="
+            node -e '
+            const http = require("http");
+            const s = http.createServer((q, r) => { r.statusCode = 200; r.end("TEST_PORT_3000_OK"); });
+            s.listen(3000, "0.0.0.0", () => {
+              console.log("✅ Node successfully bound to 0.0.0.0:3000!");
+              http.get("http://127.0.0.1:3000", res => {
+                let d = "";
+                res.on("data", c => d += c);
+                res.on("end", () => {
+                  console.log(`✅ Local HTTP test connection succeeded: ${res.statusCode} ${d}`);
+                  s.close();
+                  process.exit(0);
+                });
+              }).on("error", e => {
+                console.error("❌ Local HTTP test connection failed:", e.message);
+                s.close();
+                process.exit(1);
+              });
+            });
+            s.on("error", e => {
+              console.error("❌ Port 3000 bind test failed:", e.message);
+              process.exit(1);
+            });
+            ' || true
 
             echo "=== RESTARTING APPLICATION VIA PM2 & PASSENGER ==="
             mkdir -p tmp
@@ -295,12 +320,9 @@ jobs:
             npx pm2 list 2>/dev/null || pm2 list 2>/dev/null || true
             ps -ef | grep -E "node|pm2|next" | grep -v grep || true
 
-            echo "=== PM2 APPLICATION STDOUT ==="
-            cat pm2-out*.log .next/standalone/pm2-out*.log 2>/dev/null | tail -n 80 || true
-            echo "=== PM2 APPLICATION STDERR ==="
-            cat pm2-error*.log .next/standalone/pm2-error*.log 2>/dev/null | tail -n 80 || true
-            echo "=== PM2 GLOBAL LOGS (~/.pm2/logs/) ==="
-            cat ~/.pm2/logs/* 2>/dev/null | tail -n 80 || true
+            echo "=== LIVE PM2 LOGS FOR aelbd-production ==="
+            pm2 logs aelbd-production --nostream --lines 60 2>/dev/null || npx pm2 logs aelbd-production --nostream --lines 60 2>/dev/null || true
+            cat pm2-out*.log pm2-error*.log 2>/dev/null | tail -n 60 || true
 
             echo "=== LISTENING TCP PORTS ==="
             ss -tln 2>/dev/null || netstat -tln 2>/dev/null || true
@@ -338,6 +360,15 @@ jobs:
             if [ "$LOCAL_CODE" != "200" ]; then
               echo "=== PM2 PROCESS 0 DETAIL ==="
               npx pm2 describe 0 2>/dev/null || true
+              echo "=== CURRENT PROCESS ENVIRONMENT & PORTS ==="
+              PID=$(pgrep -u "$USER" -f 'server.js|next-server' | head -n 1)
+              if [ -n "$PID" ]; then
+                echo "Found PID: $PID"
+                cat /proc/$PID/cmdline 2>/dev/null | tr '\0' ' ' || true; echo ""
+                cat /proc/$PID/environ 2>/dev/null | tr '\0' '\n' | grep -E "PORT|HOST|NODE" || true
+                echo "Open FDs for $PID:"
+                ls -l /proc/$PID/fd 2>/dev/null || true
+              fi
             fi
 
             echo "✅ Deployment complete!"

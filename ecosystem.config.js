@@ -1,17 +1,11 @@
-const fs = require('fs');
 const path = require('path');
-
-const standaloneDir = path.join(__dirname, '.next', 'standalone');
-const standaloneServer = path.join(standaloneDir, 'server.js');
-const useStandalone = fs.existsSync(standaloneServer);
 
 module.exports = {
   apps: [
     {
       name: 'aelbd-production',
-      cwd: useStandalone ? standaloneDir : __dirname,
-      script: useStandalone ? 'server.js' : './node_modules/next/dist/bin/next',
-      args: useStandalone ? '' : ['start', '-p', '3000', '-H', '0.0.0.0'],
+      cwd: __dirname,
+      script: 'server.js',
       instances: 1,
       exec_mode: 'fork',
       autorestart: true,

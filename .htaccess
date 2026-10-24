@@ -1,7 +1,5 @@
 # Hostinger Node.js Application Routing
 
-DirectoryIndex ""
-
 <IfModule mod_rewrite.c>
     RewriteEngine On
     
@@ -15,7 +13,10 @@ DirectoryIndex ""
         RequestHeader unset x-middleware-subrequest
     </IfModule>
 
-    # Forward all requests except actual existing static files to Node.js
-    RewriteCond %{REQUEST_FILENAME} !-f
+    # Serve existing static files directly
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
+
+    # Forward all other requests (including /) to Node.js backend on port 3000
     RewriteRule ^(.*)$ http://127.0.0.1:3000/$1 [P,L]
 </IfModule>
