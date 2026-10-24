@@ -3,7 +3,7 @@ const path = require('path');
 
 process.env.NODE_ENV = 'production';
 process.env.PORT = process.env.PORT || '3000';
-process.env.HOSTNAME = process.env.HOSTNAME || '0.0.0.0';
+process.env.HOSTNAME = process.env.HOSTNAME || '127.0.0.1';
 
 const standaloneServer = path.join(__dirname, '.next', 'standalone', 'server.js');
 

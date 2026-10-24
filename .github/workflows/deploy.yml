@@ -273,15 +273,15 @@ jobs:
             if command -v pm2 >/dev/null 2>&1; then
               echo "Starting clean via global PM2..."
               pm2 delete all 2>/dev/null || true
-              pm2 start ecosystem.config.js --env production
+              pm2 start ecosystem.config.js --env production --update-env
             elif [ -f "./node_modules/.bin/pm2" ]; then
               echo "Starting clean via local node_modules PM2..."
               ./node_modules/.bin/pm2 delete all 2>/dev/null || true
-              ./node_modules/.bin/pm2 start ecosystem.config.js --env production
+              ./node_modules/.bin/pm2 start ecosystem.config.js --env production --update-env
             elif command -v npx >/dev/null 2>&1; then
               echo "Starting clean via npx pm2..."
               npx pm2 delete all 2>/dev/null || true
-              npx pm2 start ecosystem.config.js --env production
+              npx pm2 start ecosystem.config.js --env production --update-env
             fi
 
             echo "Waiting 12 seconds for Next.js initialization..."
@@ -302,10 +302,12 @@ jobs:
             echo "Public HTTPS response code for blog post: $PUBLIC_CODE"
 
             if [ "$LOCAL_CODE" != "200" ]; then
+              echo "=== PORT 3000 DIAGNOSTICS ==="
+              (netstat -tlpn 2>/dev/null || ss -tlpn 2>/dev/null || lsof -i :3000 2>/dev/null) | grep 3000 || echo "Nothing listening on 3000"
               echo "=== RECENT PM2 OUT LOGS ==="
-              cat ~/.pm2/logs/aelbd-production-out*.log 2>/dev/null | tail -n 60 || true
+              cat ~/.pm2/logs/aelbd-production-out*.log 2>/dev/null | tail -n 120 || true
               echo "=== RECENT PM2 ERROR LOGS ==="
-              cat ~/.pm2/logs/aelbd-production-error*.log 2>/dev/null | tail -n 60 || true
+              cat ~/.pm2/logs/aelbd-production-error*.log 2>/dev/null | tail -n 120 || true
             fi
 
             echo "✅ Deployment complete!"

@@ -24,7 +24,7 @@ module.exports = {
       env_production: {
         NODE_ENV: 'production',
         PORT: 3000,
-        HOSTNAME: '0.0.0.0',
+        HOSTNAME: '127.0.0.1',
         UV_THREADPOOL_SIZE: '1',
       },
     },

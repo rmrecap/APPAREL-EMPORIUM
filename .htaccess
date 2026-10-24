@@ -15,9 +15,7 @@ DirectoryIndex ""
         RequestHeader unset x-middleware-subrequest
     </IfModule>
 
-    # Forward all requests to the running Node.js server (e.g., PM2 on port 3000)
-    # Make sure the port here matches the port PM2 or npm start is running on
+    # Forward all requests except actual existing static files to Node.js
     RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.*)$ http://127.0.0.1:3000/$1 [P,L]
 </IfModule>
