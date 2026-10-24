@@ -265,17 +265,21 @@ jobs:
             touch "/home/$USER/domains/aelbd.net/tmp/restart.txt" 2>/dev/null || true
 
             if command -v pm2 >/dev/null 2>&1; then
-              echo "Restarting via global PM2..."
-              pm2 restart ecosystem.config.js --env production 2>/dev/null || pm2 start ecosystem.config.js --env production 2>/dev/null || true
+              echo "Starting clean via global PM2..."
+              pm2 delete all 2>/dev/null || true
+              pm2 start ecosystem.config.js --env production
             elif [ -f "./node_modules/.bin/pm2" ]; then
-              echo "Restarting via local node_modules PM2..."
-              ./node_modules/.bin/pm2 restart ecosystem.config.js --env production 2>/dev/null || ./node_modules/.bin/pm2 start ecosystem.config.js --env production 2>/dev/null || true
+              echo "Starting clean via local node_modules PM2..."
+              ./node_modules/.bin/pm2 delete all 2>/dev/null || true
+              ./node_modules/.bin/pm2 start ecosystem.config.js --env production
             elif command -v npx >/dev/null 2>&1; then
-              echo "Restarting via npx pm2..."
-              npx pm2 restart ecosystem.config.js --env production 2>/dev/null || npx pm2 start ecosystem.config.js --env production 2>/dev/null || true
+              echo "Starting clean via npx pm2..."
+              npx pm2 delete all 2>/dev/null || true
+              npx pm2 start ecosystem.config.js --env production
             fi
 
-            sleep 3
+            echo "Waiting 12 seconds for Next.js initialization..."
+            sleep 12
             echo "=== RUNNING PROCESSES AFTER RESTART ==="
             ps -ef | grep -E "node|pm2|next" | grep -v grep || true
 
@@ -286,12 +290,10 @@ jobs:
             echo "Public HTTPS response code for blog post: $PUBLIC_CODE"
 
             if [ "$LOCAL_CODE" != "200" ]; then
+              echo "=== RECENT PM2 OUT LOGS ==="
+              cat ~/.pm2/logs/aelbd-production-out*.log 2>/dev/null | tail -n 60 || true
               echo "=== RECENT PM2 ERROR LOGS ==="
               cat ~/.pm2/logs/aelbd-production-error*.log 2>/dev/null | tail -n 60 || true
-              if [ -f "crash.log" ]; then
-                echo "=== CRASH.LOG CONTENT ==="
-                cat crash.log | tail -n 60 || true
-              fi
             fi
 
             echo "✅ Deployment complete!"

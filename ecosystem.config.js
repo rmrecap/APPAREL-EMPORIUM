@@ -10,7 +10,7 @@ module.exports = {
     {
       name: 'aelbd-production',
       cwd: __dirname,
-      script: useStandalone ? standaloneServer : 'server.js',
+      script: 'server.js',
       args: '',
       instances: 1,
       exec_mode: 'fork',
