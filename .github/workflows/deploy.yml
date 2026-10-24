@@ -295,12 +295,27 @@ jobs:
             npx pm2 list 2>/dev/null || pm2 list 2>/dev/null || true
             ps -ef | grep -E "node|pm2|next" | grep -v grep || true
 
-            echo "=== PM2 APPLICATION STDOUT (pm2-out.log) ==="
-            cat pm2-out.log 2>/dev/null | tail -n 80 || true
-            echo "=== PM2 APPLICATION STDERR (pm2-error.log) ==="
-            cat pm2-error.log 2>/dev/null | tail -n 80 || true
+            echo "=== PM2 APPLICATION STDOUT ==="
+            cat pm2-out*.log .next/standalone/pm2-out*.log 2>/dev/null | tail -n 80 || true
+            echo "=== PM2 APPLICATION STDERR ==="
+            cat pm2-error*.log .next/standalone/pm2-error*.log 2>/dev/null | tail -n 80 || true
             echo "=== PM2 GLOBAL LOGS (~/.pm2/logs/) ==="
             cat ~/.pm2/logs/* 2>/dev/null | tail -n 80 || true
+
+            echo "=== LISTENING TCP PORTS ==="
+            ss -tln 2>/dev/null || netstat -tln 2>/dev/null || true
+
+            echo "=== DIRECT NODE HTTP PROBE ==="
+            node -e '
+            const http = require("http");
+            ["127.0.0.1", "localhost", "0.0.0.0"].forEach(h => {
+              const req = http.get({ host: h, port: 3000, path: "/", timeout: 4000 }, res => {
+                console.log(`✅ [NODE PROBE] ${h}:3000 -> HTTP ${res.statusCode}`);
+              });
+              req.on("error", e => console.log(`❌ [NODE PROBE] ${h}:3000 -> ${e.code || e.message}`));
+              req.on("timeout", () => { req.destroy(); console.log(`⏳ [NODE PROBE] ${h}:3000 -> TIMEOUT`); });
+            });
+            ' || true
 
             echo "=== VERIFYING LOCAL HTTP SERVER RESPONSE ==="
             LOCAL_CODE="FAILED"
@@ -321,8 +336,6 @@ jobs:
             echo "Public HTTPS response code for blog post: $PUBLIC_CODE"
 
             if [ "$LOCAL_CODE" != "200" ]; then
-              echo "=== PORT 3000 DIAGNOSTICS ==="
-              (netstat -tlpn 2>/dev/null || ss -tlpn 2>/dev/null || lsof -i :3000 2>/dev/null) | grep 3000 || echo "Nothing listening on 3000"
               echo "=== PM2 PROCESS 0 DETAIL ==="
               npx pm2 describe 0 2>/dev/null || true
             fi
