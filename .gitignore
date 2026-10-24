@@ -14,10 +14,9 @@ out/
 
 # Database files (SQLite — contains real data, never commit)
 *.db
-*.db-journal
-*.db-shm
-*.db-wal
-prisma/*.db
+*.db-*
+*.db.*
+prisma/*.db*
 
 # Temporary scripts (debug/migration helpers)
 tmp/

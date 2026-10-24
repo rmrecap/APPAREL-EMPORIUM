@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-guards';
-import { getGSCAuth, GSC_SITE_URL, APP_BASE_URL } from '@/lib/gsc-auth';
-import { google } from 'googleapis';
+import { indexSingleUrl, batchIndexUrls, submitSitemapToGSC } from '@/lib/gsc-service';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,108 +33,25 @@ export async function POST(req: Request) {
         }
 
         const { action = 'index', url, urls } = body;
-        const { auth, siteUrl } = await getGSCAuth();
 
-        // ── SITEMAP RESUBMIT ──────────────────────────────────────
+        // 1. Sitemap submission
         if (action === 'sitemap') {
-            const searchconsole = google.searchconsole({ version: 'v1', auth });
-            const sitemapFeedpath = `${APP_BASE_URL}/sitemap.xml`;
-
-            await searchconsole.sitemaps.submit({
-                siteUrl,
-                feedpath: sitemapFeedpath,
-            });
-
-            const statusRes = await searchconsole.sitemaps.get({
-                siteUrl,
-                feedpath: sitemapFeedpath,
-            }).catch(() => null);
-
-            return NextResponse.json({
-                success: true,
-                message: 'Sitemap submitted to Google Search Console successfully',
-                feedpath: sitemapFeedpath,
-                sitemapStatus: statusRes?.data || null,
-                timestamp: new Date().toISOString(),
-            });
+            const result = await submitSitemapToGSC();
+            return NextResponse.json(result);
         }
 
-        // ── BATCH INDEXING ────────────────────────────────────────
+        // 2. Batch indexing
         if (action === 'batch_index' && Array.isArray(urls)) {
-            const indexing = google.indexing({ version: 'v3', auth });
-            const results: any[] = [];
-
-            for (const rawUrl of urls) {
-                let targetUrl = rawUrl.trim();
-                if (targetUrl.startsWith('/')) {
-                    targetUrl = `${APP_BASE_URL}${targetUrl}`;
-                }
-
-                try {
-                    const res = await indexing.urlNotifications.publish({
-                        requestBody: {
-                            url: targetUrl,
-                            type: 'URL_UPDATED',
-                        },
-                    });
-                    results.push({
-                        url: targetUrl,
-                        status: 'SUCCESS',
-                        statusCode: res.status,
-                        notifyTime: res.data.urlNotificationMetadata?.latestUpdate?.notifyTime || new Date().toISOString(),
-                    });
-                } catch (err: any) {
-                    results.push({
-                        url: targetUrl,
-                        status: 'ERROR',
-                        error: err.message,
-                    });
-                }
-            }
-
-            return NextResponse.json({
-                success: true,
-                action: 'batch_index',
-                total: urls.length,
-                results,
-                timestamp: new Date().toISOString(),
-            });
+            const result = await batchIndexUrls(urls);
+            return NextResponse.json(result);
         }
 
-        // ── SINGLE URL INDEXING ───────────────────────────────────
-        if (!url || typeof url !== 'string') {
-            return NextResponse.json({ error: 'A valid url is required for indexing' }, { status: 400 });
-        }
-
-        let targetUrl = url.trim();
-        if (targetUrl.startsWith('/')) {
-            targetUrl = `${APP_BASE_URL}${targetUrl}`;
-        }
-
-        if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
-            return NextResponse.json({ error: 'URL must start with http:// or https://' }, { status: 400 });
-        }
-
-        const indexing = google.indexing({ version: 'v3', auth });
-
-        const notifyRes = await indexing.urlNotifications.publish({
-            requestBody: {
-                url: targetUrl,
-                type: 'URL_UPDATED',
-            },
-        });
-
-        return NextResponse.json({
-            success: true,
-            action: 'index',
-            url: targetUrl,
-            status: notifyRes.status,
-            metadata: notifyRes.data.urlNotificationMetadata?.latestUpdate || null,
-            timestamp: new Date().toISOString(),
-        });
+        // 3. Single URL indexing
+        const result = await indexSingleUrl(url);
+        return NextResponse.json(result);
 
     } catch (error: any) {
-        console.error('[GSC Index API Error]', error);
+        console.error('[Admin GSC Index API Error]', error);
         return NextResponse.json(
             {
                 success: false,
