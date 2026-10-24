@@ -42,7 +42,7 @@ jobs:
           $SSH_CMD "echo '✅ SSH connection authenticated successfully as '\$(whoami)' on '\$(hostname)''"
 
           # Reset any stuck processes from prior timed-out jobs
-          $SSH_CMD "killall -9 node npm ts-node prisma 2>/dev/null || true" || true
+          $SSH_CMD "pkill -9 -u \$(whoami) -f 'node|npm|ts-node|prisma' 2>/dev/null || true" || true
           sleep 2
 
           $SSH_CMD "bash -s" << 'EOF'
@@ -199,8 +199,15 @@ jobs:
             echo "Building Next.js application..."
             npm run build
             
-            # Restart application across Passenger and PM2
-            echo "Restarting application service..."
+            # Process diagnostics and robust restart
+            echo "=== RUNNING PROCESSES BEFORE RESTART ==="
+            ps -ef | grep -E "node|pm2|next" | grep -v grep || true
+
+            echo "=== TERMINATING STALE NODE WORKERS ==="
+            pkill -9 -u "$USER" -f 'node|pm2|next' 2>/dev/null || true
+            sleep 2
+
+            echo "=== RESTARTING APPLICATION ACROSS PASSENGER & PM2 ==="
             mkdir -p tmp
             touch tmp/restart.txt
             mkdir -p "/home/$USER/domains/aelbd.net/hbuilds/current/nodejs/tmp" 2>/dev/null || true
@@ -211,11 +218,18 @@ jobs:
             touch "/home/$USER/domains/aelbd.net/tmp/restart.txt" 2>/dev/null || true
 
             if command -v pm2 >/dev/null 2>&1; then
-              pm2 reload ecosystem.config.js --env production 2>/dev/null || pm2 restart all 2>/dev/null || true
+              echo "Restarting via global PM2..."
+              pm2 restart ecosystem.config.js --env production 2>/dev/null || pm2 start ecosystem.config.js --env production 2>/dev/null || true
+            elif [ -f "./node_modules/.bin/pm2" ]; then
+              echo "Restarting via local node_modules PM2..."
+              ./node_modules/.bin/pm2 restart ecosystem.config.js --env production 2>/dev/null || ./node_modules/.bin/pm2 start ecosystem.config.js --env production 2>/dev/null || true
+            elif command -v npx >/dev/null 2>&1; then
+              echo "Restarting via npx pm2..."
+              npx pm2 restart ecosystem.config.js --env production 2>/dev/null || npx pm2 start ecosystem.config.js --env production 2>/dev/null || true
             fi
 
-            # Force terminate stale node workers so Passenger immediately spawns the newly built server
-            killall -9 node 2>/dev/null || true
-            sleep 1
+            sleep 2
+            echo "=== RUNNING PROCESSES AFTER RESTART ==="
+            ps -ef | grep -E "node|pm2|next" | grep -v grep || true
             echo "✅ Deployment complete!"
           EOF

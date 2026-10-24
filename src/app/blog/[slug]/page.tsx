@@ -17,15 +17,27 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const slug = resolvedParams?.slug;
     if (!slug) return { title: 'Post Not Found' };
 
-    const post = await prisma.blogPost.findUnique({ where: { slug } });
+    let decodedSlug = slug;
+    try {
+        decodedSlug = decodeURIComponent(slug);
+    } catch { }
+
+    const post = await prisma.blogPost.findFirst({
+        where: {
+            OR: [
+                { slug },
+                { slug: decodedSlug }
+            ]
+        }
+    });
     if (!post) return { title: 'Post Not Found' };
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
 
-    const effectiveTitle = slug === 'bsci-vs-sedex-compliance-standards-guide'
+    const effectiveTitle = (slug === 'bsci-vs-sedex-compliance-standards-guide' || decodedSlug === 'bsci-vs-sedex-compliance-standards-guide')
         ? 'BSCI vs SEDEX (SMETA): Apparel Compliance Guide for Global Buyers [2026]'
         : (post.seoTitle || `${post.title} | Apparel Emporium Blog`);
 
-    const effectiveDescription = slug === 'bsci-vs-sedex-compliance-standards-guide'
+    const effectiveDescription = (slug === 'bsci-vs-sedex-compliance-standards-guide' || decodedSlug === 'bsci-vs-sedex-compliance-standards-guide')
         ? 'Complete BSCI vs SEDEX (SMETA) compliance guide for global apparel buyers. Compare 4-pillar SMETA audit checklists, eliminate duplicate audits, and source from certified garment factories in Bangladesh.'
         : (post.seoDescription || post.excerpt || post.content.replace(/<[^>]*>/g, '').substring(0, 160));
 
@@ -64,21 +76,34 @@ export default async function BlogPostPage({ params }: PageProps) {
         const slug = resolvedParams?.slug;
         if (!slug) notFound();
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
-    const [post, recentPosts] = await Promise.all([
-        prisma.blogPost.findUnique({
-            where: { slug },
-            include: { author: { select: { name: true, avatar: true, email: true } } }
-        }),
-        prisma.blogPost.findMany({
-            where: { isPublished: true, slug: { not: slug } },
-            orderBy: { publishedAt: 'desc' },
-            take: 4,
-            select: { id: true, slug: true, title: true, excerpt: true, coverImage: true, publishedAt: true }
-        }),
-    ]);
+        let decodedSlug = slug;
+        try {
+            decodedSlug = decodeURIComponent(slug);
+        } catch { }
 
-    if (!post || !post.isPublished) notFound();
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
+        const [post, recentPosts] = await Promise.all([
+            prisma.blogPost.findFirst({
+                where: {
+                    OR: [
+                        { slug },
+                        { slug: decodedSlug }
+                    ]
+                },
+                include: { author: { select: { name: true, avatar: true, email: true } } }
+            }),
+            prisma.blogPost.findMany({
+                where: {
+                    isPublished: true,
+                    slug: { notIn: [slug, decodedSlug] }
+                },
+                orderBy: { publishedAt: 'desc' },
+                take: 4,
+                select: { id: true, slug: true, title: true, excerpt: true, coverImage: true, publishedAt: true }
+            }),
+        ]);
+
+        if (!post || !post.isPublished) notFound();
 
     const readingTime = getReadingTime(post.content);
     const publishedDate = post.publishedAt
