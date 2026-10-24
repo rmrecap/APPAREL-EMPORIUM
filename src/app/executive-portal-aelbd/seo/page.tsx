@@ -103,11 +103,15 @@ export default function SeoManagerPage() {
         try {
             const res = await fetch('/api/settings?group=seo');
             const data = await res.json();
-            const map: Record<string, string> = {};
             if (data.settings) {
-                data.settings.forEach((s: any) => map[s.key] = s.value);
+                if (Array.isArray(data.settings)) {
+                    const map: Record<string, string> = {};
+                    data.settings.forEach((s: any) => map[s.key] = s.value);
+                    setSettings(map);
+                } else if (typeof data.settings === 'object') {
+                    setSettings(data.settings);
+                }
             }
-            setSettings(map);
         } catch (e) {
             console.error('Failed to load SEO settings:', e);
         }
@@ -117,8 +121,13 @@ export default function SeoManagerPage() {
         try {
             const res = await fetch('/api/settings?group=redirects');
             const data = await res.json();
-            const arr = JSON.parse(data.settings?.find((s: any) => s.key === 'seo_redirects')?.value || '[]');
-            setRedirects(arr);
+            let raw = '[]';
+            if (Array.isArray(data.settings)) {
+                raw = data.settings.find((s: any) => s.key === 'seo_redirects')?.value || '[]';
+            } else if (data.settings && typeof data.settings === 'object') {
+                raw = data.settings['seo_redirects'] || '[]';
+            }
+            setRedirects(JSON.parse(raw));
         } catch { setRedirects([]); }
     };
 
