@@ -211,25 +211,25 @@ jobs:
               mkdir -p .next/standalone/.next
               cp -rn .next/static .next/standalone/.next/ 2>/dev/null || true
               mkdir -p .next/standalone/prisma
-              cp -rn prisma/dev.db .next/standalone/prisma/ 2>/dev/null || true
+              cp -f prisma/dev.db .next/standalone/prisma/dev.db 2>/dev/null || true
+              cp -f prisma/dev.db .next/standalone/dev.db 2>/dev/null || true
+              cp -f prisma/dev.db ./dev.db 2>/dev/null || true
               cp .env .next/standalone/.env 2>/dev/null || true
             fi
 
-            # Sync production build to public_html (in case Apache/Passenger serves from public_html)
-            if [ -d "/home/$USER/domains/aelbd.net/public_html" ] && [ "$DEPLOY_DIR" != "/home/$USER/domains/aelbd.net/public_html" ]; then
-              echo "Syncing production build to public_html for Passenger/Apache..."
+            # Sync production build and reverse proxy .htaccess to public_html
+            if [ -d "/home/$USER/domains/aelbd.net/public_html" ]; then
+              echo "Syncing production build & proxy rules to public_html..."
               cp -r .next "/home/$USER/domains/aelbd.net/public_html/" 2>/dev/null || true
               cp -rn public "/home/$USER/domains/aelbd.net/public_html/" 2>/dev/null || true
               mkdir -p "/home/$USER/domains/aelbd.net/public_html/prisma"
-              cp prisma/dev.db "/home/$USER/domains/aelbd.net/public_html/prisma/" 2>/dev/null || true
+              cp -f prisma/dev.db "/home/$USER/domains/aelbd.net/public_html/prisma/dev.db" 2>/dev/null || true
+              cp -f prisma/dev.db "/home/$USER/domains/aelbd.net/public_html/dev.db" 2>/dev/null || true
               cp .env "/home/$USER/domains/aelbd.net/public_html/" 2>/dev/null || true
               cp package.json "/home/$USER/domains/aelbd.net/public_html/" 2>/dev/null || true
               cp server.js "/home/$USER/domains/aelbd.net/public_html/" 2>/dev/null || true
-              # Remove port 3000 reverse proxy from public_html/.htaccess so Passenger can run natively
-              if [ -f "/home/$USER/domains/aelbd.net/public_html/.htaccess" ]; then
-                sed -i '/127\.0\.0\.1:3000/d' "/home/$USER/domains/aelbd.net/public_html/.htaccess" 2>/dev/null || true
-                sed -i '/REQUEST_FILENAME/d' "/home/$USER/domains/aelbd.net/public_html/.htaccess" 2>/dev/null || true
-              fi
+              cp ecosystem.config.js "/home/$USER/domains/aelbd.net/public_html/" 2>/dev/null || true
+              cp -f .htaccess "/home/$USER/domains/aelbd.net/public_html/.htaccess" 2>/dev/null || true
               mkdir -p "/home/$USER/domains/aelbd.net/public_html/tmp"
               touch "/home/$USER/domains/aelbd.net/public_html/tmp/restart.txt"
             fi
@@ -241,10 +241,12 @@ jobs:
                 cp -r .next "$HB/" 2>/dev/null || true
                 cp -rn public "$HB/" 2>/dev/null || true
                 mkdir -p "$HB/prisma"
-                cp prisma/dev.db "$HB/prisma/" 2>/dev/null || true
+                cp -f prisma/dev.db "$HB/prisma/dev.db" 2>/dev/null || true
+                cp -f prisma/dev.db "$HB/dev.db" 2>/dev/null || true
                 cp .env "$HB/" 2>/dev/null || true
                 cp package.json "$HB/" 2>/dev/null || true
                 cp server.js "$HB/" 2>/dev/null || true
+                cp ecosystem.config.js "$HB/" 2>/dev/null || true
                 mkdir -p "$HB/tmp"
                 touch "$HB/tmp/restart.txt"
               fi
@@ -254,18 +256,16 @@ jobs:
             echo "=== RUNNING PROCESSES BEFORE RESTART ==="
             ps -ef | grep -E "node|pm2|next" | grep -v grep || true
 
-            echo "=== TERMINATING STALE NODE WORKERS ==="
+            echo "=== TERMINATING STALE NODE WORKERS & CLEARING PORT 3000 ==="
+            fuser -k 3000/tcp 2>/dev/null || true
             pkill -9 -u "$USER" -f 'node|pm2|next' 2>/dev/null || true
-            sleep 2
+            sleep 3
 
-            echo "=== RESTARTING APPLICATION ACROSS PASSENGER & PM2 ==="
+            echo "=== RESTARTING APPLICATION VIA PM2 & PASSENGER ==="
             mkdir -p tmp
             touch tmp/restart.txt
-            mkdir -p "/home/$USER/domains/aelbd.net/hbuilds/current/nodejs/tmp" 2>/dev/null || true
-            touch "/home/$USER/domains/aelbd.net/hbuilds/current/nodejs/tmp/restart.txt" 2>/dev/null || true
             mkdir -p "/home/$USER/domains/aelbd.net/public_html/tmp" 2>/dev/null || true
             touch "/home/$USER/domains/aelbd.net/public_html/tmp/restart.txt" 2>/dev/null || true
-            touch "/home/$USER/domains/aelbd.net/tmp/restart.txt" 2>/dev/null || true
             passenger-config restart-app / 2>/dev/null || true
             passenger-config restart-app "/home/$USER/domains/aelbd.net/public_html" 2>/dev/null || true
             passenger-config restart-app "/home/$USER/domains/aelbd.net/nodejs" 2>/dev/null || true
@@ -290,9 +290,15 @@ jobs:
             ps -ef | grep -E "node|pm2|next" | grep -v grep || true
 
             echo "=== VERIFYING LOCAL HTTP SERVER RESPONSE ==="
-            LOCAL_CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:3000/blog/bsci-vs-sedex-compliance-standards-guide" 2>/dev/null || echo "FAILED")
-            echo "Local HTTP response code for blog post: $LOCAL_CODE"
-            PUBLIC_CODE=$(curl -s -o /dev/null -w "%{http_code}" "https://aelbd.net/blog/bsci-vs-sedex-compliance-standards-guide" 2>/dev/null || echo "FAILED")
+            LOCAL_CODE="FAILED"
+            for i in 1 2 3 4 5; do
+              LOCAL_CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:3000/blog/bsci-vs-sedex-compliance-standards-guide" 2>/dev/null || echo "FAILED")
+              echo "Attempt $i - Local HTTP response code for blog post: $LOCAL_CODE"
+              if [ "$LOCAL_CODE" = "200" ]; then break; fi
+              sleep 3
+            done
+
+            PUBLIC_CODE=$(curl -s -o /dev/null -w "%{http_code}" -A "Mozilla/5.0" "https://aelbd.net/blog/bsci-vs-sedex-compliance-standards-guide" 2>/dev/null || echo "FAILED")
             echo "Public HTTPS response code for blog post: $PUBLIC_CODE"
 
             if [ "$LOCAL_CODE" != "200" ]; then
