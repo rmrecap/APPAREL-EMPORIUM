@@ -262,8 +262,9 @@ jobs:
             sleep 3
             fuser -k 3000/tcp 2>/dev/null || true
 
-            # Remove stale PM2 logs to prevent misleading diagnostic output
-            rm -rf ~/.pm2/logs/* ~/.pm2/pids/* 2>/dev/null || true
+            # Truncate application logs
+            > pm2-out.log 2>/dev/null || true
+            > pm2-error.log 2>/dev/null || true
 
             echo "=== RESTARTING APPLICATION VIA PM2 & PASSENGER ==="
             mkdir -p tmp
@@ -277,17 +278,14 @@ jobs:
             if command -v pm2 >/dev/null 2>&1; then
               echo "Starting clean via global PM2..."
               pm2 delete all 2>/dev/null || true
-              pm2 flush 2>/dev/null || true
               pm2 start ecosystem.config.js --env production --update-env
             elif [ -f "./node_modules/.bin/pm2" ]; then
               echo "Starting clean via local node_modules PM2..."
               ./node_modules/.bin/pm2 delete all 2>/dev/null || true
-              ./node_modules/.bin/pm2 flush 2>/dev/null || true
               ./node_modules/.bin/pm2 start ecosystem.config.js --env production --update-env
             elif command -v npx >/dev/null 2>&1; then
               echo "Starting clean via npx pm2..."
               npx pm2 delete all 2>/dev/null || true
-              npx pm2 flush 2>/dev/null || true
               npx pm2 start ecosystem.config.js --env production --update-env
             fi
 
@@ -295,6 +293,10 @@ jobs:
             sleep 15
             echo "=== RUNNING PROCESSES AFTER RESTART ==="
             ps -ef | grep -E "node|pm2|next" | grep -v grep || true
+
+            echo "=== PM2 APPLICATION STDOUT & STDERR LOGS ==="
+            cat pm2-out.log 2>/dev/null | tail -n 60 || true
+            cat pm2-error.log 2>/dev/null | tail -n 60 || true
 
             echo "=== VERIFYING LOCAL HTTP SERVER RESPONSE ==="
             LOCAL_CODE="FAILED"
@@ -313,10 +315,6 @@ jobs:
             if [ "$LOCAL_CODE" != "200" ]; then
               echo "=== PORT 3000 DIAGNOSTICS ==="
               (netstat -tlpn 2>/dev/null || ss -tlpn 2>/dev/null || lsof -i :3000 2>/dev/null) | grep 3000 || echo "Nothing listening on 3000"
-              echo "=== RECENT PM2 LOGS ==="
-              pm2 logs aelbd-production --lines 60 --nostream 2>/dev/null || true
-              cat ~/.pm2/logs/aelbd-production-out.log 2>/dev/null | tail -n 80 || true
-              cat ~/.pm2/logs/aelbd-production-error.log 2>/dev/null | tail -n 80 || true
             fi
 
             echo "✅ Deployment complete!"
