@@ -2,8 +2,9 @@ import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { Calendar, User, Clock, ArrowLeft, Facebook, Twitter, Linkedin, LinkIcon } from 'lucide-react';
+import { Calendar, User, Clock, ArrowLeft, Facebook, Twitter, Linkedin } from 'lucide-react';
 import B2BLeadMagnetSection from '@/components/leads/B2BLeadMagnetSection';
+import CopyLinkButton from '@/components/blog/CopyLinkButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -467,31 +468,9 @@ export default async function BlogPostPage({ params }: PageProps) {
                                             </a>
                                         ))}
                                         {/* Copy link button */}
-                                        <button
-                                            title="Copy link"
-                                            className="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
-                                            id="copy-link-btn"
-                                        >
-                                            <LinkIcon size={16} />
-                                            Copy Link
-                                        </button>
+                                        <CopyLinkButton url={postUrl} />
                                     </div>
                                 </div>
-
-                                {/* CopyLink client script — inline tiny script for copy */}
-                                <script dangerouslySetInnerHTML={{
-                                    __html: `
-                                        document.addEventListener('DOMContentLoaded', function() {
-                                            var btn = document.getElementById('copy-link-btn');
-                                            if (btn) btn.addEventListener('click', function() {
-                                                navigator.clipboard.writeText(window.location.href).then(function() {
-                                                    btn.textContent = '✓ Link Copied!';
-                                                    setTimeout(function() { btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg> Copy Link'; }, 2000);
-                                                });
-                                            });
-                                        });
-                                    `
-                                }} />
 
                                 {/* ── AUTHOR BIO ─────────────────────────── */}
                                 <div className="mt-12 p-6 bg-primary/5 dark:bg-primary/10 rounded-2xl border border-primary/20 flex items-center gap-5">
@@ -542,7 +521,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                                                     <img src={rp.coverImage} alt={rp.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
                                                 ) : (
                                                     <div className="absolute inset-0 flex items-center justify-center text-primary/30 text-2xl font-black">
-                                                        {rp.title.charAt(0)}
+                                                        {rp.title?.charAt(0) || 'A'}
                                                     </div>
                                                 )}
                                             </div>

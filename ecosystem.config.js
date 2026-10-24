@@ -9,6 +9,7 @@ module.exports = {
   apps: [
     {
       name: 'aelbd-production',
+      cwd: __dirname,
       script: useStandalone ? standaloneServer : 'node_modules/next/dist/bin/next',
       args: useStandalone ? '' : 'start -p 3000',
       instances: 1,

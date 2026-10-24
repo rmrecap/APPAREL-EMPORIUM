@@ -199,6 +199,17 @@ jobs:
             echo "Building Next.js application..."
             npm run build
             
+            # Sync standalone static assets and database if standalone build was generated
+            if [ -d ".next/standalone" ]; then
+              echo "Syncing assets to .next/standalone..."
+              cp -rn public .next/standalone/ 2>/dev/null || true
+              mkdir -p .next/standalone/.next
+              cp -rn .next/static .next/standalone/.next/ 2>/dev/null || true
+              mkdir -p .next/standalone/prisma
+              cp -rn prisma/dev.db .next/standalone/prisma/ 2>/dev/null || true
+              cp .env .next/standalone/.env 2>/dev/null || true
+            fi
+
             # Process diagnostics and robust restart
             echo "=== RUNNING PROCESSES BEFORE RESTART ==="
             ps -ef | grep -E "node|pm2|next" | grep -v grep || true
@@ -228,8 +239,22 @@ jobs:
               npx pm2 restart ecosystem.config.js --env production 2>/dev/null || npx pm2 start ecosystem.config.js --env production 2>/dev/null || true
             fi
 
-            sleep 2
+            sleep 3
             echo "=== RUNNING PROCESSES AFTER RESTART ==="
             ps -ef | grep -E "node|pm2|next" | grep -v grep || true
+
+            echo "=== VERIFYING LOCAL HTTP SERVER RESPONSE ==="
+            LOCAL_CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:3000/blog/bsci-vs-sedex-compliance-standards-guide" 2>/dev/null || echo "FAILED")
+            echo "Local HTTP response code for blog post: $LOCAL_CODE"
+
+            if [ "$LOCAL_CODE" != "200" ]; then
+              echo "=== RECENT PM2 ERROR LOGS ==="
+              cat ~/.pm2/logs/aelbd-production-error*.log 2>/dev/null | tail -n 60 || true
+              if [ -f "crash.log" ]; then
+                echo "=== CRASH.LOG CONTENT ==="
+                cat crash.log | tail -n 60 || true
+              fi
+            fi
+
             echo "✅ Deployment complete!"
           EOF

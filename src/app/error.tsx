@@ -27,6 +27,12 @@ export default function ErrorBoundary({
                 <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 leading-relaxed">
                     A temporary browser cache or network mismatch occurred. Please click below to reload the page with the latest version.
                 </p>
+                {error?.digest && (
+                    <p className="text-xs font-mono text-gray-400 dark:text-gray-500 mb-6 bg-gray-50 dark:bg-gray-800/40 py-1.5 px-3 rounded-lg border border-gray-200 dark:border-gray-700 inline-block">
+                        Ref: {error.digest}
+                    </p>
+                )}
+
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <button
                         onClick={() => {

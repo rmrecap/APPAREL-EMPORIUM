@@ -34,10 +34,11 @@ export async function middleware(req: NextRequest) {
     }
 
     // ── PRIORITY 2: External API & Backup routes bypass middleware session auth ─
-    // /api/external/*, /api/admin/backup/*, and /api/admin/gsc/* have their own route-level token & secret verification.
-    if (path.startsWith('/api/external/') || path.startsWith('/api/admin/backup/') || path.startsWith('/api/backup/') || path.startsWith('/api/admin/gsc/')) {
+    // /api/external/*, /api/admin/backup/*, /api/diagnostic/*, and /api/admin/gsc/* have their own route-level token & secret verification.
+    if (path.startsWith('/api/external/') || path.startsWith('/api/admin/backup/') || path.startsWith('/api/backup/') || path.startsWith('/api/admin/gsc/') || path.startsWith('/api/diagnostic/')) {
         return NextResponse.next();
     }
+
 
     // ── PRIORITY 2.5: Auto-route Misdirected External AI/API Requests ──────────
     // If external tools or clients mistakenly POST to '/' or '/products' or '/product' 
