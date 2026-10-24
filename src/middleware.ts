@@ -167,7 +167,7 @@ export const config = {
     // - _next/image    (image optimization)
     // - favicon.ico
     // - Static public assets (images, documents, fonts) to prevent middleware memory exhaustion
-    matcher: ['/((?!api/auth|api/external|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|pdf|ico|woff2?)).*)'],
+    matcher: ['/((?!api/auth|api/external|api/admin/gsc|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|pdf|ico|woff2?)).*)'],
 };
 
 
