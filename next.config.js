@@ -17,6 +17,7 @@ const nextConfig = {
     },
     serverExternalPackages: ['geoip-lite'],
     generateBuildId: async () => 'aelbd-prod-' + Date.now(),
+    output: 'standalone',
     images: {
         unoptimized: false, // Next.js image optimization
         // AVIF optimization disabled due to libheif/sharp remote code execution vulnerability (CVE-2026-75604 / GHSA-2xp9-vwfh-vxw4)

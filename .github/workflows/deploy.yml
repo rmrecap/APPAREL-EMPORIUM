@@ -305,16 +305,20 @@ jobs:
             echo "=== VERIFYING LOCAL HTTP SERVER RESPONSE ==="
             LOCAL_CODE="FAILED"
             for i in 1 2 3 4 5 6; do
-              LOCAL_CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:3000/blog/bsci-vs-sedex-compliance-standards-guide" 2>/dev/null || echo "FAILED")
-              echo "Attempt $i - Local HTTP response code for blog post: $LOCAL_CODE"
+              LOCAL_CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:3000/" 2>/dev/null || echo "FAILED")
+              echo "Attempt $i - Local HTTP response code for homepage: $LOCAL_CODE"
               if [ "$LOCAL_CODE" = "200" ]; then break; fi
               sleep 3
             done
 
-            PUBLIC_CODE=$(curl -s -o /dev/null -w "%{http_code}" -A "Mozilla/5.0" "https://aelbd.net/blog/bsci-vs-sedex-compliance-standards-guide" 2>/dev/null || echo "FAILED")
-            echo "Public HTTPS response code for blog post: $PUBLIC_CODE"
+            BLOG_CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:3000/blog/bsci-vs-sedex-compliance-standards-guide" 2>/dev/null || echo "FAILED")
+            echo "Local HTTP response code for blog post: $BLOG_CODE"
+
             HOME_CODE=$(curl -s -o /dev/null -w "%{http_code}" -A "Mozilla/5.0" "https://aelbd.net/" 2>/dev/null || echo "FAILED")
             echo "Public HTTPS response code for homepage: $HOME_CODE"
+
+            PUBLIC_CODE=$(curl -s -o /dev/null -w "%{http_code}" -A "Mozilla/5.0" "https://aelbd.net/blog/bsci-vs-sedex-compliance-standards-guide" 2>/dev/null || echo "FAILED")
+            echo "Public HTTPS response code for blog post: $PUBLIC_CODE"
 
             if [ "$LOCAL_CODE" != "200" ]; then
               echo "=== PORT 3000 DIAGNOSTICS ==="

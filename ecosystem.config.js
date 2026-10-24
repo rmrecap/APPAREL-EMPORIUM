@@ -1,17 +1,21 @@
+const fs = require('fs');
 const path = require('path');
+
+const standaloneDir = path.join(__dirname, '.next', 'standalone');
+const standaloneServer = path.join(standaloneDir, 'server.js');
+const useStandalone = fs.existsSync(standaloneServer);
 
 module.exports = {
   apps: [
     {
       name: 'aelbd-production',
-      cwd: __dirname,
-      script: './node_modules/next/dist/bin/next',
-      args: ['start', '-p', '3000', '-H', '127.0.0.1'],
-      interpreter: 'node',
+      cwd: useStandalone ? standaloneDir : __dirname,
+      script: useStandalone ? 'server.js' : './node_modules/next/dist/bin/next',
+      args: useStandalone ? '' : ['start', '-p', '3000', '-H', '0.0.0.0'],
       instances: 1,
       exec_mode: 'fork',
       autorestart: true,
-      restart_delay: 4000,
+      restart_delay: 3000,
       max_restarts: 10,
       watch: false,
       max_memory_restart: '1200M',
@@ -20,16 +24,17 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PORT: 3000,
-        HOSTNAME: '127.0.0.1',
+        HOSTNAME: '0.0.0.0',
       },
       env_production: {
         NODE_ENV: 'production',
         PORT: 3000,
-        HOSTNAME: '127.0.0.1',
+        HOSTNAME: '0.0.0.0',
       },
     },
   ],
 };
+
 
 
 
