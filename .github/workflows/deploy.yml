@@ -260,24 +260,10 @@ jobs:
             fuser -k 3000/tcp 2>/dev/null || true
             pkill -9 -u "$USER" -f 'node|pm2|next' 2>/dev/null || true
             sleep 3
+            fuser -k 3000/tcp 2>/dev/null || true
 
-            echo "=== DIRECT TEST OF NEXT START ==="
-            node -e '
-            const net = require("net");
-            const s = net.createServer();
-            s.once("error", (e) => console.log("TCP BIND ERROR on 127.0.0.1:3000:", e.message));
-            s.listen(3000, "127.0.0.1", () => {
-              console.log("✅ TCP BIND 127.0.0.1:3000 SUCCESSFUL!");
-              s.close();
-            });
-            '
-            node node_modules/next/dist/bin/next start -p 3000 -H 127.0.0.1 > /tmp/next_direct.log 2>&1 &
-            DIRECT_PID=$!
-            sleep 6
-            echo "--- NEXT DIRECT LOG OUTPUT ---"
-            cat /tmp/next_direct.log || true
-            kill -9 $DIRECT_PID 2>/dev/null || true
-            sleep 2
+            # Remove stale PM2 logs to prevent misleading diagnostic output
+            rm -rf ~/.pm2/logs/* ~/.pm2/pids/* 2>/dev/null || true
 
             echo "=== RESTARTING APPLICATION VIA PM2 & PASSENGER ==="
             mkdir -p tmp
@@ -291,25 +277,28 @@ jobs:
             if command -v pm2 >/dev/null 2>&1; then
               echo "Starting clean via global PM2..."
               pm2 delete all 2>/dev/null || true
+              pm2 flush 2>/dev/null || true
               pm2 start ecosystem.config.js --env production --update-env
             elif [ -f "./node_modules/.bin/pm2" ]; then
               echo "Starting clean via local node_modules PM2..."
               ./node_modules/.bin/pm2 delete all 2>/dev/null || true
+              ./node_modules/.bin/pm2 flush 2>/dev/null || true
               ./node_modules/.bin/pm2 start ecosystem.config.js --env production --update-env
             elif command -v npx >/dev/null 2>&1; then
               echo "Starting clean via npx pm2..."
               npx pm2 delete all 2>/dev/null || true
+              npx pm2 flush 2>/dev/null || true
               npx pm2 start ecosystem.config.js --env production --update-env
             fi
 
-            echo "Waiting 12 seconds for Next.js initialization..."
-            sleep 12
+            echo "Waiting 15 seconds for Next.js initialization..."
+            sleep 15
             echo "=== RUNNING PROCESSES AFTER RESTART ==="
             ps -ef | grep -E "node|pm2|next" | grep -v grep || true
 
             echo "=== VERIFYING LOCAL HTTP SERVER RESPONSE ==="
             LOCAL_CODE="FAILED"
-            for i in 1 2 3 4 5; do
+            for i in 1 2 3 4 5 6; do
               LOCAL_CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:3000/blog/bsci-vs-sedex-compliance-standards-guide" 2>/dev/null || echo "FAILED")
               echo "Attempt $i - Local HTTP response code for blog post: $LOCAL_CODE"
               if [ "$LOCAL_CODE" = "200" ]; then break; fi
@@ -318,14 +307,16 @@ jobs:
 
             PUBLIC_CODE=$(curl -s -o /dev/null -w "%{http_code}" -A "Mozilla/5.0" "https://aelbd.net/blog/bsci-vs-sedex-compliance-standards-guide" 2>/dev/null || echo "FAILED")
             echo "Public HTTPS response code for blog post: $PUBLIC_CODE"
+            HOME_CODE=$(curl -s -o /dev/null -w "%{http_code}" -A "Mozilla/5.0" "https://aelbd.net/" 2>/dev/null || echo "FAILED")
+            echo "Public HTTPS response code for homepage: $HOME_CODE"
 
             if [ "$LOCAL_CODE" != "200" ]; then
               echo "=== PORT 3000 DIAGNOSTICS ==="
               (netstat -tlpn 2>/dev/null || ss -tlpn 2>/dev/null || lsof -i :3000 2>/dev/null) | grep 3000 || echo "Nothing listening on 3000"
-              echo "=== RECENT PM2 OUT LOGS ==="
-              cat ~/.pm2/logs/aelbd-production-out*.log 2>/dev/null | tail -n 120 || true
-              echo "=== RECENT PM2 ERROR LOGS ==="
-              cat ~/.pm2/logs/aelbd-production-error*.log 2>/dev/null | tail -n 120 || true
+              echo "=== RECENT PM2 LOGS ==="
+              pm2 logs aelbd-production --lines 60 --nostream 2>/dev/null || true
+              cat ~/.pm2/logs/aelbd-production-out.log 2>/dev/null | tail -n 80 || true
+              cat ~/.pm2/logs/aelbd-production-error.log 2>/dev/null | tail -n 80 || true
             fi
 
             echo "✅ Deployment complete!"
