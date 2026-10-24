@@ -225,7 +225,11 @@ jobs:
               cp .env "/home/$USER/domains/aelbd.net/public_html/" 2>/dev/null || true
               cp package.json "/home/$USER/domains/aelbd.net/public_html/" 2>/dev/null || true
               cp server.js "/home/$USER/domains/aelbd.net/public_html/" 2>/dev/null || true
-              cp .htaccess "/home/$USER/domains/aelbd.net/public_html/" 2>/dev/null || true
+              # Remove port 3000 reverse proxy from public_html/.htaccess so Passenger can run natively
+              if [ -f "/home/$USER/domains/aelbd.net/public_html/.htaccess" ]; then
+                sed -i '/127\.0\.0\.1:3000/d' "/home/$USER/domains/aelbd.net/public_html/.htaccess" 2>/dev/null || true
+                sed -i '/REQUEST_FILENAME/d' "/home/$USER/domains/aelbd.net/public_html/.htaccess" 2>/dev/null || true
+              fi
               mkdir -p "/home/$USER/domains/aelbd.net/public_html/tmp"
               touch "/home/$USER/domains/aelbd.net/public_html/tmp/restart.txt"
             fi
@@ -261,8 +265,10 @@ jobs:
             touch "/home/$USER/domains/aelbd.net/hbuilds/current/nodejs/tmp/restart.txt" 2>/dev/null || true
             mkdir -p "/home/$USER/domains/aelbd.net/public_html/tmp" 2>/dev/null || true
             touch "/home/$USER/domains/aelbd.net/public_html/tmp/restart.txt" 2>/dev/null || true
-            mkdir -p "/home/$USER/domains/aelbd.net/tmp" 2>/dev/null || true
             touch "/home/$USER/domains/aelbd.net/tmp/restart.txt" 2>/dev/null || true
+            passenger-config restart-app / 2>/dev/null || true
+            passenger-config restart-app "/home/$USER/domains/aelbd.net/public_html" 2>/dev/null || true
+            passenger-config restart-app "/home/$USER/domains/aelbd.net/nodejs" 2>/dev/null || true
 
             if command -v pm2 >/dev/null 2>&1; then
               echo "Starting clean via global PM2..."
