@@ -210,5 +210,9 @@ jobs:
             if command -v pm2 >/dev/null 2>&1; then
               pm2 reload ecosystem.config.js --env production 2>/dev/null || pm2 restart all 2>/dev/null || true
             fi
+
+            # Force terminate stale node workers so Passenger immediately spawns the newly built server
+            killall -9 node 2>/dev/null || true
+            sleep 1
             echo "✅ Deployment complete!"
           EOF
