@@ -291,12 +291,16 @@ jobs:
 
             echo "Waiting 15 seconds for Next.js initialization..."
             sleep 15
-            echo "=== RUNNING PROCESSES AFTER RESTART ==="
+            echo "=== PM2 STATUS & PROCESSES AFTER RESTART ==="
+            npx pm2 list 2>/dev/null || pm2 list 2>/dev/null || true
             ps -ef | grep -E "node|pm2|next" | grep -v grep || true
 
-            echo "=== PM2 APPLICATION STDOUT & STDERR LOGS ==="
-            cat pm2-out.log 2>/dev/null | tail -n 60 || true
-            cat pm2-error.log 2>/dev/null | tail -n 60 || true
+            echo "=== PM2 APPLICATION STDOUT (pm2-out.log) ==="
+            cat pm2-out.log 2>/dev/null | tail -n 80 || true
+            echo "=== PM2 APPLICATION STDERR (pm2-error.log) ==="
+            cat pm2-error.log 2>/dev/null | tail -n 80 || true
+            echo "=== PM2 GLOBAL LOGS (~/.pm2/logs/) ==="
+            cat ~/.pm2/logs/* 2>/dev/null | tail -n 80 || true
 
             echo "=== VERIFYING LOCAL HTTP SERVER RESPONSE ==="
             LOCAL_CODE="FAILED"
@@ -315,6 +319,8 @@ jobs:
             if [ "$LOCAL_CODE" != "200" ]; then
               echo "=== PORT 3000 DIAGNOSTICS ==="
               (netstat -tlpn 2>/dev/null || ss -tlpn 2>/dev/null || lsof -i :3000 2>/dev/null) | grep 3000 || echo "Nothing listening on 3000"
+              echo "=== PM2 PROCESS 0 DETAIL ==="
+              npx pm2 describe 0 2>/dev/null || true
             fi
 
             echo "✅ Deployment complete!"
