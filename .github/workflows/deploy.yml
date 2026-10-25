@@ -41,9 +41,9 @@ jobs:
           # Sanity check connection
           $SSH_CMD "echo '✅ SSH connection authenticated successfully as '\$(whoami)' on '\$(hostname)''"
 
-          # Reset any stuck processes from prior timed-out jobs
-          $SSH_CMD "pkill -9 -u \$(whoami) -f 'node|npm|ts-node|prisma' 2>/dev/null || true" || true
-          sleep 2
+          # Reset any stuck processes or PM2 daemons from prior runs to free 100% of available memory
+          $SSH_CMD "pm2 kill 2>/dev/null || true; npx pm2 kill 2>/dev/null || true; pkill -9 -u \$(whoami) -f 'node|npm|pm2|next|ts-node|prisma' 2>/dev/null || true" || true
+          sleep 3
 
           $SSH_CMD "bash -s" << 'EOF'
             export PATH=$PATH:/usr/local/bin:/opt/alt/alt-nodejs22/root/usr/bin:/opt/alt/alt-nodejs20/root/usr/bin
@@ -78,7 +78,7 @@ jobs:
             cd "$DEPLOY_DIR"
             
             # Prevent Hostinger memory and thread crashing
-            export NODE_OPTIONS="--max-old-space-size=1024"
+            export NODE_OPTIONS="--max-old-space-size=1280"
             export UV_THREADPOOL_SIZE=1
             git config --global pack.threads 1
             git config --global pack.windowMemory 50m
@@ -203,6 +203,10 @@ jobs:
             
             echo "Building Next.js application..."
             export SKIP_PREBUILD_SYNC=1
+            pm2 kill 2>/dev/null || true
+            npx pm2 kill 2>/dev/null || true
+            pkill -9 -u "$USER" -f 'next-server' 2>/dev/null || true
+            sleep 2
             npm run build || { echo "❌ FATAL: Next.js build failed!"; exit 1; }
             
             # Sync standalone static assets and database if standalone build was generated

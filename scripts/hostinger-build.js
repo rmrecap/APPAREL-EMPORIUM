@@ -14,7 +14,7 @@ function run(cmd, desc) {
             env: {
                 ...process.env,
                 NEXT_DEBUG_BUILD: '1',
-                NODE_OPTIONS: '--max-old-space-size=800 --stack-trace-limit=50',
+                NODE_OPTIONS: '--max-old-space-size=1280 --stack-trace-limit=100',
                 UV_THREADPOOL_SIZE: '1'
             }
         });
