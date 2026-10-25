@@ -327,48 +327,40 @@ jobs:
             echo "=== LISTENING TCP PORTS ==="
             ss -tln 2>/dev/null || netstat -tln 2>/dev/null || true
 
-            echo "=== DIRECT NODE HTTP PROBE ==="
+            echo "=== TESTING DIRECT HOST & SOCKET PROBES ==="
             node -e '
             const http = require("http");
-            ["127.0.0.1", "localhost", "0.0.0.0"].forEach(h => {
-              const req = http.get({ host: h, port: 3000, path: "/", timeout: 4000 }, res => {
-                console.log(`✅ [NODE PROBE] ${h}:3000 -> HTTP ${res.statusCode}`);
+            ["0.0.0.0", "127.0.0.1"].forEach(h => {
+              const req = http.get({ host: h, port: 3000, path: "/", timeout: 3000 }, res => {
+                console.log(`✅ [PROBE] ${h}:3000 -> HTTP ${res.statusCode}`);
               });
-              req.on("error", e => console.log(`❌ [NODE PROBE] ${h}:3000 -> ${e.code || e.message}`));
-              req.on("timeout", () => { req.destroy(); console.log(`⏳ [NODE PROBE] ${h}:3000 -> TIMEOUT`); });
+              req.on("error", e => console.log(`ℹ️ [PROBE] ${h}:3000 -> ${e.code || e.message}`));
+              req.on("timeout", () => { req.destroy(); console.log(`⏳ [PROBE] ${h}:3000 -> TIMEOUT`); });
             });
             ' || true
 
-            echo "=== VERIFYING LOCAL HTTP SERVER RESPONSE ==="
-            LOCAL_CODE="FAILED"
-            for i in 1 2 3 4 5 6; do
-              LOCAL_CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:3000/" 2>/dev/null || echo "FAILED")
-              echo "Attempt $i - Local HTTP response code for homepage: $LOCAL_CODE"
-              if [ "$LOCAL_CODE" = "200" ]; then break; fi
-              sleep 3
+            echo "=== VERIFYING PUBLIC PRODUCTION SITE (HTTPS) ==="
+            HOME_CODE="FAILED"
+            for i in 1 2 3 4 5 6 7 8 9 10; do
+              HOME_CODE=$(curl -s -o /dev/null -w "%{http_code}" -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" "https://aelbd.net/" 2>/dev/null || echo "FAILED")
+              echo "Attempt $i - Public HTTPS response code for homepage: $HOME_CODE"
+              if [ "$HOME_CODE" = "200" ]; then break; fi
+              sleep 4
             done
 
-            BLOG_CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:3000/blog/bsci-vs-sedex-compliance-standards-guide" 2>/dev/null || echo "FAILED")
-            echo "Local HTTP response code for blog post: $BLOG_CODE"
+            BLOG_CODE=$(curl -s -o /dev/null -w "%{http_code}" -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" "https://aelbd.net/blog/bsci-vs-sedex-compliance-standards-guide" 2>/dev/null || echo "FAILED")
+            echo "Public HTTPS response code for blog post: $BLOG_CODE"
 
-            HOME_CODE=$(curl -s -o /dev/null -w "%{http_code}" -A "Mozilla/5.0" "https://aelbd.net/" 2>/dev/null || echo "FAILED")
-            echo "Public HTTPS response code for homepage: $HOME_CODE"
+            PROD_CODE=$(curl -s -o /dev/null -w "%{http_code}" -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" "https://aelbd.net/products" 2>/dev/null || echo "FAILED")
+            echo "Public HTTPS response code for products: $PROD_CODE"
 
-            PUBLIC_CODE=$(curl -s -o /dev/null -w "%{http_code}" -A "Mozilla/5.0" "https://aelbd.net/blog/bsci-vs-sedex-compliance-standards-guide" 2>/dev/null || echo "FAILED")
-            echo "Public HTTPS response code for blog post: $PUBLIC_CODE"
-
-            if [ "$LOCAL_CODE" != "200" ]; then
-              echo "=== PM2 PROCESS 0 DETAIL ==="
+            if [ "$HOME_CODE" != "200" ]; then
+              echo "=== DIAGNOSTICS FOR NON-200 RESPONSE ==="
               npx pm2 describe 0 2>/dev/null || true
-              echo "=== CURRENT PROCESS ENVIRONMENT & PORTS ==="
-              PID=$(pgrep -u "$USER" -f 'server.js|next-server' | head -n 1)
-              if [ -n "$PID" ]; then
-                echo "Found PID: $PID"
-                cat /proc/$PID/cmdline 2>/dev/null | tr '\0' ' ' || true; echo ""
-                cat /proc/$PID/environ 2>/dev/null | tr '\0' '\n' | grep -E "PORT|HOST|NODE" || true
-                echo "Open FDs for $PID:"
-                ls -l /proc/$PID/fd 2>/dev/null || true
-              fi
+              tail -n 40 pm2-error*.log 2>/dev/null || true
+              tail -n 40 pm2-out*.log 2>/dev/null || true
+              tail -n 40 /home/$USER/domains/aelbd.net/hbuilds/current/nodejs/stderr.log 2>/dev/null || true
+              tail -n 40 /home/$USER/domains/aelbd.net/public_html/stderr.log 2>/dev/null || true
             fi
 
             echo "✅ Deployment complete!"

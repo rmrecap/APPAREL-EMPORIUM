@@ -18,12 +18,12 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PORT: 3000,
-        HOSTNAME: '127.0.0.1',
+        HOSTNAME: '0.0.0.0',
       },
       env_production: {
         NODE_ENV: 'production',
         PORT: 3000,
-        HOSTNAME: '127.0.0.1',
+        HOSTNAME: '0.0.0.0',
       },
     },
   ],

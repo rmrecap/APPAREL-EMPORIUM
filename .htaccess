@@ -16,7 +16,11 @@
     # Serve existing static files directly
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^ - [L]
+</IfModule>
 
-    # Forward all other requests (including /) to Node.js backend on port 3000
-    RewriteRule ^(.*)$ http://127.0.0.1:3000/$1 [P,L]
+# Phusion Passenger native execution for Hostinger Node.js
+<IfModule mod_passenger.c>
+    PassengerEnabled on
+    PassengerAppType node
+    PassengerStartupFile server.js
 </IfModule>
