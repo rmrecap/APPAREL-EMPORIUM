@@ -222,6 +222,18 @@ async function main() {
         }
     }
 
+    // 7b. CLEAR WEBPACK CACHE TO PREVENT MEMORY SPIKE
+    const nextCache = path.join(cwd, '.next', 'cache');
+    if (fs.existsSync(nextCache)) {
+        try {
+            console.log('🧹 [CACHE] Purging stale .next/cache to prevent memory explosion during build...');
+            fs.rmSync(nextCache, { recursive: true, force: true });
+            console.log('✅ [CACHE] .next/cache purged successfully.');
+        } catch (e) {
+            console.warn('⚠️ [CACHE WARNING]', e.message);
+        }
+    }
+
     // 8. BUILD NEXT.JS PRODUCTION APPLICATION
     console.log('\n🏗️ [BUILD] Compiling Next.js production build...');
     process.env.NEXT_DEBUG_BUILD = '1';

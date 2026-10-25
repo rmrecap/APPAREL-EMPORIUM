@@ -207,6 +207,7 @@ jobs:
             npx pm2 kill 2>/dev/null || true
             pkill -9 -u "$USER" -f 'next-server' 2>/dev/null || true
             sleep 2
+            rm -rf .next/cache 2>/dev/null || true
             npm run build || { echo "❌ FATAL: Next.js build failed!"; exit 1; }
             
             # Sync standalone static assets and database if standalone build was generated
