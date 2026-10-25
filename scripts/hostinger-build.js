@@ -14,7 +14,7 @@ function run(cmd, desc) {
             env: {
                 ...process.env,
                 NEXT_DEBUG_BUILD: '1',
-                NODE_OPTIONS: '--max-old-space-size=1280 --stack-trace-limit=100',
+                NODE_OPTIONS: '--max-old-space-size=800 --stack-trace-limit=50',
                 UV_THREADPOOL_SIZE: '1'
             }
         });
@@ -174,48 +174,52 @@ async function main() {
         }
     }
 
-    // 4. GENERATE PRISMA CLIENT WITH LOCAL PINNED BINARY
-    grantExecPerms(path.join(cwd, 'node_modules', '@prisma', 'engines'));
-    grantExecPerms(path.join(cwd, 'node_modules', '.bin'));
-    const localPrisma = path.join(cwd, 'node_modules', 'prisma', 'build', 'index.js');
-    if (fs.existsSync(localPrisma)) {
-        run(`node "${localPrisma}" generate`, 'Generate Prisma Client');
+    // 4. GENERATE PRISMA CLIENT & SYNC (Skip if already performed in deploy pipeline to save memory)
+    if (process.env.SKIP_PREBUILD_SYNC === '1') {
+        console.log('⚡ [SKIP] Database pre-sync and Prisma generation already performed in deploy pipeline. Going directly to Next.js build...');
     } else {
-        run('npx -y prisma@5.22.0 generate', 'Generate Prisma Client via npx');
-    }
-
-    // 5. PRE-MIGRATION PRODUCT INTEGRITY GUARD
-    if (fs.existsSync(path.join(cwd, 'scripts', 'guard-product-integrity.js'))) {
-        run('node scripts/guard-product-integrity.js', 'Pre-migration Product Integrity Guard');
-    }
-
-    // 6. UPDATE SCHEMA & SETTINGS
-    try {
         grantExecPerms(path.join(cwd, 'node_modules', '@prisma', 'engines'));
+        grantExecPerms(path.join(cwd, 'node_modules', '.bin'));
+        const localPrisma = path.join(cwd, 'node_modules', 'prisma', 'build', 'index.js');
         if (fs.existsSync(localPrisma)) {
-            run(`node "${localPrisma}" db push --accept-data-loss`, 'Sync Database Schema');
+            run(`node "${localPrisma}" generate`, 'Generate Prisma Client');
         } else {
-            run('npx -y prisma@5.22.0 db push --accept-data-loss', 'Sync Database Schema via npx');
+            run('npx -y prisma@5.22.0 generate', 'Generate Prisma Client via npx');
         }
-    } catch (dbSyncErr) {
-        console.warn('⚠️ [DB SYNC WARNING] db push encountered a non-fatal warning, proceeding with integrity guards:', dbSyncErr.message);
-    }
 
-    if (fs.existsSync(path.join(cwd, 'scripts', 'sync-corporate-settings.js'))) {
-        run('node scripts/sync-corporate-settings.js', 'Synchronize Corporate Site Settings');
-    }
+        // 5. PRE-MIGRATION PRODUCT INTEGRITY GUARD
+        if (fs.existsSync(path.join(cwd, 'scripts', 'guard-product-integrity.js'))) {
+            run('node scripts/guard-product-integrity.js', 'Pre-migration Product Integrity Guard');
+        }
 
-    if (fs.existsSync(path.join(cwd, 'scripts', 'update-megamenu.js'))) {
-        run('node scripts/update-megamenu.js', 'Synchronize MegaMenu Structure');
-    }
+        // 6. UPDATE SCHEMA & SETTINGS
+        try {
+            grantExecPerms(path.join(cwd, 'node_modules', '@prisma', 'engines'));
+            if (fs.existsSync(localPrisma)) {
+                run(`node "${localPrisma}" db push --accept-data-loss`, 'Sync Database Schema');
+            } else {
+                run('npx -y prisma@5.22.0 db push --accept-data-loss', 'Sync Database Schema via npx');
+            }
+        } catch (dbSyncErr) {
+            console.warn('⚠️ [DB SYNC WARNING] db push encountered a non-fatal warning, proceeding with integrity guards:', dbSyncErr.message);
+        }
 
-    if (fs.existsSync(path.join(cwd, 'scripts', 'sync-blog-posts.js'))) {
-        run('node scripts/sync-blog-posts.js', 'Synchronize Blog Posts');
-    }
+        if (fs.existsSync(path.join(cwd, 'scripts', 'sync-corporate-settings.js'))) {
+            run('node scripts/sync-corporate-settings.js', 'Synchronize Corporate Site Settings');
+        }
 
-    // 7. POST-MIGRATION PRODUCT INTEGRITY GUARD
-    if (fs.existsSync(path.join(cwd, 'scripts', 'guard-product-integrity.js'))) {
-        run('node scripts/guard-product-integrity.js', 'Post-migration Product Integrity Guard');
+        if (fs.existsSync(path.join(cwd, 'scripts', 'update-megamenu.js'))) {
+            run('node scripts/update-megamenu.js', 'Synchronize MegaMenu Structure');
+        }
+
+        if (fs.existsSync(path.join(cwd, 'scripts', 'sync-blog-posts.js'))) {
+            run('node scripts/sync-blog-posts.js', 'Synchronize Blog Posts');
+        }
+
+        // 7. POST-MIGRATION PRODUCT INTEGRITY GUARD
+        if (fs.existsSync(path.join(cwd, 'scripts', 'guard-product-integrity.js'))) {
+            run('node scripts/guard-product-integrity.js', 'Post-migration Product Integrity Guard');
+        }
     }
 
     // 8. BUILD NEXT.JS PRODUCTION APPLICATION

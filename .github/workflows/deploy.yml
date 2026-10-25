@@ -78,7 +78,7 @@ jobs:
             cd "$DEPLOY_DIR"
             
             # Prevent Hostinger memory and thread crashing
-            export NODE_OPTIONS="--max-old-space-size=1280"
+            export NODE_OPTIONS="--max-old-space-size=1024"
             export UV_THREADPOOL_SIZE=1
             git config --global pack.threads 1
             git config --global pack.windowMemory 50m
@@ -202,6 +202,7 @@ jobs:
             node scripts/guard-product-integrity.js
             
             echo "Building Next.js application..."
+            export SKIP_PREBUILD_SYNC=1
             npm run build || { echo "❌ FATAL: Next.js build failed!"; exit 1; }
             
             # Sync standalone static assets and database if standalone build was generated
