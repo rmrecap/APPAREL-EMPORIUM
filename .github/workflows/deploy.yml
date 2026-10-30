@@ -227,6 +227,7 @@ jobs:
             if [ -d "/home/$USER/domains/aelbd.net/public_html" ]; then
               echo "Syncing production build & proxy rules to public_html..."
               cp -r .next "/home/$USER/domains/aelbd.net/public_html/" 2>/dev/null || true
+              cp -rn public/* "/home/$USER/domains/aelbd.net/public_html/" 2>/dev/null || true
               cp -rn public "/home/$USER/domains/aelbd.net/public_html/" 2>/dev/null || true
               mkdir -p "/home/$USER/domains/aelbd.net/public_html/prisma"
               cp -f prisma/dev.db "/home/$USER/domains/aelbd.net/public_html/prisma/dev.db" 2>/dev/null || true
@@ -245,6 +246,7 @@ jobs:
               if [ -d "$HB" ]; then
                 echo "Syncing production build to $HB..."
                 cp -r .next "$HB/" 2>/dev/null || true
+                cp -rn public/* "$HB/" 2>/dev/null || true
                 cp -rn public "$HB/" 2>/dev/null || true
                 mkdir -p "$HB/prisma"
                 cp -f prisma/dev.db "$HB/prisma/dev.db" 2>/dev/null || true
@@ -320,8 +322,8 @@ jobs:
               npx pm2 start ecosystem.config.js --env production --update-env
             fi
 
-            echo "Waiting 15 seconds for Next.js initialization..."
-            sleep 15
+            echo "Waiting 30 seconds for Next.js initialization..."
+            sleep 30
             echo "=== PM2 STATUS & PROCESSES AFTER RESTART ==="
             npx pm2 list 2>/dev/null || pm2 list 2>/dev/null || true
             ps -ef | grep -E "node|pm2|next" | grep -v grep || true
@@ -347,7 +349,7 @@ jobs:
 
             echo "=== VERIFYING PUBLIC PRODUCTION SITE (HTTPS) ==="
             HOME_CODE="FAILED"
-            for i in 1 2 3 4 5 6 7 8 9 10; do
+            for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
               HOME_CODE=$(curl -s -o /dev/null -w "%{http_code}" -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" "https://aelbd.net/" 2>/dev/null || echo "FAILED")
               echo "Attempt $i - Public HTTPS response code for homepage: $HOME_CODE"
               if [ "$HOME_CODE" = "200" ]; then break; fi
