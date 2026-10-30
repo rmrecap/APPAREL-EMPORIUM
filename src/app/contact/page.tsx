@@ -123,9 +123,9 @@ export default function ContactPage() {
     const phoneLabel      = settings.contact_phone_label   || 'Phone Icon';
     const phoneValue      = settings.contact_phone         || settings.company_phone   || '+88 02 4895 5519, 096 6691 2038';
     const whatsappLabel   = settings.contact_whatsapp_label || 'WhatsApp Icon';
-    const whatsappValue   = settings.contact_whatsapp       || settings.whatsapp_number || '+88 018 1142 2225';
+    const whatsappValue   = (settings.contact_whatsapp       || settings.whatsapp_number || '').trim();
     const cleanWaNumber   = whatsappValue.replace(/[^0-9]/g, '');
-    const waChatUrl       = `https://wa.me/${cleanWaNumber}?text=${encodeURIComponent('Hello Apparel Emporium, I would like to inquire about your garments manufacturing and sourcing services.')}`;
+    const waChatUrl       = cleanWaNumber ? `https://wa.me/${cleanWaNumber}?text=${encodeURIComponent('Hello Apparel Emporium, I would like to inquire about your garments manufacturing and sourcing services.')}` : '';
     const websiteValue    = settings.website_url           || 'www.aelbd.net';
 
     /* ── Image assets ── */
@@ -319,47 +319,51 @@ export default function ContactPage() {
                                 </a>
 
                                 {/* 4. WhatsApp Pill */}
-                                <a
-                                    href={waChatUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="contact-pill rounded-2xl p-2.5 sm:p-3 flex items-center gap-3 group transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] border border-emerald-500/30 dark:border-emerald-500/20 hover:border-emerald-500/60"
-                                    title="Click to chat directly on WhatsApp"
-                                >
-                                    <div className="pill-inset-icon-box rounded-xl w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center shrink-0 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:bg-[#25D366] group-hover:text-white transition-all shadow-inner">
-                                        <MessageCircle size={20} className="text-emerald-600 dark:text-emerald-400 group-hover:text-white transition-colors" />
-                                    </div>
-                                    <div className="min-w-0 flex-1">
-                                        <div className="pill-label text-[10px] sm:text-[11px] font-bold uppercase tracking-wider mb-0.5 text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
-                                            <span>{whatsappLabel}</span>
-                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                {whatsappValue && waChatUrl && (
+                                    <a
+                                        href={waChatUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="contact-pill rounded-2xl p-2.5 sm:p-3 flex items-center gap-3 group transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] border border-emerald-500/30 dark:border-emerald-500/20 hover:border-emerald-500/60"
+                                        title="Click to chat directly on WhatsApp"
+                                    >
+                                        <div className="pill-inset-icon-box rounded-xl w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center shrink-0 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:bg-[#25D366] group-hover:text-white transition-all shadow-inner">
+                                            <MessageCircle size={20} className="text-emerald-600 dark:text-emerald-400 group-hover:text-white transition-colors" />
                                         </div>
-                                        <div className="pill-value text-xs sm:text-[12.5px] font-bold flex items-center gap-2 text-slate-800 dark:text-slate-200">
-                                            <span>{whatsappValue}</span>
-                                            <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-extrabold uppercase tracking-wide">
-                                                Message
-                                            </span>
+                                        <div className="min-w-0 flex-1">
+                                            <div className="pill-label text-[10px] sm:text-[11px] font-bold uppercase tracking-wider mb-0.5 text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                                                <span>{whatsappLabel}</span>
+                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                            </div>
+                                            <div className="pill-value text-xs sm:text-[12.5px] font-bold flex items-center gap-2 text-slate-800 dark:text-slate-200">
+                                                <span>{whatsappValue}</span>
+                                                <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-extrabold uppercase tracking-wide">
+                                                    Message
+                                                </span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="shrink-0 text-emerald-600 dark:text-emerald-400 opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all pr-1">
-                                        <ArrowUpRight size={15} />
-                                    </div>
-                                </a>
+                                        <div className="shrink-0 text-emerald-600 dark:text-emerald-400 opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all pr-1">
+                                            <ArrowUpRight size={15} />
+                                        </div>
+                                    </a>
+                                )}
 
                             </div>
                         </div>
 
                         {/* Action Buttons: WhatsApp Direct & Direct Inquiry */}
                         <div className="pt-4 flex flex-wrap items-center justify-between sm:justify-end gap-2.5">
-                            <a
-                                href={waChatUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="rounded-full px-4 sm:px-5 py-2 sm:py-2.5 text-[11px] font-bold uppercase tracking-wider transition-all duration-200 hover:scale-105 active:scale-95 inline-flex items-center gap-2 cursor-pointer shadow-sm bg-gradient-to-r from-[#128C7E] to-[#25D366] hover:from-[#0e6e63] hover:to-[#1fa851] text-white"
-                            >
-                                <MessageCircle size={14} />
-                                <span>Chat on WhatsApp</span>
-                            </a>
+                            {waChatUrl && (
+                                <a
+                                    href={waChatUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="rounded-full px-4 sm:px-5 py-2 sm:py-2.5 text-[11px] font-bold uppercase tracking-wider transition-all duration-200 hover:scale-105 active:scale-95 inline-flex items-center gap-2 cursor-pointer shadow-sm bg-gradient-to-r from-[#128C7E] to-[#25D366] hover:from-[#0e6e63] hover:to-[#1fa851] text-white"
+                                >
+                                    <MessageCircle size={14} />
+                                    <span>Chat on WhatsApp</span>
+                                </a>
+                            )}
                             <button
                                 onClick={() => setIsFormOpen(true)}
                                 className="inquiry-btn rounded-full px-4 sm:px-5 py-2 sm:py-2.5 text-[11px] font-bold uppercase tracking-wider transition-all duration-200 hover:scale-105 active:scale-95 inline-flex items-center gap-2 cursor-pointer shadow-sm"
@@ -524,21 +528,25 @@ export default function ContactPage() {
                                     {formLoading ? 'Submitting...' : 'Submit Inquiry'}
                                 </button>
 
-                                <div className="relative flex py-1 items-center">
-                                    <div className="flex-grow border-t border-slate-300 dark:border-white/10" />
-                                    <span className="flex-shrink mx-3 text-[10px] uppercase font-bold text-slate-400">Or Message Instantly</span>
-                                    <div className="flex-grow border-t border-slate-300 dark:border-white/10" />
-                                </div>
+                                {waChatUrl && (
+                                    <>
+                                        <div className="relative flex py-1 items-center">
+                                            <div className="flex-grow border-t border-slate-300 dark:border-white/10" />
+                                            <span className="flex-shrink mx-3 text-[10px] uppercase font-bold text-slate-400">Or Message Instantly</span>
+                                            <div className="flex-grow border-t border-slate-300 dark:border-white/10" />
+                                        </div>
 
-                                <a
-                                    href={waChatUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#128C7E] to-[#25D366] hover:from-[#0e6e63] hover:to-[#1fa851] text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-sm transition-all"
-                                >
-                                    <MessageCircle size={15} />
-                                    <span>Chat on WhatsApp: {whatsappValue}</span>
-                                </a>
+                                        <a
+                                            href={waChatUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#128C7E] to-[#25D366] hover:from-[#0e6e63] hover:to-[#1fa851] text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-sm transition-all"
+                                        >
+                                            <MessageCircle size={15} />
+                                            <span>Chat on WhatsApp: {whatsappValue}</span>
+                                        </a>
+                                    </>
+                                )}
                             </form>
                         )}
                     </div>

@@ -335,18 +335,30 @@ export default function MobileNav({ menus, isOpen, onClose }: MobileNavProps) {
                     {/* Quick Contacts & Theme Switch */}
                     <div className="grid grid-cols-2 gap-2 pt-1">
                         {(() => {
-                            const waRaw = settings.contact_whatsapp || settings.whatsapp_number || '+88 018 1142 2225';
+                            const waRaw = (settings.contact_whatsapp || settings.whatsapp_number || '').trim();
                             const waClean = waRaw.replace(/[^0-9]/g, '');
-                            const waLink = `https://wa.me/${waClean}?text=${encodeURIComponent('Hello Apparel Emporium, I would like to inquire about your garments sourcing services.')}`;
+                            if (waRaw && waClean) {
+                                const waLink = `https://wa.me/${waClean}?text=${encodeURIComponent('Hello Apparel Emporium, I would like to inquire about your garments sourcing services.')}`;
+                                return (
+                                    <a
+                                        href={waLink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-300 bg-white dark:bg-white/5 border border-slate-200/80 dark:border-white/10 hover:bg-slate-50 transition-colors"
+                                    >
+                                        <MessageCircle size={14} className="text-emerald-500" />
+                                        <span>WhatsApp</span>
+                                    </a>
+                                );
+                            }
+                            const contactEmail = settings.contact_email || settings.company_email || 'kamal@aelbd.net';
                             return (
                                 <a
-                                    href={waLink}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                                    href={`mailto:${contactEmail}`}
                                     className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-300 bg-white dark:bg-white/5 border border-slate-200/80 dark:border-white/10 hover:bg-slate-50 transition-colors"
                                 >
-                                    <MessageCircle size={14} className="text-emerald-500" />
-                                    <span>WhatsApp</span>
+                                    <Mail size={14} className="text-amber-500" />
+                                    <span>Email Us</span>
                                 </a>
                             );
                         })()}

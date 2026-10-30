@@ -65,12 +65,12 @@ export default function Footer() {
     const proprietorTitle = settings.proprietor_title || 'Proprietor';
     const address = settings.contact_address || settings.company_address || 'House # 03 (2nd Floor), Road # 12, Sector # 13, Uttara Model Town, Dhaka- 1230, Bangladesh';
     const telephone = settings.contact_phone || settings.company_phone || '+88 02 4895 5519, 096 6691 2038';
-    const cellWhatsApp = settings.contact_whatsapp || settings.whatsapp_number || '+88 018 1142 2225';
+    const cellWhatsApp = (settings.contact_whatsapp || settings.whatsapp_number || '').trim();
     const email = settings.contact_email || settings.company_email || 'kamal@aelbd.net';
     const website = settings.website_url ? settings.website_url.replace(/^https?:\/\//, '') : 'www.aelbd.net';
 
     const cleanWa = cellWhatsApp.replace(/[^0-9]/g, '');
-    const waUrl = `https://wa.me/${cleanWa}?text=${encodeURIComponent('Hello Apparel Emporium, I would like to inquire about your garments sourcing services.')}`;
+    const waUrl = cleanWa ? `https://wa.me/${cleanWa}?text=${encodeURIComponent('Hello Apparel Emporium, I would like to inquire about your garments sourcing services.')}` : '';
 
     return (
         <footer className="bg-[#121620] dark:bg-[#060A12] text-slate-300 pt-16 pb-12 border-t border-slate-800/80 dark:border-white/5 transition-colors duration-500">
@@ -143,20 +143,22 @@ export default function Footer() {
                                 </div>
 
                                 {/* Cell / WhatsApp */}
-                                <div className="flex items-center gap-2.5">
-                                    <MessageCircle size={15} className="text-emerald-400 shrink-0" />
-                                    <a
-                                        href={waUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="font-semibold text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1.5 group"
-                                    >
-                                        <span>Cell / WhatsApp: {cellWhatsApp}</span>
-                                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 uppercase font-black">
-                                            Chat
-                                        </span>
-                                    </a>
-                                </div>
+                                {cellWhatsApp && waUrl && (
+                                    <div className="flex items-center gap-2.5">
+                                        <MessageCircle size={15} className="text-emerald-400 shrink-0" />
+                                        <a
+                                            href={waUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="font-semibold text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1.5 group"
+                                        >
+                                            <span>Cell / WhatsApp: {cellWhatsApp}</span>
+                                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 uppercase font-black">
+                                                Chat
+                                            </span>
+                                        </a>
+                                    </div>
+                                )}
 
                                 {/* Email */}
                                 <div className="flex items-center gap-2.5">

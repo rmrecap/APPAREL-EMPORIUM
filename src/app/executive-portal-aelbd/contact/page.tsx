@@ -69,8 +69,8 @@ const CONTACT_CHANNELS_FIELDS: FieldDef[] = [
     {
         key: 'contact_whatsapp',
         label: 'Official WhatsApp Number (Click-to-Chat)',
-        placeholder: '+88 018 1142 2225',
-        hint: 'Direct WhatsApp hotline for buyer & customer inquiries (e.g. +88 018 1142 2225).'
+        placeholder: '+8801XXXXXXXXX (leave empty to disable)',
+        hint: 'Direct WhatsApp hotline for buyer & customer inquiries (leave blank to disable).'
     },
 ];
 

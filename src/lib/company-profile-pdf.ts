@@ -121,7 +121,7 @@ export async function generateCompanyProfilePDF(): Promise<Buffer> {
     const address = settings.contact_address || settings.company_address || 'House # 03 (2nd Floor), Road # 12, Sector # 13, Uttara Model Town, Dhaka-1230, Bangladesh';
     const email = settings.contact_email || settings.company_email || 'kamal@aelbd.net';
     const phone = settings.contact_phone || settings.company_phone || '+88 02 4895 5519, 096 6691 2038';
-    const whatsapp = settings.contact_whatsapp || settings.whatsapp_number || '+88 018 1142 2225';
+    const whatsapp = (settings.contact_whatsapp || settings.whatsapp_number || '').trim();
     const website = settings.website_url || settings.site_url || 'https://www.aelbd.net';
 
     const aboutParagraph = settings.about_paragraph ||
@@ -857,10 +857,15 @@ export async function generateCompanyProfilePDF(): Promise<Buffer> {
             p2: address,
             p3: 'Uttara Model Town, Dhaka, BD'
         },
-        {
+        whatsapp ? {
             title: 'HOTLINES & WHATSAPP',
             p1: `Cell/WA: ${whatsapp}`,
             p2: `Hotline: ${phone}`,
+            p3: 'Direct Buyer Merchandising Desk'
+        } : {
+            title: 'CORPORATE HOTLINE',
+            p1: `Hotline: ${phone}`,
+            p2: `Email: ${email}`,
             p3: 'Direct Buyer Merchandising Desk'
         },
         {

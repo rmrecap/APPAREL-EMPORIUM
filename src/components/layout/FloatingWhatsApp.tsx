@@ -13,9 +13,11 @@ export default function FloatingWhatsApp() {
     // Never render inside executive / admin portal
     if (pathname?.startsWith('/executive-portal-aelbd')) return null;
 
-    // Resolve WhatsApp number with prioritized fallbacks
-    const rawNumber = settings.contact_whatsapp || settings.whatsapp_number || '+88 018 1142 2225';
+    // Resolve WhatsApp number with prioritized settings (hidden if disabled/empty)
+    const rawNumber = (settings.contact_whatsapp || settings.whatsapp_number || '').trim();
+    if (!rawNumber) return null;
     const cleanNumber = rawNumber.replace(/[^0-9]/g, '');
+    if (!cleanNumber) return null;
     const companyName = settings.company_name || 'Apparel Emporium';
 
     const defaultMessage = `Hello ${companyName}, I would like to inquire about your garments manufacturing and sourcing services.`;

@@ -6,7 +6,7 @@ async function main() {
         { key: 'company_name', value: 'Apparel Emporium' },
         { key: 'company_short_description', value: 'A 100% export-oriented readymade garments, home textiles, footwear and accessories buying house in Dhaka, Bangladesh. Sourcing excellence since inception.' },
         { key: 'company_address', value: 'House # 09, Road # 03 Sector # 05, Uttara\nDhaka- 1230, Bangladesh' },
-        { key: 'company_phone', value: '+8801881 1422225' },
+        { key: 'company_phone', value: '+88 02 4895 5519, 096 6691 2038' },
         { key: 'company_email', value: 'kamal@aelbd.net' },
         { key: 'company_website', value: 'www.aelbd.net' },
         { key: 'company_vision', value: 'Our vision is to be a premier Buying House to merchandise readymade garments, home textiles, footwear and accessories to international customers/buyers.' },

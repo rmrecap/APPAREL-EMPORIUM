@@ -191,7 +191,7 @@ export default function SettingsPage() {
                         </div>
                         <div>
                             <label className="block text-sm font-semibold mb-2 flex items-center gap-2"><MessageCircle className="w-4 h-4 text-emerald-500" /> WhatsApp Number (Click-to-Chat)</label>
-                            <input name="whatsapp_number" type="text" placeholder="+88 018 1142 2225" value={formData.whatsapp_number || ''} onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 outline-none focus:ring-2 focus:ring-primary/50 transition-shadow" />
+                            <input name="whatsapp_number" type="text" placeholder="+8801XXXXXXXXX (leave empty to disable)" value={formData.whatsapp_number || ''} onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 outline-none focus:ring-2 focus:ring-primary/50 transition-shadow" />
                         </div>
                         <div>
                             <label className="block text-sm font-semibold mb-2 flex items-center gap-2"><Mail className="w-4 h-4 text-gray-400" /> Email Address</label>

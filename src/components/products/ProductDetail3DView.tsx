@@ -262,9 +262,9 @@ export default function ProductDetail3DView({
     const showSpecsTable = settings['product_detail_show_specs'] !== 'false';
     const showGlobe = settings['product_detail_show_globe'] !== 'false';
     const showFlowchart = settings['product_detail_show_flowchart'] !== 'false';
-    const whatsappRaw = settings.contact_whatsapp || settings.whatsapp_number || '+88 018 1142 2225';
+    const whatsappRaw = (settings.contact_whatsapp || settings.whatsapp_number || '').trim();
     const whatsappClean = whatsappRaw.replace(/[^0-9]/g, '');
-    const productWhatsAppUrl = `https://wa.me/${whatsappClean}?text=${encodeURIComponent(`Hello Apparel Emporium, I would like to inquire about the product: ${product.name} (SKU: ${product.sku || 'N/A'}). Please share pricing, MOQ, and sample options.`)}`;
+    const productWhatsAppUrl = whatsappClean ? `https://wa.me/${whatsappClean}?text=${encodeURIComponent(`Hello Apparel Emporium, I would like to inquire about the product: ${product.name} (SKU: ${product.sku || 'N/A'}). Please share pricing, MOQ, and sample options.`)}` : '';
 
     const [activeImage, setActiveImage] = useState<string>(images[0] || DEFAULT_PRODUCT_IMAGE);
 
@@ -627,16 +627,18 @@ export default function ProductDetail3DView({
                                 <span>Request Quotation</span>
                             </button>
 
-                            <a
-                                href={productWhatsAppUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="rounded-full py-3.5 px-5 text-xs font-black uppercase tracking-wider transition-all duration-200 hover:scale-105 active:scale-95 text-center cursor-pointer shadow-md flex items-center justify-center gap-2 bg-gradient-to-r from-[#128C7E] to-[#25D366] hover:from-[#0e6e63] hover:to-[#1fa851] text-white shrink-0"
-                                title="Chat directly on WhatsApp about this product"
-                            >
-                                <MessageCircle size={15} />
-                                <span>WhatsApp RFQ</span>
-                            </a>
+                            {productWhatsAppUrl && (
+                                <a
+                                    href={productWhatsAppUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="rounded-full py-3.5 px-5 text-xs font-black uppercase tracking-wider transition-all duration-200 hover:scale-105 active:scale-95 text-center cursor-pointer shadow-md flex items-center justify-center gap-2 bg-gradient-to-r from-[#128C7E] to-[#25D366] hover:from-[#0e6e63] hover:to-[#1fa851] text-white shrink-0"
+                                    title="Chat directly on WhatsApp about this product"
+                                >
+                                    <MessageCircle size={15} />
+                                    <span>WhatsApp RFQ</span>
+                                </a>
+                            )}
 
                             <a
                                 href="/api/company-profile/pdf?download=true"
@@ -947,21 +949,25 @@ export default function ProductDetail3DView({
                                     {formLoading ? 'Submitting...' : 'Submit RFQ'}
                                 </button>
 
-                                <div className="relative flex py-1 items-center">
-                                    <div className="flex-grow border-t border-slate-300 dark:border-white/10" />
-                                    <span className="flex-shrink mx-3 text-[10px] uppercase font-bold text-slate-400">Or Inquire Instantly</span>
-                                    <div className="flex-grow border-t border-slate-300 dark:border-white/10" />
-                                </div>
+                                {productWhatsAppUrl && (
+                                    <>
+                                        <div className="relative flex py-1 items-center">
+                                            <div className="flex-grow border-t border-slate-300 dark:border-white/10" />
+                                            <span className="flex-shrink mx-3 text-[10px] uppercase font-bold text-slate-400">Or Inquire Instantly</span>
+                                            <div className="flex-grow border-t border-slate-300 dark:border-white/10" />
+                                        </div>
 
-                                <a
-                                    href={productWhatsAppUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#128C7E] to-[#25D366] hover:from-[#0e6e63] hover:to-[#1fa851] text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-sm transition-all"
-                                >
-                                    <MessageCircle size={15} />
-                                    <span>Chat on WhatsApp: {whatsappRaw}</span>
-                                </a>
+                                        <a
+                                            href={productWhatsAppUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#128C7E] to-[#25D366] hover:from-[#0e6e63] hover:to-[#1fa851] text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-sm transition-all"
+                                        >
+                                            <MessageCircle size={15} />
+                                            <span>Chat on WhatsApp: {whatsappRaw}</span>
+                                        </a>
+                                    </>
+                                )}
                             </form>
                         )}
                     </div>
