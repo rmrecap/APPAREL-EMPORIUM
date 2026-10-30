@@ -223,7 +223,7 @@ jobs:
               cp .env .next/standalone/.env 2>/dev/null || true
             fi
 
-            # Sync production build and reverse proxy .htaccess to public_html
+            # Sync production build and Passenger configuration to public_html
             if [ -d "/home/$USER/domains/aelbd.net/public_html" ]; then
               echo "Syncing production build & proxy rules to public_html..."
               cp -r .next "/home/$USER/domains/aelbd.net/public_html/" 2>/dev/null || true
@@ -237,6 +237,10 @@ jobs:
               cp server.js "/home/$USER/domains/aelbd.net/public_html/" 2>/dev/null || true
               cp ecosystem.config.js "/home/$USER/domains/aelbd.net/public_html/" 2>/dev/null || true
               cp -f .htaccess "/home/$USER/domains/aelbd.net/public_html/.htaccess" 2>/dev/null || true
+              ln -sfn "/home/$USER/domains/aelbd.net/nodejs/node_modules" "/home/$USER/domains/aelbd.net/public_html/node_modules" 2>/dev/null || true
+              chmod 755 "/home/$USER/domains/aelbd.net/public_html" 2>/dev/null || true
+              chmod 644 "/home/$USER/domains/aelbd.net/public_html/.htaccess" 2>/dev/null || true
+              chmod 755 "/home/$USER/domains/aelbd.net/public_html/server.js" 2>/dev/null || true
               mkdir -p "/home/$USER/domains/aelbd.net/public_html/tmp"
               touch "/home/$USER/domains/aelbd.net/public_html/tmp/restart.txt"
             fi
@@ -255,6 +259,11 @@ jobs:
                 cp package.json "$HB/" 2>/dev/null || true
                 cp server.js "$HB/" 2>/dev/null || true
                 cp ecosystem.config.js "$HB/" 2>/dev/null || true
+                cp -f .htaccess "$HB/.htaccess" 2>/dev/null || true
+                ln -sfn "/home/$USER/domains/aelbd.net/nodejs/node_modules" "$HB/node_modules" 2>/dev/null || true
+                chmod 755 "$HB" 2>/dev/null || true
+                chmod 644 "$HB/.htaccess" 2>/dev/null || true
+                chmod 755 "$HB/server.js" 2>/dev/null || true
                 mkdir -p "$HB/tmp"
                 touch "$HB/tmp/restart.txt"
               fi
@@ -369,6 +378,8 @@ jobs:
               tail -n 40 pm2-out*.log 2>/dev/null || true
               tail -n 40 /home/$USER/domains/aelbd.net/hbuilds/current/nodejs/stderr.log 2>/dev/null || true
               tail -n 40 /home/$USER/domains/aelbd.net/public_html/stderr.log 2>/dev/null || true
+              passenger-status 2>/dev/null || true
+              tail -n 40 /var/log/passenger*.log 2>/dev/null || true
             fi
 
             echo "✅ Deployment complete!"
