@@ -129,8 +129,8 @@ export default function ContactPage() {
     const websiteValue    = settings.website_url           || 'www.aelbd.net';
 
     /* ── Image assets ── */
-    const showroomLight = settings.contact_showroom_light || '/images/contact/showroom_light.jpg';
-    const showroomDark  = settings.contact_showroom_dark  || '/images/contact/showroom_dark.jpg';
+    const showroomLight = settings.contact_showroom_light || '/images/office/showroom_lounge_wide.jpg?v=20261106_2';
+    const showroomDark  = settings.contact_showroom_dark  || '/images/office/showroom_lounge_wide.jpg?v=20261106_2';
     const globeLight    = settings.contact_globe_light    || '/images/contact/globe_light.jpg';
     const globeDark     = settings.contact_globe_dark     || '/images/contact/globe_dark.jpg';
     const blazerLight   = settings.contact_blazer_light   || '/images/contact/blazer_light.jpg';
@@ -142,28 +142,28 @@ export default function ContactPage() {
 
     const contactShowrooms = [
         {
-            src: showroomLight,
-            title: 'Showroom & Meeting Lounge',
+            src: '/images/office/showroom_lounge_wide.jpg?v=20261106_2',
+            title: 'Corporate Showroom & Meeting Lounge',
             tag: 'Buyer Negotiation Lounge',
-            label: 'Main Lounge',
+            label: 'Showroom Lounge',
             desc: 'Central conference table and apparel sample racks at our Uttara Model Town, Dhaka headquarters.'
         },
         {
-            src: '/images/office/knit_woven_double_rack.jpg',
+            src: '/images/office/knit_woven_double_rack.jpg?v=20261106_2',
             title: 'Two-Tier Sample Development Racks',
             tag: 'Sampling Development',
             label: 'Sample Racks',
             desc: 'Over 500+ active apparel samples ready for fit tests, fabric handfeel evaluation, and buyer review.'
         },
         {
-            src: '/images/office/boardroom_conference_table.jpg',
+            src: '/images/office/boardroom_conference_table.jpg?v=20261106_2',
             title: 'Corporate Conference Boardroom',
             tag: 'Strategic Operations',
             label: 'Boardroom',
             desc: 'Executive boardroom where our merchandising and QA executives coordinate with global buyers.'
         },
         {
-            src: '/images/office/sample_racks_shirts.jpg',
+            src: '/images/office/sample_racks_shirts.jpg?v=20261106_2',
             title: 'Apparel Display & Merchandising',
             tag: 'Product Catalog',
             label: 'Collections',
@@ -289,7 +289,7 @@ export default function ContactPage() {
                                 <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                                     <div 
                                         onClick={() => setLightboxItem({
-                                            src: '/images/about/ceo_portrait.jpg',
+                                            src: '/images/office/ceo_kamal_hossain_aelbd.jpg?v=20261106_2',
                                             title: proprietorName,
                                             tag: `${proprietorTitle} • ${companyName}`,
                                             desc: 'Leading apparel sourcing, merchandising, and factory network partnerships at Apparel Emporium.'
@@ -298,7 +298,7 @@ export default function ContactPage() {
                                         title="Click to view CEO portrait"
                                     >
                                         <img
-                                            src="/images/about/ceo_portrait.jpg"
+                                            src="/images/office/ceo_kamal_hossain_aelbd.jpg?v=20261106_2"
                                             alt={proprietorName}
                                             className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-110"
                                         />

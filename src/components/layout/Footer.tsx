@@ -112,7 +112,7 @@ export default function Footer() {
                             <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.04] border border-white/10">
                                 <div className="w-10 h-10 rounded-xl overflow-hidden border border-amber-400/40 dark:border-cyan-400/40 shadow-md shrink-0 bg-slate-800">
                                     <img
-                                        src="/images/about/ceo_portrait.jpg"
+                                        src="/images/office/ceo_kamal_hossain_aelbd.jpg?v=20261106_2"
                                         alt={proprietorName}
                                         className="w-full h-full object-cover object-top"
                                     />

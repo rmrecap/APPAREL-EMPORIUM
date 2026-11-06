@@ -9,37 +9,37 @@ import { Vision3DIcon, Mission3DIcon, Values3DIcon, Flowchart3DIcon } from '../.
 
 const OFFICE_GALLERY = [
     {
-        src: '/images/office/showroom_lounge_wide.jpg',
+        src: '/images/office/showroom_lounge_wide.jpg?v=20261106_2',
         title: 'Showroom & Buyer Meeting Lounge',
         tag: 'Executive Lounge',
         desc: 'Spacious negotiation lounge with direct access to garment development collections for international buyers.'
     },
     {
-        src: '/images/office/knit_woven_double_rack.jpg',
+        src: '/images/office/knit_woven_double_rack.jpg?v=20261106_2',
         title: 'Sampling Development Racks',
         tag: 'Knit & Woven Racks',
         desc: 'Over 500+ active apparel samples spanning knitwear, woven shirts, casual tops, and seasonal activewear.'
     },
     {
-        src: '/images/office/boardroom_conference_table.jpg',
+        src: '/images/office/boardroom_conference_table.jpg?v=20261106_2',
         title: 'Corporate Conference Boardroom',
         tag: 'Strategic Operations',
         desc: 'Dedicated meeting facility where our merchandising, technical, and QA executives align on production milestones.'
     },
     {
-        src: '/images/office/sample_racks_shirts.jpg',
+        src: '/images/office/sample_racks_shirts.jpg?v=20261106_2',
         title: 'Garments Display & Sourcing Floor',
         tag: 'Apparel Collections',
         desc: 'Curated selection of polos, tees, swimwear, casual shirts, and trousers ready for international private label sourcing.'
     },
     {
-        src: '/images/office/apparel_collection_racks.jpg',
+        src: '/images/office/apparel_collection_racks.jpg?v=20261106_2',
         title: 'Apparel Collection & Trims Showcase',
         tag: 'Design & Variety',
         desc: 'Vibrant casual wear, shorts, and fabric swatches demonstrating multi-category sourcing breadth.'
     },
     {
-        src: '/images/office/meeting_room_perspective.jpg',
+        src: '/images/office/meeting_room_perspective.jpg?v=20261106_2',
         title: 'Buyer Interaction & Fit Review Floor',
         tag: 'Uttara Model Town HQ',
         desc: 'Comfortable environment for international buyers to conduct sample evaluations, fit reviews, and costings.'
@@ -76,9 +76,9 @@ export default function AboutPage() {
     const profileBtnUrl  = settings.profile_btn_url  || '/company-profile.pdf';
 
     /* ── Image assets ── */
-    const aboutImgLight = settings.about_image_light || '/images/office/knit_woven_double_rack.jpg';
-    const aboutImgDark  = settings.about_image_dark  || '/images/office/knit_woven_double_rack.jpg';
-    const ceoImage      = settings.ceo_image         || '/images/about/ceo_portrait.jpg';
+    const aboutImgLight = settings.about_image_light || '/images/office/knit_woven_double_rack.jpg?v=20261106_2';
+    const aboutImgDark  = settings.about_image_dark  || '/images/office/knit_woven_double_rack.jpg?v=20261106_2';
+    const ceoImage      = settings.ceo_image         || '/images/office/ceo_kamal_hossain_aelbd.jpg?v=20261106_2';
     const blazerLight   = '/images/about/blazer_light.jpg';
     const blazerDark    = '/images/about/blazer_dark.jpg';
 
@@ -88,17 +88,17 @@ export default function AboutPage() {
 
     const heroSlides = [
         {
-            src: aboutImgLight,
+            src: '/images/office/knit_woven_double_rack.jpg?v=20261106_2',
             title: 'Garments Sampling Studio',
             subtitle: 'Uttara Model Town, Dhaka'
         },
         {
-            src: '/images/office/showroom_lounge_wide.jpg',
+            src: '/images/office/showroom_lounge_wide.jpg?v=20261106_2',
             title: 'Showroom & Meeting Lounge',
             subtitle: 'Buyer Negotiation Suite'
         },
         {
-            src: '/images/office/boardroom_conference_table.jpg',
+            src: '/images/office/boardroom_conference_table.jpg?v=20261106_2',
             title: 'Executive Conference Room',
             subtitle: 'Production & Sourcing Operations'
         }
