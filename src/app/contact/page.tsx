@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { MapPin, Mail, Phone, MessageSquare, X, CheckCircle2, Copy, Check, MessageCircle, ArrowUpRight, UserCheck, Building2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { MapPin, Mail, Phone, MessageSquare, X, CheckCircle2, Copy, Check, MessageCircle, ArrowUpRight, UserCheck, Building2, Maximize2, Sparkles } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
 import Coded3DGlobe from '../../components/products/Coded3DGlobe';
 import { Flowchart3DIcon, MapPin3DIcon, Mail3DIcon, Phone3DIcon } from '../../components/ui/Claymorphic3DIcons';
@@ -136,7 +136,56 @@ export default function ContactPage() {
     const blazerLight   = settings.contact_blazer_light   || '/images/contact/blazer_light.jpg';
     const blazerDark    = settings.contact_blazer_dark    || '/images/contact/blazer_dark.jpg';
 
-    /* ── Interaction state ── */
+    /* ── Showroom Facilities & Interaction state ── */
+    const [showroomIdx, setShowroomIdx] = useState(0);
+    const [lightboxItem, setLightboxItem] = useState<{ src: string; title: string; desc?: string; tag?: string } | null>(null);
+
+    const contactShowrooms = [
+        {
+            src: showroomLight,
+            title: 'Showroom & Meeting Lounge',
+            tag: 'Buyer Negotiation Lounge',
+            label: 'Main Lounge',
+            desc: 'Central conference table and apparel sample racks at our Uttara Model Town, Dhaka headquarters.'
+        },
+        {
+            src: '/images/office/knit_woven_double_rack.jpg',
+            title: 'Two-Tier Sample Development Racks',
+            tag: 'Sampling Development',
+            label: 'Sample Racks',
+            desc: 'Over 500+ active apparel samples ready for fit tests, fabric handfeel evaluation, and buyer review.'
+        },
+        {
+            src: '/images/office/boardroom_conference_table.jpg',
+            title: 'Corporate Conference Boardroom',
+            tag: 'Strategic Operations',
+            label: 'Boardroom',
+            desc: 'Executive boardroom where our merchandising and QA executives coordinate with global buyers.'
+        },
+        {
+            src: '/images/office/sample_racks_shirts.jpg',
+            title: 'Apparel Display & Merchandising',
+            tag: 'Product Catalog',
+            label: 'Collections',
+            desc: 'Knitwear, polos, shorts, and woven tops organized for seasonal sourcing selection.'
+        }
+    ];
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setShowroomIdx(prev => (prev + 1) % contactShowrooms.length);
+        }, 6000);
+        return () => clearInterval(timer);
+    }, [contactShowrooms.length]);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setLightboxItem(null);
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
+
     const [copiedKey, setCopiedKey] = useState<string | null>(null);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [formLoading, setFormLoading] = useState(false);
@@ -238,8 +287,24 @@ export default function ContactPage() {
                             {/* Proprietor Leadership Card */}
                             <div className="mb-3 p-2.5 sm:p-3 rounded-2xl bg-white/60 dark:bg-white/[0.04] border border-white/80 dark:border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.04)] flex items-center justify-between gap-3">
                                 <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#128C7E] via-teal-700 to-[#1B365D] flex items-center justify-center font-black text-white text-xs shadow-md shrink-0">
-                                        KH
+                                    <div 
+                                        onClick={() => setLightboxItem({
+                                            src: '/images/about/ceo_portrait.jpg',
+                                            title: proprietorName,
+                                            tag: `${proprietorTitle} • ${companyName}`,
+                                            desc: 'Leading apparel sourcing, merchandising, and factory network partnerships at Apparel Emporium.'
+                                        })}
+                                        className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl overflow-hidden border border-amber-500/40 dark:border-cyan-400/40 shadow-md shrink-0 bg-slate-200 dark:bg-slate-800 cursor-pointer group relative"
+                                        title="Click to view CEO portrait"
+                                    >
+                                        <img
+                                            src="/images/about/ceo_portrait.jpg"
+                                            alt={proprietorName}
+                                            className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-110"
+                                        />
+                                        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            <Maximize2 size={12} className="text-white drop-shadow" />
+                                        </div>
                                     </div>
                                     <div className="min-w-0">
                                         <div className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-cyan-400 flex items-center gap-1">
@@ -375,31 +440,101 @@ export default function ContactPage() {
                     </div>
 
                     {/* ── Right Column: 3D Beveled Showroom Window matching Left Height ── */}
-                    <div className="showroom-bezel rounded-[28px] sm:rounded-[36px] p-2.5 sm:p-3 h-full min-h-[460px] md:min-h-[500px] flex items-center justify-center overflow-hidden">
-                        <div className="w-full h-full min-h-[440px] md:min-h-[480px] rounded-[22px] sm:rounded-[28px] overflow-hidden relative group">
-                            {/* Light Mode Showroom */}
-                            <img
-                                src={showroomLight}
-                                alt="Apparel Emporium Showroom Atelier"
-                                className="w-full h-full object-cover rounded-[22px] sm:rounded-[28px] dark:hidden transition-transform duration-700 group-hover:scale-105"
-                            />
-                            {/* Dark Mode Showroom with Ambient Cyan Rim Lighting */}
-                            <div className="hidden dark:block w-full h-full relative">
+                    <div className="showroom-bezel rounded-[28px] sm:rounded-[36px] p-2.5 sm:p-3 h-full min-h-[460px] md:min-h-[500px] flex flex-col justify-between overflow-hidden relative">
+                        <div 
+                            onClick={() => setLightboxItem(contactShowrooms[showroomIdx])}
+                            className="w-full h-full min-h-[380px] md:min-h-[420px] rounded-[22px] sm:rounded-[28px] overflow-hidden relative group cursor-pointer"
+                            title="Click to view full photo"
+                        >
+                            {contactShowrooms.map((item, idx) => (
                                 <img
-                                    src={showroomDark}
-                                    alt="Apparel Emporium Showroom Atelier Dark"
-                                    className="w-full h-full object-cover rounded-[22px] sm:rounded-[28px] transition-transform duration-700 group-hover:scale-105"
+                                    key={idx}
+                                    src={item.src}
+                                    alt={item.title}
+                                    className={`w-full h-full object-cover rounded-[22px] sm:rounded-[28px] transition-all duration-700 absolute inset-0 ${
+                                        idx === showroomIdx ? 'opacity-100 scale-100' : 'opacity-0 scale-105 pointer-events-none'
+                                    }`}
                                 />
-                                <div
-                                    className="absolute inset-0 rounded-[22px] sm:rounded-[28px] pointer-events-none"
-                                    style={{
-                                        boxShadow: 'inset 0 0 35px rgba(6,182,212,0.22)'
-                                    }}
-                                />
+                            ))}
+
+                            {/* Dark Mode Showroom with Ambient Cyan Rim Lighting */}
+                            <div
+                                className="hidden dark:block absolute inset-0 rounded-[22px] sm:rounded-[28px] pointer-events-none"
+                                style={{
+                                    boxShadow: 'inset 0 0 35px rgba(6,182,212,0.22)'
+                                }}
+                            />
+
+                            {/* Top Badge: Physical Showroom */}
+                            <div className="absolute top-3 left-3 z-10">
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-black/65 backdrop-blur-md text-white border border-white/20 shadow-lg">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                    <span>{contactShowrooms[showroomIdx].title}</span>
+                                </span>
                             </div>
+
+                            {/* Enlarge Hint */}
+                            <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="p-1.5 rounded-xl bg-black/65 backdrop-blur-md text-white border border-white/20 shadow">
+                                    <Maximize2 size={13} />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Interactive Thumbnail / View Selector Bar */}
+                        <div className="pt-2.5 px-1 flex items-center justify-between gap-1.5 z-10">
+                            {contactShowrooms.map((item, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => setShowroomIdx(idx)}
+                                    className={`flex-1 py-1.5 px-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                                        idx === showroomIdx
+                                            ? 'bg-slate-900 text-white dark:bg-cyan-500 dark:text-slate-950 shadow-sm scale-102 font-extrabold'
+                                            : 'bg-white/50 dark:bg-white/[0.06] text-slate-700 dark:text-slate-300 hover:bg-white/80 dark:hover:bg-white/10'
+                                    }`}
+                                >
+                                    <span className="truncate block text-center">{item.label}</span>
+                                </button>
+                            ))}
                         </div>
                     </div>
 
+                </section>
+
+                {/* ═══════════════════════ SECTION: VISIT OUR DHAKA HEADQUARTERS & SHOWROOM ═══════════════════════ */}
+                <section className="space-y-6">
+                    <div className="goal-tablet rounded-[26px] sm:rounded-[32px] px-6 sm:px-10 py-6 text-center max-w-3xl mx-auto">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 mb-2 border border-emerald-500/30">
+                            <Building2 size={13} />
+                            <span>Physical Sourcing Desk &amp; Sample Room</span>
+                        </div>
+                        <h2 className="goal-heading text-lg sm:text-xl md:text-2xl font-black tracking-tight mb-2 uppercase font-heading">
+                            Visit Our Uttara Showroom &amp; Facilities
+                        </h2>
+                        <p className="goal-subtext text-xs sm:text-[13px] leading-relaxed font-medium max-w-xl mx-auto">
+                            We warmly welcome global buyers, buying houses, and brand executives to inspect our ready garment samples, evaluate fabric swatches, and discuss pricing in person at our Dhaka headquarters.
+                        </p>
+                        <div className="pt-4 flex flex-wrap items-center justify-center gap-3">
+                            <button
+                                onClick={() => setIsFormOpen(true)}
+                                className="inquiry-btn rounded-full px-5 py-2.5 text-xs font-bold uppercase tracking-wider inline-flex items-center gap-2 cursor-pointer shadow-sm transition-all hover:scale-105"
+                            >
+                                <MessageSquare size={14} />
+                                <span>Schedule Showroom Visit</span>
+                            </button>
+                            {waChatUrl && (
+                                <a
+                                    href={waChatUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="rounded-full px-5 py-2.5 text-xs font-bold uppercase tracking-wider inline-flex items-center gap-2 cursor-pointer shadow-sm bg-gradient-to-r from-[#128C7E] to-[#25D366] text-white hover:scale-105 transition-all"
+                                >
+                                    <MessageCircle size={14} />
+                                    <span>Instant WhatsApp Coordination</span>
+                                </a>
+                            )}
+                        </div>
+                    </div>
                 </section>
 
                 {/* ═══════════════════════ LOWER FLOATING ROW ═══════════════════════ */}
@@ -549,6 +684,51 @@ export default function ContactPage() {
                                 )}
                             </form>
                         )}
+                    </div>
+                </div>
+            )}
+
+            {/* ═══════════════════════ LIGHTBOX / FULLSCREEN PHOTO MODAL ═══════════════════════ */}
+            {lightboxItem && (
+                <div 
+                    onClick={() => setLightboxItem(null)}
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+                >
+                    <div 
+                        onClick={e => e.stopPropagation()}
+                        className="contact-glass-card rounded-[32px] p-4 sm:p-5 max-w-2xl w-full relative shadow-2xl overflow-hidden"
+                    >
+                        <button
+                            onClick={() => setLightboxItem(null)}
+                            className="absolute top-4 right-4 z-20 p-2 rounded-full bg-black/50 hover:bg-black/80 text-white transition-colors cursor-pointer"
+                            aria-label="Close"
+                        >
+                            <X size={18} />
+                        </button>
+
+                        <div className="showroom-bezel rounded-[22px] p-1.5 overflow-hidden mb-4 max-h-[70vh] flex items-center justify-center bg-black/10">
+                            <img
+                                src={lightboxItem.src}
+                                alt={lightboxItem.title}
+                                className="max-w-full max-h-[65vh] w-auto h-auto object-contain rounded-[18px]"
+                            />
+                        </div>
+
+                        <div className="px-2 pb-1">
+                            {lightboxItem.tag && (
+                                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-extrabold tracking-wider uppercase bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 mb-1 border border-emerald-500/30">
+                                    {lightboxItem.tag}
+                                </span>
+                            )}
+                            <h3 className="contact-heading text-base sm:text-lg font-black tracking-tight mb-1">
+                                {lightboxItem.title}
+                            </h3>
+                            {lightboxItem.desc && (
+                                <p className="contact-subtext text-xs sm:text-[13px] leading-relaxed">
+                                    {lightboxItem.desc}
+                                </p>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}

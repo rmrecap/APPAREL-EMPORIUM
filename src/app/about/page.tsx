@@ -1,10 +1,50 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Maximize2, X, ChevronLeft, ChevronRight, Building2, MapPin, Sparkles, CheckCircle2, UserCheck } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
 import Coded3DGlobe from '../../components/products/Coded3DGlobe';
 import { Vision3DIcon, Mission3DIcon, Values3DIcon, Flowchart3DIcon } from '../../components/ui/Claymorphic3DIcons';
+
+const OFFICE_GALLERY = [
+    {
+        src: '/images/office/showroom_lounge_wide.jpg',
+        title: 'Showroom & Buyer Meeting Lounge',
+        tag: 'Executive Lounge',
+        desc: 'Spacious negotiation lounge with direct access to garment development collections for international buyers.'
+    },
+    {
+        src: '/images/office/knit_woven_double_rack.jpg',
+        title: 'Sampling Development Racks',
+        tag: 'Knit & Woven Racks',
+        desc: 'Over 500+ active apparel samples spanning knitwear, woven shirts, casual tops, and seasonal activewear.'
+    },
+    {
+        src: '/images/office/boardroom_conference_table.jpg',
+        title: 'Corporate Conference Boardroom',
+        tag: 'Strategic Operations',
+        desc: 'Dedicated meeting facility where our merchandising, technical, and QA executives align on production milestones.'
+    },
+    {
+        src: '/images/office/sample_racks_shirts.jpg',
+        title: 'Garments Display & Sourcing Floor',
+        tag: 'Apparel Collections',
+        desc: 'Curated selection of polos, tees, swimwear, casual shirts, and trousers ready for international private label sourcing.'
+    },
+    {
+        src: '/images/office/apparel_collection_racks.jpg',
+        title: 'Apparel Collection & Trims Showcase',
+        tag: 'Design & Variety',
+        desc: 'Vibrant casual wear, shorts, and fabric swatches demonstrating multi-category sourcing breadth.'
+    },
+    {
+        src: '/images/office/meeting_room_perspective.jpg',
+        title: 'Buyer Interaction & Fit Review Floor',
+        tag: 'Uttara Model Town HQ',
+        desc: 'Comfortable environment for international buyers to conduct sample evaluations, fit reviews, and costings.'
+    }
+];
 
 export default function AboutPage() {
     const { settings } = useSettings();
@@ -36,13 +76,49 @@ export default function AboutPage() {
     const profileBtnUrl  = settings.profile_btn_url  || '/company-profile.pdf';
 
     /* ── Image assets ── */
-    const aboutImgLight = settings.about_image_light || '/images/about/mannequin_light.jpg';
-    const aboutImgDark  = settings.about_image_dark  || '/images/about/mannequin_dark.jpg';
+    const aboutImgLight = settings.about_image_light || '/images/office/knit_woven_double_rack.jpg';
+    const aboutImgDark  = settings.about_image_dark  || '/images/office/knit_woven_double_rack.jpg';
     const ceoImage      = settings.ceo_image         || '/images/about/ceo_portrait.jpg';
-    const sphereLight   = settings.globe_image_light || '/images/about/sphere_light.jpg';
-    const sphereDark    = settings.globe_image_dark  || '/images/about/sphere_dark.jpg';
     const blazerLight   = '/images/about/blazer_light.jpg';
     const blazerDark    = '/images/about/blazer_dark.jpg';
+
+    /* ── Interactive State ── */
+    const [heroSlide, setHeroSlide] = useState(0);
+    const [lightboxItem, setLightboxItem] = useState<{ src: string; title: string; desc?: string; tag?: string } | null>(null);
+
+    const heroSlides = [
+        {
+            src: aboutImgLight,
+            title: 'Garments Sampling Studio',
+            subtitle: 'Uttara Model Town, Dhaka'
+        },
+        {
+            src: '/images/office/showroom_lounge_wide.jpg',
+            title: 'Showroom & Meeting Lounge',
+            subtitle: 'Buyer Negotiation Suite'
+        },
+        {
+            src: '/images/office/boardroom_conference_table.jpg',
+            title: 'Executive Conference Room',
+            subtitle: 'Production & Sourcing Operations'
+        }
+    ];
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setHeroSlide(prev => (prev + 1) % heroSlides.length);
+        }, 5000);
+        return () => clearInterval(timer);
+    }, [heroSlides.length]);
+
+    // Handle ESC key for modal
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setLightboxItem(null);
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
     return (
         <div className="about-page-canvas min-h-screen relative overflow-hidden transition-colors duration-500">
@@ -70,19 +146,57 @@ export default function AboutPage() {
                         </p>
                     </div>
 
-                    {/* Right: Studio Mannequin Showcase - compact frame matching height */}
-                    <div className="clay-bezel-frame rounded-[28px] p-2 sm:p-2.5 h-[230px] sm:h-[250px] flex items-center justify-center overflow-hidden">
-                        <div className="w-full h-full rounded-[22px] overflow-hidden relative group">
-                            <img
-                                src={aboutImgLight}
-                                alt="Atelier Mannequin Tailoring Studio"
-                                className="w-full h-full object-cover rounded-[22px] dark:hidden transition-transform duration-700 group-hover:scale-105"
-                            />
-                            <img
-                                src={aboutImgDark}
-                                alt="Atelier Mannequin Tailoring Studio Dark"
-                                className="w-full h-full object-cover rounded-[22px] hidden dark:block transition-transform duration-700 group-hover:scale-105"
-                            />
+                    {/* Right: Studio & Showroom Showcase - compact frame matching height */}
+                    <div 
+                        onClick={() => setLightboxItem({
+                            src: heroSlides[heroSlide].src,
+                            title: heroSlides[heroSlide].title,
+                            desc: 'Apparel Emporium corporate headquarters & garment development showroom located in Uttara Model Town, Dhaka.',
+                            tag: 'Dhaka Facility'
+                        })}
+                        className="clay-bezel-frame rounded-[28px] p-2 sm:p-2.5 h-[230px] sm:h-[250px] flex items-center justify-center overflow-hidden relative group cursor-pointer"
+                        title="Click to view full photo"
+                    >
+                        <div className="w-full h-full rounded-[22px] overflow-hidden relative">
+                            {heroSlides.map((slide, idx) => (
+                                <img
+                                    key={idx}
+                                    src={slide.src}
+                                    alt={slide.title}
+                                    className={`w-full h-full object-cover rounded-[22px] transition-all duration-700 absolute inset-0 ${
+                                        idx === heroSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-105 pointer-events-none'
+                                    }`}
+                                />
+                            ))}
+
+                            {/* Showroom Overlay Badge */}
+                            <div className="absolute top-2.5 left-2.5 z-10">
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-black/60 backdrop-blur-md text-white border border-white/20 shadow-md">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                    <span>{heroSlides[heroSlide].title}</span>
+                                </span>
+                            </div>
+
+                            {/* Zoom hint */}
+                            <div className="absolute bottom-2.5 right-2.5 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="p-1.5 rounded-xl bg-black/60 backdrop-blur-md text-white/90 border border-white/20">
+                                    <Maximize2 size={13} />
+                                </div>
+                            </div>
+
+                            {/* Slide dots */}
+                            <div className="absolute bottom-2.5 left-2.5 z-10 flex gap-1.5">
+                                {heroSlides.map((_, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={(e) => { e.stopPropagation(); setHeroSlide(idx); }}
+                                        className={`h-1.5 rounded-full transition-all ${
+                                            idx === heroSlide ? 'w-5 bg-white' : 'w-1.5 bg-white/50 hover:bg-white/80'
+                                        }`}
+                                        aria-label={`Slide ${idx + 1}`}
+                                    />
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -181,15 +295,83 @@ export default function AboutPage() {
                                 </div>
 
                                 {/* CEO portrait in extruded 3D photo bezel */}
-                                <div className="flex-shrink-0 clay-bezel-frame rounded-[18px] p-1.5 w-24 h-32 sm:w-28 sm:h-36 overflow-hidden">
+                                <div 
+                                    onClick={() => setLightboxItem({
+                                        src: ceoImage,
+                                        title: 'Md. Kamal Hossain',
+                                        tag: 'Managing Director & CEO',
+                                        desc: 'Md. Kamal Hossain is the Managing Director & CEO of Apparel Emporium, leading global apparel merchandising and sourcing operations with international buyers worldwide.'
+                                    })}
+                                    className="flex-shrink-0 clay-bezel-frame rounded-[18px] p-1.5 w-24 h-32 sm:w-28 sm:h-36 overflow-hidden cursor-pointer group relative"
+                                    title="Click to view full portrait"
+                                >
                                     <img
                                         src={ceoImage}
-                                        alt="Chief Executive Officer"
-                                        className="w-full h-full object-cover rounded-[13px]"
+                                        alt="Md. Kamal Hossain - Managing Director & CEO"
+                                        className="w-full h-full object-cover object-top rounded-[13px] transition-transform duration-500 group-hover:scale-105"
                                     />
+                                    <div className="absolute inset-0 bg-black/30 rounded-[13px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center m-1.5">
+                                        <Maximize2 size={16} className="text-white drop-shadow" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </section>
+
+                {/* ═══════════════════════ SECTION: OUR SAMPLING SHOWROOM & CORPORATE HEADQUARTERS ═══════════════════════ */}
+                <section className="space-y-6">
+                    {/* Header tablet */}
+                    <div className="clay-card rounded-[28px] p-6 sm:p-7 text-center">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 mb-2 border border-emerald-500/30">
+                            <Building2 size={13} />
+                            <span>Physical Headquarters &amp; Sampling Facility</span>
+                        </div>
+                        <h2 className="clay-heading text-xl sm:text-2xl font-black tracking-tight mb-2 uppercase font-heading">
+                            Our Office &amp; Sample Showroom
+                        </h2>
+                        <p className="clay-text text-xs sm:text-[13px] leading-relaxed font-medium max-w-2xl mx-auto">
+                            Located at Sector 13, Uttara Model Town, Dhaka. Explore our dedicated sampling development racks, executive boardroom, and comfortable buyer negotiation suites.
+                        </p>
+                    </div>
+
+                    {/* 4-Card Office Gallery Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        {OFFICE_GALLERY.slice(0, 4).map((item, idx) => (
+                            <div
+                                key={idx}
+                                onClick={() => setLightboxItem(item)}
+                                className="clay-card rounded-[26px] p-3 group cursor-pointer transition-all duration-300 hover:-translate-y-1 overflow-hidden"
+                            >
+                                <div className="clay-bezel-frame rounded-[20px] p-1.5 overflow-hidden relative aspect-[16/11]">
+                                    <img
+                                        src={item.src}
+                                        alt={item.title}
+                                        className="w-full h-full object-cover rounded-[16px] transition-transform duration-700 group-hover:scale-105"
+                                    />
+                                    {/* Overlay Badge */}
+                                    <div className="absolute top-3 left-3 z-10">
+                                        <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-black/65 backdrop-blur-md text-white border border-white/20 shadow">
+                                            {item.tag}
+                                        </span>
+                                    </div>
+                                    {/* Zoom Hint */}
+                                    <div className="absolute bottom-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className="p-2 rounded-xl bg-black/70 backdrop-blur-md text-white border border-white/20 shadow-md">
+                                            <Maximize2 size={14} />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="p-3 pt-3.5">
+                                    <h3 className="clay-heading text-sm sm:text-base font-black tracking-tight mb-1 group-hover:text-emerald-700 dark:group-hover:text-cyan-400 transition-colors">
+                                        {item.title}
+                                    </h3>
+                                    <p className="clay-text text-xs leading-relaxed line-clamp-2">
+                                        {item.desc}
+                                    </p>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </section>
 
@@ -249,6 +431,51 @@ export default function AboutPage() {
                 </section>
 
             </div>
+
+            {/* ═══════════════════════ LIGHTBOX / FULLSCREEN PHOTO MODAL ═══════════════════════ */}
+            {lightboxItem && (
+                <div 
+                    onClick={() => setLightboxItem(null)}
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+                >
+                    <div 
+                        onClick={e => e.stopPropagation()}
+                        className="clay-card rounded-[32px] p-4 sm:p-5 max-w-2xl w-full relative shadow-2xl overflow-hidden"
+                    >
+                        <button
+                            onClick={() => setLightboxItem(null)}
+                            className="absolute top-4 right-4 z-20 p-2 rounded-full bg-black/50 hover:bg-black/80 text-white transition-colors cursor-pointer"
+                            aria-label="Close"
+                        >
+                            <X size={18} />
+                        </button>
+
+                        <div className="clay-bezel-frame rounded-[22px] p-1.5 overflow-hidden mb-4 max-h-[70vh] flex items-center justify-center bg-black/10">
+                            <img
+                                src={lightboxItem.src}
+                                alt={lightboxItem.title}
+                                className="max-w-full max-h-[65vh] w-auto h-auto object-contain rounded-[18px]"
+                            />
+                        </div>
+
+                        <div className="px-2 pb-1">
+                            {lightboxItem.tag && (
+                                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-extrabold tracking-wider uppercase bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 mb-1 border border-emerald-500/30">
+                                    {lightboxItem.tag}
+                                </span>
+                            )}
+                            <h3 className="clay-heading text-base sm:text-lg font-black tracking-tight mb-1">
+                                {lightboxItem.title}
+                            </h3>
+                            {lightboxItem.desc && (
+                                <p className="clay-text text-xs sm:text-[13px] leading-relaxed">
+                                    {lightboxItem.desc}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* ═══════════════════════ EXACT NEUMORPHIC & GLOW STYLING ═══════════════════════ */}
             <style jsx global>{`

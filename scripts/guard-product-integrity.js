@@ -3,6 +3,29 @@ const fs = require('fs');
 const path = require('path');
 
 const prisma = new PrismaClient();
+const MIN_EXPECTED_PRODUCTS = 170;
+
+async function restoreFromJson(jsonPath) {
+    if (!fs.existsSync(jsonPath)) return false;
+    try {
+        console.log(`📥 [INTEGRITY GUARD] Emergency restoring products from JSON archive: ${jsonPath}`);
+        const raw = fs.readFileSync(jsonPath, 'utf8');
+        const products = JSON.parse(raw);
+        for (const p of products) {
+            const data = { ...p };
+            delete data.category; // remove relation object
+            await prisma.product.upsert({
+                where: { id: p.id },
+                update: data,
+                create: data,
+            });
+        }
+        return true;
+    } catch (e) {
+        console.error('Failed to restore from JSON:', e.message);
+        return false;
+    }
+}
 
 async function verifyAndProtect() {
     console.log('🛡️ [INTEGRITY GUARD] Verifying database and product count...');
@@ -14,6 +37,7 @@ async function verifyAndProtect() {
     const dbPath = path.join(process.cwd(), 'prisma', 'dev.db');
     const homeDir = process.env.HOME || process.env.USERPROFILE || '';
     const backupDir = path.join(homeDir, 'db_backups');
+    const jsonBackup = path.join(process.cwd(), 'prisma', 'catalog_backup_174_products.json');
 
     if (!fs.existsSync(backupDir)) {
         try {
@@ -23,22 +47,22 @@ async function verifyAndProtect() {
         }
     }
 
-    if (count >= 46) {
-        console.log(`✅ [INTEGRITY GUARD] Product count is healthy (${count} >= 46). Creating verified snapshot...`);
+    if (count >= MIN_EXPECTED_PRODUCTS) {
+        console.log(`✅ [INTEGRITY GUARD] Product count is healthy (${count} >= ${MIN_EXPECTED_PRODUCTS}). Creating verified snapshots...`);
         try {
             if (fs.existsSync(dbPath)) {
                 fs.copyFileSync(dbPath, path.join(backupDir, 'dev_verified_healthy.db'));
                 fs.copyFileSync(dbPath, path.join(process.cwd(), 'prisma', 'dev.db.verified'));
-                console.log('✅ [INTEGRITY GUARD] Verified database snapshot saved.');
+                console.log('✅ [INTEGRITY GUARD] Verified database snapshot saved to disk.');
             }
         } catch (err) {
             console.warn('Snapshot copy warning:', err.message);
         }
         return true;
     } else {
-        console.error(`🚨 [INTEGRITY GUARD] Product count is LOW (${count} < 46)! Attempting recovery...`);
+        console.error(`🚨 [INTEGRITY GUARD] Product count is LOW (${count} < ${MIN_EXPECTED_PRODUCTS})! Attempting recovery...`);
         
-        // Search for healthy backup
+        // Search for healthy backup candidates
         const candidateBackups = [
             path.join(backupDir, 'dev_verified_healthy.db'),
             path.join(backupDir, 'live_backup_latest.db'),
@@ -58,13 +82,25 @@ async function verifyAndProtect() {
 
         if (recovered) {
             const reCount = await prisma.product.count();
-            console.log(`✅ [INTEGRITY GUARD] Recovered product count: ${reCount}`);
-            if (reCount >= 46) {
+            console.log(`✅ [INTEGRITY GUARD] Recovered product count via SQLite backup: ${reCount}`);
+            if (reCount >= MIN_EXPECTED_PRODUCTS) {
                 return true;
             }
         }
 
-        throw new Error(`CRITICAL INTEGRITY FAILURE: Product count is ${count} (expected >= 46). Deployment halted to protect data.`);
+        // If SQLite candidate was still low or missing, fallback to JSON archive
+        if (fs.existsSync(jsonBackup)) {
+            const jsonOk = await restoreFromJson(jsonBackup);
+            if (jsonOk) {
+                const finalCount = await prisma.product.count();
+                console.log(`✅ [INTEGRITY GUARD] Recovered product count via JSON archive: ${finalCount}`);
+                if (finalCount >= MIN_EXPECTED_PRODUCTS) {
+                    return true;
+                }
+            }
+        }
+
+        throw new Error(`CRITICAL INTEGRITY FAILURE: Product count is ${count} (expected >= ${MIN_EXPECTED_PRODUCTS}). Deployment halted to protect data.`);
     }
 }
 

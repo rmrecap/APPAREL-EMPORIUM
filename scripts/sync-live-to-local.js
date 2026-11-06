@@ -46,12 +46,21 @@ async function main() {
         });
     }
 
-    console.log('Fetching all live products...');
-    const prodRes = await fetch('https://www.aelbd.net/api/products?limit=100');
-    const prodData = await prodRes.json();
-    const products = prodData.products || [];
+    console.log('Fetching all live products via pagination...');
+    let page = 1;
+    const products = [];
+    while (true) {
+        const prodRes = await fetch(`https://www.aelbd.net/api/products?limit=100&page=${page}`);
+        const prodData = await prodRes.json();
+        const batch = prodData.products || [];
+        if (batch.length === 0) break;
+        products.push(...batch);
+        console.log(`Fetched page ${page} (${batch.length} products). Total so far: ${products.length}`);
+        if (products.length >= (prodData.total || 0) || batch.length < 100) break;
+        page++;
+    }
 
-    console.log(`Fetched ${products.length} live products. Upserting into local database...`);
+    console.log(`Fetched ${products.length} live products total. Upserting into local database...`);
 
     for (const p of products) {
         // If product's categoryId does not exist in category table, ensure it exists

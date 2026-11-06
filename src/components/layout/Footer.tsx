@@ -110,8 +110,12 @@ export default function Footer() {
 
                             {/* Proprietor Identification Pill */}
                             <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.04] border border-white/10">
-                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center font-black text-white text-sm shadow-md shrink-0">
-                                    KH
+                                <div className="w-10 h-10 rounded-xl overflow-hidden border border-amber-400/40 dark:border-cyan-400/40 shadow-md shrink-0 bg-slate-800">
+                                    <img
+                                        src="/images/about/ceo_portrait.jpg"
+                                        alt={proprietorName}
+                                        className="w-full h-full object-cover object-top"
+                                    />
                                 </div>
                                 <div className="min-w-0 flex-1">
                                     <div className="text-[10px] font-bold uppercase tracking-widest text-amber-400/90 dark:text-cyan-400/90 flex items-center gap-1">
