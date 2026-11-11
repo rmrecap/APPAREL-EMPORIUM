@@ -335,9 +335,8 @@ jobs:
             npx pm2 list 2>/dev/null || pm2 list 2>/dev/null || true
             ps -ef | grep -E "node|pm2|next" | grep -v grep || true
 
-            echo "=== LIVE PM2 LOGS FOR aelbd-production ==="
-            pm2 logs aelbd-production --nostream --lines 60 2>/dev/null || npx pm2 logs aelbd-production --nostream --lines 60 2>/dev/null || true
-            cat pm2-out*.log pm2-error*.log 2>/dev/null | tail -n 60 || true
+            echo "=== LIVE PM2 & APPLICATION LOGS ==="
+            tail -n 60 pm2-out*.log pm2-error*.log ~/.pm2/logs/* 2>/dev/null || true
 
             echo "=== LISTENING TCP PORTS ==="
             ss -tln 2>/dev/null || netstat -tln 2>/dev/null || true
