@@ -174,6 +174,34 @@ async function main() {
         }
     }
 
+    // 3c. ENSURE IN-PROCESS STATIC WORKER (ELIMINATES SPAWN EAGAIN ON HOSTINGER SHARED HOSTING)
+    const buildIndexPath = path.join(cwd, 'node_modules', 'next', 'dist', 'build', 'index.js');
+    if (fs.existsSync(buildIndexPath)) {
+        try {
+            let content = fs.readFileSync(buildIndexPath, 'utf8');
+            const targetWorkerSnippet = 'return new _worker.Worker(staticWorkerPath, {';
+            if (content.includes(targetWorkerSnippet) && !content.includes('IN_PROCESS_STATIC_WORKER_APPLIED')) {
+                console.log('🔧 [PATCH] Applying zero-fork in-process static worker patch to Next.js build...');
+                const inProcessWorkerReplacement = `// IN_PROCESS_STATIC_WORKER_APPLIED
+    const wm = require('./worker');
+    return {
+        exportPages: (args) => { options?.progress?.run?.(); return wm.exportPages(args); },
+        hasCustomGetInitialProps: (args) => wm.hasCustomGetInitialProps(args),
+        isPageStatic: (args) => wm.isPageStatic(args),
+        getDefinedNamedExports: (args) => wm.getDefinedNamedExports(args),
+        end: async () => {},
+        close: () => {}
+    };
+    return new _worker.Worker(staticWorkerPath, {`;
+                content = content.replace(targetWorkerSnippet, inProcessWorkerReplacement);
+                fs.writeFileSync(buildIndexPath, content, 'utf8');
+                console.log('✅ [PATCH] Next.js createStaticWorker patched for 100% in-process execution.');
+            }
+        } catch (patchErr) {
+            console.warn('⚠️ [STATIC WORKER PATCH WARNING]', patchErr.message);
+        }
+    }
+
     // 4. GENERATE PRISMA CLIENT & SYNC (Skip if already performed in deploy pipeline to save memory)
     if (process.env.SKIP_PREBUILD_SYNC === '1') {
         console.log('⚡ [SKIP] Database pre-sync and Prisma generation already performed in deploy pipeline. Going directly to Next.js build...');
