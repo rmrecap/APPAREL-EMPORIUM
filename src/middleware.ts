@@ -52,6 +52,26 @@ export async function middleware(req: NextRequest) {
         return NextResponse.rewrite(new URL('/api/external/products', req.url));
     }
 
+    // ── PRIORITY 2.8: Agent Content Negotiation (Accept: text/markdown) ───────
+    // If an AI agent or markdown-aware client requests markdown, return compact markdown representation.
+    const acceptHeader = req.headers.get('accept') || '';
+    if (
+        method === 'GET' &&
+        acceptHeader.includes('text/markdown') &&
+        !path.startsWith('/api/') &&
+        !path.startsWith('/executive')
+    ) {
+        const markdown = getMarkdownRepresentation(path);
+        return new NextResponse(markdown, {
+            status: 200,
+            headers: {
+                'Content-Type': 'text/markdown; charset=utf-8',
+                'Vary': 'Accept',
+                'Cache-Control': 'public, max-age=3600',
+            },
+        });
+    }
+
     // Core routes definition
     const isAdminRoute = path.startsWith('/executive-portal-aelbd');
     const isApiRoute = path.startsWith('/api/');
@@ -170,5 +190,86 @@ export const config = {
     // - Static public assets (images, documents, fonts) to prevent middleware memory exhaustion
     matcher: ['/((?!api/auth|api/external|api/admin/gsc|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|pdf|ico|woff2?)).*)'],
 };
+
+function getMarkdownRepresentation(path: string): string {
+    const cleanPath = path.toLowerCase().replace(/\/$/, '') || '/';
+
+    if (cleanPath === '/' || cleanPath === '') {
+        return `# Apparel Emporium Ltd. (AELBD) — Export Garments Sourcing & Manufacturing
+
+Apparel Emporium is a premier buying house and garment exporter headquartered in Uttara, Dhaka, Bangladesh. We provide transparent merchandising, strict AQL 2.5 quality control, and end-to-end export production for global fashion brands.
+
+## Core Manufacturing Divisions
+- **Knitwear:** T-shirts, Polo Shirts, Hoodies, Sweatshirts, Tank Tops, Joggers (Single Jersey, Pique, Fleece, Rib).
+- **Woven & Denim:** 5-pocket denim jeans, cargo shorts, chino trousers, twill workwear, formal shirts.
+- **Sweaters & Outerwear:** 3GG to 14GG flat knits, cardigans, pullovers, windbreakers, and insulated jackets.
+
+## Commercial Terms & Pricing (FOB USD)
+- **MOQ:** 500 - 1,000 pcs for knitwear; 1,000 - 3,000 pcs for woven & denim.
+- **FOB Pricing Estimates:**
+  - Basic Knit T-Shirts: $2.50 - $4.50 USD
+  - Polo Shirts: $4.00 - $7.50 USD
+  - Denim Jeans & Pants: $8.50 - $18.00 USD
+  - Sweaters: $8.00 - $22.00 USD
+  - Outerwear & Jackets: $15.00 - $45.00 USD
+- **Production Lead Time:** 45 - 75 days post-approval.
+
+## Contact Information
+- **Proprietor & CEO:** Md. Kamal Hossain
+- **Address:** House # 03 (2nd Floor), Road # 12, Sector # 13, Uttara Model Town, Dhaka-1230, Bangladesh
+- **Phone:** +88 02 4895 5519, +88 096 6691 2038
+- **Email:** info@aelbd.net, kamal@aelbd.net
+- **Website:** https://aelbd.net
+
+## Agent Resources
+- Full Documentation: https://aelbd.net/llms.txt
+- MCP Server Card: https://aelbd.net/.well-known/mcp/server-card.json
+- Products Catalog: https://aelbd.net/products
+`;
+    }
+
+    if (cleanPath === '/products') {
+        return `# Apparel Emporium Product Catalog
+
+Over 170+ export garments styles across Knitwear, Woven, Denim, Sweaters, and Outerwear.
+
+## Sourcing Categories
+1. **Knitwear Fashion:** Cotton jersey t-shirts, CVC polo shirts, fleece hoodies, athletic joggers.
+2. **Woven & Denim:** Rigid & stretch denim pants, cargo trousers, twill chinos, woven shirts.
+3. **Sweaters & Flat Knits:** 3GG/5GG heavy gauge pullovers, 12GG fine gauge cardigans.
+4. **Jackets & Outerwear:** Windproof parkas, softshell jackets, padded winter coats.
+
+- To search products via API: \`GET https://aelbd.net/api/products?search=<keyword>\`
+- To submit an inquiry: https://aelbd.net/contact
+`;
+    }
+
+    if (cleanPath === '/about') {
+        return `# About Apparel Emporium Ltd.
+
+Established in Dhaka, Bangladesh, Apparel Emporium is a trusted buying house committed to delivering world-class apparel sourcing strictly tailored to buyer specifications.
+
+- **Managing Director & CEO:** Md. Kamal Hossain
+- **Showroom & Head Office:** Uttara Model Town, Sector 13, Road 12, House 03 (2nd Floor), Dhaka-1230.
+- **Certifications:** Audited partner facilities adhering to BSCI, SEDEX, OEKO-TEX, GOTS, and WRAP.
+`;
+    }
+
+    if (cleanPath === '/contact') {
+        return `# Contact Apparel Emporium Corporate HQ
+
+- **Head Office:** House # 03 (2nd Floor), Road # 12, Sector # 13, Uttara Model Town, Dhaka-1230, Bangladesh
+- **Telephone:** +88 02 4895 5519, +88 096 6691 2038
+- **Email:** info@aelbd.net, kamal@aelbd.net
+- **RFQ Submission:** https://aelbd.net/contact
+`;
+    }
+
+    return `# Apparel Emporium Ltd. — ${path}
+
+Visit https://aelbd.net for full details or view https://aelbd.net/llms.txt for agent documentation.
+`;
+}
+
 
 

@@ -1,0 +1,17 @@
+# Robots.txt for Apparel Emporium (https://aelbd.net)
+Content-Signal: search=yes, ai-train=no
+
+User-agent: *
+Allow: /
+Disallow: /executive-portal-aelbd/
+Disallow: /executive-login
+Disallow: /buyer-portal/
+Disallow: /compare
+Disallow: /api/
+Disallow: /*?q=*
+Disallow: /*?product=*
+Disallow: /*?page=*
+
+Host: aelbd.net
+Sitemap: https://aelbd.net/sitemap.xml
+

@@ -223,6 +223,7 @@ export default function Footer() {
                                 Buyer Support
                             </h4>
                             <ul className="space-y-2.5 text-xs sm:text-sm">
+                                <li><Link href="/contact#pricing-rfq" className="text-amber-400 hover:text-amber-300 font-medium transition-colors">Pricing & RFQ Guide (FOB USD)</Link></li>
                                 <li><Link href="/faqs" className="text-slate-400 hover:text-white transition-colors">Sampling FAQs</Link></li>
                                 <li><Link href="/terms" className="text-slate-400 hover:text-white transition-colors">Terms of Supply</Link></li>
                                 <li><Link href="/privacy-policy" className="text-slate-400 hover:text-white transition-colors">Privacy Policy</Link></li>
@@ -254,6 +255,47 @@ export default function Footer() {
                         <span>&bull;</span>
                         <a href={`mailto:${email}`} className="hover:text-white transition-colors">{email}</a>
                     </div>
+                </div>
+
+                {/* WebMCP Tools & Schema Semantic Markup for Agents */}
+                <div className="sr-only" aria-hidden="true">
+                    {/* Non-JS Accessible Pricing & Sourcing Offer */}
+                    <div itemScope itemType="https://schema.org/AggregateOffer">
+                        <span itemProp="priceCurrency">USD</span>
+                        <span itemProp="lowPrice">2.50</span>
+                        <span itemProp="highPrice">45.00</span>
+                        <span itemProp="offerCount">174</span>
+                        <a href="/contact#pricing-rfq" itemProp="url">Export Garments FOB Pricing & RFQ Guide</a>
+                    </div>
+
+                    {/* WebMCP Tool: searchCatalog */}
+                    <form
+                        role="search"
+                        action="/products"
+                        method="GET"
+                        toolname="searchCatalog"
+                        tooldescription="Search 170+ export garments products and fabric specifications at Apparel Emporium"
+                        data-toolname="searchCatalog"
+                        data-tooldescription="Search 170+ export garments products and fabric specifications at Apparel Emporium"
+                    >
+                        <input type="text" name="q" placeholder="Search garments..." defaultValue="" />
+                        <button type="submit">Search</button>
+                    </form>
+
+                    {/* WebMCP Tool: submitRFQ */}
+                    <form
+                        action="/api/rfq"
+                        method="POST"
+                        toolname="submitRFQ"
+                        tooldescription="Submit garments sourcing request for quotation (RFQ) with quantity and target pricing"
+                        data-toolname="submitRFQ"
+                        data-tooldescription="Submit garments sourcing request for quotation (RFQ) with quantity and target pricing"
+                    >
+                        <input type="text" name="name" defaultValue="" />
+                        <input type="email" name="email" defaultValue="" />
+                        <input type="text" name="message" defaultValue="" />
+                        <button type="submit">Submit Inquiry</button>
+                    </form>
                 </div>
 
             </div>

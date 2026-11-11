@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Apparel Emporium Sourcing MCP",
+  "version": "1.0.0",
+  "description": "Model Context Protocol (MCP) server for Apparel Emporium Ltd. - Bangladesh Garments Buying House & Export Sourcing.",
+  "endpoint": "https://aelbd.net/api/mcp",
+  "transport": "http",
+  "homepage": "https://aelbd.net",
+  "documentation": "https://aelbd.net/llms.txt",
+  "capabilities": {
+    "tools": {
+      "listChanged": false
+    },
+    "resources": {
+      "subscribe": false,
+      "listChanged": false
+    },
+    "prompts": {
+      "listChanged": false
+    }
+  },
+  "tools": [
+    {
+      "name": "search_catalog",
+      "description": "Search 170+ export-ready apparel products from Bangladesh including Knit, Woven, and Sweaters.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": { "type": "string", "description": "Search query for garment style, fabric, or category" },
+          "category": { "type": "string", "description": "Optional category filter: knitwear, woven, sweater, activewear" },
+          "limit": { "type": "number", "default": 10 }
+        },
+        "required": ["query"]
+      }
+    },
+    {
+      "name": "get_company_profile",
+      "description": "Retrieve corporate overview, factory audit standards, compliance certifications, and contact details for Apparel Emporium Ltd.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "get_pricing_and_moq_guide",
+      "description": "Get estimated FOB pricing ranges and minimum order quantities (MOQ) for bulk garment manufacturing in Bangladesh.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "category": { "type": "string", "description": "knitwear, woven, sweater, denim, outerwear" }
+        }
+      }
+    },
+    {
+      "name": "submit_rfq",
+      "description": "Submit a Request for Quotation (RFQ) directly to Apparel Emporium merchandising team.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "email": { "type": "string" },
+          "company": { "type": "string" },
+          "targetPrice": { "type": "string" },
+          "quantity": { "type": "number" },
+          "details": { "type": "string" }
+        },
+        "required": ["name", "email", "details"]
+      }
+    }
+  ]
+}
+

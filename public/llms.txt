@@ -1,0 +1,40 @@
+# Apparel Emporium Ltd. (AELBD)
+
+> Apparel Emporium is a leading export-oriented garments buying house and apparel sourcing agency headquartered in Dhaka, Bangladesh. We connect international fashion retailers, wholesalers, and private labels with certified, compliant apparel manufacturing facilities across Bangladesh.
+
+## Core Manufacturing & Sourcing Capabilities
+- **Knitwear:** Single jersey, pique, interlock, fleece, french terry t-shirts, polo shirts, hoodies, sweatshirts, tank tops, and joggers.
+- **Woven Apparel:** Denim jeans, twill pants, cargo shorts, formal shirts, casual button-downs, and workwear.
+- **Sweaters & Outerwear:** Flat-knit sweaters (3GG to 14GG), cardigans, pullovers, windbreakers, puffers, and softshell jackets.
+- **Undergarments & Activewear:** Boxer briefs, leggings, sports bras, moisture-wicking gymwear.
+- **Quality Assurance:** Full-time merchandising oversight, inline quality inspections, and pre-shipment AQL 2.5 final audits.
+- **Compliance Standards:** Partner factories are BSCI, SEDEX, OEKO-TEX Standard 100, GOTS, WRAP, and ISO certified.
+
+## Commercial Terms & Pricing
+- **FOB Pricing Estimates (USD):**
+  - Basic Knit T-Shirts: $2.50 - $4.50
+  - Polo Shirts: $4.00 - $7.50
+  - Hoodies & Fleece: $7.00 - $14.00
+  - Denim Jeans: $8.50 - $18.00
+  - Sweaters (12GG/7GG): $8.00 - $22.00
+  - Outerwear & Jackets: $15.00 - $45.00
+- **MOQ:** Generally 500 - 1,000 pieces per style/colorway for knits; 1,000 - 3,000 pieces for woven/denim.
+- **Lead Time:** Proto sample 7-10 days; bulk production 45-75 days after lab dip and trim approvals.
+- **Payment Terms:** Irrevocable Letter of Credit (L/C at sight) or T/T wire transfer.
+
+## Key Navigation Links
+- [Homepage](https://aelbd.net/): 3D visual showcase, core sourcing divisions, and company overview.
+- [Product Catalog](https://aelbd.net/products): Comprehensive live database of 170+ export garments styles.
+- [About Us](https://aelbd.net/about): Management message from Md. Kamal Hossain, corporate heritage, and Dhaka showroom.
+- [Contact & RFQ](https://aelbd.net/contact): Submit tech packs, request quotations, and schedule factory visits.
+- [Company Profile (PDF)](https://aelbd.net/company-profile.pdf): Downloadable corporate brochure and audit credentials.
+- [MCP Server Card](https://aelbd.net/.well-known/mcp/server-card.json): SEP-1649 Model Context Protocol server manifest for automated agents.
+
+## Corporate Contact
+- **Legal Entity:** Apparel Emporium Ltd.
+- **Managing Director & CEO:** Md. Kamal Hossain
+- **Head Office:** House # 03 (2nd Floor), Road # 12, Sector # 13, Uttara Model Town, Dhaka-1230, Bangladesh
+- **Telephone:** +88 02 4895 5519, +88 096 6691 2038
+- **Email:** info@aelbd.net, kamal@aelbd.net
+- **Website:** https://aelbd.net
+

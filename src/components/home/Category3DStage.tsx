@@ -219,9 +219,9 @@ export default function Category3DStage({ headings, showDecor = false, showIcons
                         {showIcons && <Sparkles size={12} className="text-amber-600 dark:text-amber-400" />}
                         Core Manufacturing Divisions
                     </span>
-                    <h2 className="text-3xl sm:text-5xl font-black text-[#1A1A1A] dark:text-white uppercase tracking-tight font-heading">
-                        Export Garments Sourcing
-                    </h2>
+                    <h1 className="text-3xl sm:text-5xl font-black text-[#1A1A1A] dark:text-white uppercase tracking-tight font-heading">
+                        Export Garments Sourcing & Manufacturing
+                    </h1>
                 </div>
 
                 {/* 3D Perspective Stage Area */}
