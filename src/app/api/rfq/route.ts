@@ -85,7 +85,7 @@ export async function POST(req: Request) {
         const parseResult = rfqSchema.safeParse(body);
         if (!parseResult.success) {
             const formattedErrors = parseResult.error.flatten().fieldErrors;
-            const firstErrorMessage = parseResult.error.errors[0]?.message || "Validation failed";
+            const firstErrorMessage = (parseResult.error as any).issues?.[0]?.message || (parseResult.error as any).errors?.[0]?.message || "Validation failed";
             return NextResponse.json(
                 { error: firstErrorMessage, errors: formattedErrors },
                 { status: 400 }

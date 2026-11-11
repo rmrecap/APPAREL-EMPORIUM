@@ -273,10 +273,12 @@ export default function Footer() {
                         role="search"
                         action="/products"
                         method="GET"
-                        toolname="searchCatalog"
-                        tooldescription="Search 170+ export garments products and fabric specifications at Apparel Emporium"
+                        {...({
+                            toolname: "searchCatalog",
+                            tooldescription: "Search 240+ export garments products and fabric specifications at Apparel Emporium"
+                        } as any)}
                         data-toolname="searchCatalog"
-                        data-tooldescription="Search 170+ export garments products and fabric specifications at Apparel Emporium"
+                        data-tooldescription="Search 240+ export garments products and fabric specifications at Apparel Emporium"
                     >
                         <input type="text" name="q" placeholder="Search garments..." defaultValue="" />
                         <button type="submit">Search</button>
@@ -286,8 +288,10 @@ export default function Footer() {
                     <form
                         action="/api/rfq"
                         method="POST"
-                        toolname="submitRFQ"
-                        tooldescription="Submit garments sourcing request for quotation (RFQ) with quantity and target pricing"
+                        {...({
+                            toolname: "submitRFQ",
+                            tooldescription: "Submit garments sourcing request for quotation (RFQ) with quantity and target pricing"
+                        } as any)}
                         data-toolname="submitRFQ"
                         data-tooldescription="Submit garments sourcing request for quotation (RFQ) with quantity and target pricing"
                     >

@@ -45,9 +45,15 @@ export default function ProductFilter({ categories }: ProductFilterProps) {
         setSelectedCategory(cat);
         setSearch(searchParams.get('q') || '');
 
-        if (cat.includes('men')) setActiveGender('men');
-        else if (cat.includes('women')) setActiveGender('women');
-        else if (cat.includes('kid')) setActiveGender('kids');
+        if (cat.includes('women') || cat.includes('ladies')) {
+            setActiveGender('women');
+        } else if (cat.includes('kid') || cat.includes('boy') || cat.includes('girl') || cat.includes('child')) {
+            setActiveGender('kids');
+        } else if (cat.includes('men')) {
+            setActiveGender('men');
+        } else {
+            setActiveGender(null);
+        }
     }, [searchParams]);
 
     // Autocomplete search
@@ -112,13 +118,19 @@ export default function ProductFilter({ categories }: ProductFilterProps) {
     };
 
     const handleGenderFilter = (gender: 'men' | 'women' | 'kids') => {
-        setActiveGender(activeGender === gender ? null : gender);
-        if (activeGender === gender) {
+        const nextGender = activeGender === gender ? null : gender;
+        setActiveGender(nextGender);
+        if (!nextGender) {
             handleCategorySelect('');
-        } else {
-            const match = categories.find(c => c.slug.includes(gender));
-            if (match) handleCategorySelect(match.slug);
-            else applyFilters(gender);
+            return;
+        }
+
+        if (gender === 'men') {
+            applyFilters('mens-fashion');
+        } else if (gender === 'women') {
+            applyFilters('womens-fashion');
+        } else if (gender === 'kids') {
+            applyFilters('childrens-fashion');
         }
     };
 

@@ -75,25 +75,35 @@ export function autoClassifyProductTaxonomy(input: ProductInputForClassification
     } else if (divisionType === 'Accessories') {
         department = 'Accessories';
     } else {
-        // Fashion or Footwear: Determine Gender
-        const hasKids = /\b(kid|kids|child|children|childrens|baby|toddler|infant|boy|girl|romper|bodysuit)\b/i.test(fullText);
-        const hasWomen = /\b(women|womens|woman|ladies|lady|female|dress|dresses|skirt|crop top)\b/i.test(fullText);
-        const hasMen = /\b(men|mens|man|male|gent|gentleman)\b/i.test(fullText);
+        // High precedence check on rawName (Product Title) - human titles are the most reliable signal
+        const titleHasWomen = /\b(women|womens|woman|ladies|lady|female)\b/i.test(rawName);
+        const titleHasKids = /\b(kid|kids|child|children|childrens|baby|toddler|infant|boy|boys|girl|girls)\b/i.test(rawName);
+        const titleHasMen = /\b(men|mens|man|male|gent|gentleman)\b/i.test(rawName) && !titleHasWomen;
 
-        if (hasKids) {
+        if (titleHasKids) {
             department = 'Kidswear';
-        } else if (hasWomen && !hasMen) {
+        } else if (titleHasWomen) {
             department = 'Womenswear';
-        } else if (hasMen) {
+        } else if (titleHasMen) {
             department = 'Menswear';
-        } else if (hasWomen) {
-            department = 'Womenswear';
         } else {
-            // Check provided input department if valid
-            if (input.department === 'Womenswear' || input.department === 'Kidswear') {
-                department = input.department;
-            } else {
+            // Fallback to broader fullText check if title is gender-neutral
+            const hasKids = /\b(kid|kids|child|children|childrens|baby|toddler|infant|boy|boys|girl|girls|romper|bodysuit)\b/i.test(fullText);
+            const hasWomen = /\b(women|womens|woman|ladies|lady|female|dress|dresses|skirt|crop top)\b/i.test(fullText);
+            const hasMen = /\b(men|mens|man|male|gent|gentleman)\b/i.test(fullText) && !hasWomen;
+
+            if (hasKids) {
+                department = 'Kidswear';
+            } else if (hasWomen) {
+                department = 'Womenswear';
+            } else if (hasMen) {
                 department = 'Menswear';
+            } else {
+                if (input.department === 'Womenswear' || input.department === 'Kidswear') {
+                    department = input.department;
+                } else {
+                    department = 'Menswear';
+                }
             }
         }
     }
