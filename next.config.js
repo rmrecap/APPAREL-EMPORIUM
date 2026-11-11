@@ -13,7 +13,7 @@ const nextConfig = {
     },
     experimental: {
         cpus: 1, // Restrict build to 1 CPU thread to avoid Hostinger NPROC/thread exhaustion
-        workerThreads: true, // Use in-process worker threads rather than spawning external OS child processes to prevent EAGAIN
+        workerThreads: false, // Prevent Next.js from spawning child worker processes during page generation
     },
     serverExternalPackages: ['geoip-lite'],
     generateBuildId: async () => 'aelbd-prod-' + Date.now(),
