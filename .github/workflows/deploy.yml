@@ -203,9 +203,8 @@ jobs:
             
             echo "Building Next.js application..."
             export SKIP_PREBUILD_SYNC=1
-            pm2 kill 2>/dev/null || true
-            npx pm2 kill 2>/dev/null || true
-            pkill -9 -u "$USER" -f 'next-server' 2>/dev/null || true
+            export NEXT_PRIVATE_WORKERS=1
+            pkill -9 -u "$USER" -f 'pm2|next-server' 2>/dev/null || true
             sleep 2
             rm -rf .next/cache 2>/dev/null || true
             npm run build || { echo "❌ FATAL: Next.js build failed!"; exit 1; }
