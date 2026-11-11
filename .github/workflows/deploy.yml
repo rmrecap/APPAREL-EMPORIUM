@@ -36,10 +36,24 @@ jobs:
 
           echo "🚀 Connecting to $USER@$HOST on port $PORT..."
 
-          SSH_CMD="ssh -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -p $PORT $USER@$HOST"
+          SSH_CMD="ssh -T -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -o ConnectTimeout=15 -p $PORT $USER@$HOST"
 
-          # Sanity check connection
-          $SSH_CMD "echo '✅ SSH connection authenticated successfully as '\$(whoami)' on '\$(hostname)''"
+          # Sanity check connection with retries for CloudLinux LVE recycling
+          SSH_OK=0
+          for i in 1 2 3 4 5; do
+            echo "Attempt $i: Testing SSH connection..."
+            if $SSH_CMD "echo '✅ SSH authenticated as '\$(whoami)' on '\$(hostname)''"; then
+              SSH_OK=1
+              break
+            fi
+            echo "⚠️ Attempt $i failed, waiting 15s for host process table cooldown..."
+            sleep 15
+          done
+
+          if [ "$SSH_OK" -ne 1 ]; then
+            echo "❌ Failed to establish SSH connection after 5 attempts."
+            exit 1
+          fi
 
           # Reset any stuck processes or PM2 daemons from prior runs to free 100% of available memory
           $SSH_CMD "pm2 kill 2>/dev/null || true; npx pm2 kill 2>/dev/null || true; pkill -9 -u \$(whoami) -f 'node|npm|pm2|next|ts-node|prisma' 2>/dev/null || true" || true
