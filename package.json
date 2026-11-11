@@ -60,7 +60,10 @@
         "nodemailer": "^10.2.1",
         "next-auth": {
             "nodemailer": "$nodemailer"
-        }
+        },
+        "minimatch": "^11.0.1",
+        "glob": "^14.0.2",
+        "qs": "^6.16.1"
     },
     "prisma": {
         "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
