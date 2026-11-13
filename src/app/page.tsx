@@ -21,8 +21,8 @@ const CTASection = nextDynamic(() => import('@/components/home/CTASection'));
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-    title: 'Apparel Emporium | Trusted Garments Sourcing Partner in Bangladesh',
-    description: 'Apparel Emporium is a leading Bangladeshi garments buying house. Providing high-standard quality assurance tailored to buyer requirements, transparent merchandising, and 100% compliant export sourcing.',
+    title: 'Apparel Emporium | B2B Garment Manufacturer & Apparel Buying House in Bangladesh',
+    description: 'Leading B2B Garment Manufacturer, Apparel Buying House, and Custom OEM/ODM Clothing Exporter in Bangladesh. Providing high-standard quality assurance (AQL inspection), ethical manufacturing, and worldwide export delivery.',
 };
 
 export default async function HomePage() {

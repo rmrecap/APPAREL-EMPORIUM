@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { autoClassifyProductTaxonomy } from '@/lib/product-classifier';
 
 export const dynamic = 'force-dynamic';
 
@@ -60,6 +61,37 @@ export async function POST(req: NextRequest) {
                             name: "get_pricing_and_moq_guide",
                             description: "Get FOB pricing ranges and MOQ info",
                             inputSchema: { type: "object", properties: {} }
+                        },
+                        {
+                            name: "list_categories",
+                            description: "List all 240+ garment categories with hierarchy and slugs for taxonomy alignment",
+                            inputSchema: {
+                                type: "object",
+                                properties: {
+                                    parentSlug: { type: "string", description: "Optional parent category slug filter (e.g. 'menswear', 'womenswear')" },
+                                    limit: { type: "number", default: 100 }
+                                }
+                            }
+                        },
+                        {
+                            name: "get_taxonomy_overview",
+                            description: "Get product count breakdown across departments (Menswear, Womenswear, Kidswear, Home Textiles)",
+                            inputSchema: { type: "object", properties: {} }
+                        },
+                        {
+                            name: "classify_and_correct_product",
+                            description: "Classify or manually correct a product's department, division, subcategory, or category",
+                            inputSchema: {
+                                type: "object",
+                                properties: {
+                                    productId: { type: "string", description: "Product ID to correct" },
+                                    department: { type: "string", enum: ["Menswear", "Womenswear", "Kidswear", "Home Textiles", "Accessories"] },
+                                    divisionType: { type: "string", enum: ["Knit", "Woven", "Sweater", "Footwear", "Home Textiles", "Accessories"] },
+                                    categoryId: { type: "string", description: "Target category ID" },
+                                    dryRun: { type: "boolean", default: false, description: "If true, returns preview without writing to database" }
+                                },
+                                required: ["productId"]
+                            }
                         }
                     ]
                 }
@@ -166,6 +198,141 @@ export async function POST(req: NextRequest) {
                 }, {
                     headers: { 'Access-Control-Allow-Origin': '*' }
                 });
+            }
+
+            if (toolName === 'list_categories') {
+                const limit = Math.min(Number(args.limit) || 100, 300);
+                const where: any = { isActive: true };
+                if (args.parentSlug) {
+                    where.parent = { slug: args.parentSlug };
+                }
+
+                const categories = await prisma.category.findMany({
+                    where,
+                    select: {
+                        id: true,
+                        name: true,
+                        slug: true,
+                        parentId: true,
+                        parent: { select: { name: true, slug: true } },
+                        _count: { select: { products: true } }
+                    },
+                    orderBy: { order: 'asc' },
+                    take: limit
+                });
+
+                return NextResponse.json({
+                    jsonrpc: "2.0",
+                    id,
+                    result: {
+                        content: [{
+                            type: "text",
+                            text: JSON.stringify({ total: categories.length, categories }, null, 2)
+                        }]
+                    }
+                }, { headers: { 'Access-Control-Allow-Origin': '*' } });
+            }
+
+            if (toolName === 'get_taxonomy_overview') {
+                const [mensCount, womensCount, kidsCount, homeCount, total] = await Promise.all([
+                    prisma.product.count({ where: { department: 'Menswear', isActive: true } }),
+                    prisma.product.count({ where: { department: 'Womenswear', isActive: true } }),
+                    prisma.product.count({ where: { department: 'Kidswear', isActive: true } }),
+                    prisma.product.count({ where: { department: 'Home Textiles', isActive: true } }),
+                    prisma.product.count({ where: { isActive: true } })
+                ]);
+
+                return NextResponse.json({
+                    jsonrpc: "2.0",
+                    id,
+                    result: {
+                        content: [{
+                            type: "text",
+                            text: JSON.stringify({
+                                total_active_products: total,
+                                breakdown: {
+                                    menswear: mensCount,
+                                    womenswear: womensCount,
+                                    kidswear: kidsCount,
+                                    home_textiles: homeCount,
+                                    other: total - (mensCount + womensCount + kidsCount + homeCount)
+                                }
+                            }, null, 2)
+                        }]
+                    }
+                }, { headers: { 'Access-Control-Allow-Origin': '*' } });
+            }
+
+            if (toolName === 'classify_and_correct_product') {
+                const { productId, dryRun = false } = args;
+                const product = await prisma.product.findUnique({
+                    where: { id: productId },
+                    include: { category: true }
+                });
+
+                if (!product) {
+                    return NextResponse.json({
+                        jsonrpc: "2.0",
+                        id,
+                        error: { code: -32602, message: `Product not found with ID ${productId}` }
+                    }, { status: 404 });
+                }
+
+                // If explicit corrections provided, use them; otherwise run auto-classifier
+                let targetDept = args.department;
+                let targetDivision = args.divisionType;
+                let targetCategoryId = args.categoryId;
+
+                if (!targetDept || !targetDivision) {
+                    const classified = autoClassifyProductTaxonomy({
+                        name: product.name,
+                        title: product.title,
+                        description: product.description,
+                        category: product.category?.slug,
+                        categoryName: product.category?.name
+                    });
+                    if (!targetDept) targetDept = classified.department;
+                    if (!targetDivision) targetDivision = classified.divisionType;
+                }
+
+                const changes: any = {};
+                if (targetDept && targetDept !== product.department) changes.department = targetDept;
+                if (targetDivision && targetDivision !== product.divisionType) changes.divisionType = targetDivision;
+                if (targetCategoryId && targetCategoryId !== product.categoryId) changes.categoryId = targetCategoryId;
+
+                if (!dryRun && Object.keys(changes).length > 0) {
+                    await prisma.product.update({
+                        where: { id: productId },
+                        data: changes
+                    });
+                }
+
+                return NextResponse.json({
+                    jsonrpc: "2.0",
+                    id,
+                    result: {
+                        content: [{
+                            type: "text",
+                            text: JSON.stringify({
+                                productId,
+                                productName: product.name,
+                                dryRun,
+                                changesApplied: dryRun ? "PREVIEW_ONLY" : (Object.keys(changes).length > 0 ? "COMMITTED" : "NO_CHANGES_NEEDED"),
+                                previous: {
+                                    department: product.department,
+                                    divisionType: product.divisionType,
+                                    categoryId: product.categoryId,
+                                    categoryName: product.category?.name
+                                },
+                                updated: {
+                                    department: targetDept || product.department,
+                                    divisionType: targetDivision || product.divisionType,
+                                    categoryId: targetCategoryId || product.categoryId
+                                }
+                            }, null, 2)
+                        }]
+                    }
+                }, { headers: { 'Access-Control-Allow-Origin': '*' } });
             }
         }
 

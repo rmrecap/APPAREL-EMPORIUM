@@ -8,22 +8,22 @@ export const dynamic = 'force-dynamic';
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
 
 export const metadata: Metadata = {
-    title: 'Woven Garments Sourcing & Export Manufacturing | AELBD Bangladesh',
-    description: 'Source export-grade woven apparel (shirts, denim jeans, trousers, jackets, chinos) from ethically audited, BSCI & SEDEX compliant factories in Bangladesh. Custom OEM/ODM specs, low MOQ, competitive pricing.',
+    title: 'Woven Garments & Denim B2B Manufacturer in Bangladesh | Apparel Buying House',
+    description: 'Leading B2B Garment Manufacturer and Apparel Buying House for export-grade woven apparel (denim jeans, shirts, trousers, jackets, chinos) in Bangladesh. Custom OEM/ODM clothing exporter.',
     alternates: {
         canonical: `${baseUrl}/products/woven`,
     },
     openGraph: {
-        title: 'Woven Garments Sourcing & Export Manufacturing | AELBD Bangladesh',
-        description: 'Source export-grade woven apparel from certified Bangladesh garment manufacturers. Denim, formal shirts, chinos, cargo pants, and outerwear.',
+        title: 'Woven Garments & Denim B2B Manufacturer in Bangladesh | Apparel Buying House',
+        description: 'B2B Garment Manufacturer & Apparel Buying House in Bangladesh. Custom OEM/ODM woven clothing exporter: denim, shirts, trousers, and outerwear.',
         url: `${baseUrl}/products/woven`,
         images: ['/logo.jpg'],
         type: 'website',
     },
     twitter: {
         card: 'summary_large_image',
-        title: 'Woven Garments Sourcing & Export Manufacturing | AELBD Bangladesh',
-        description: 'Source export-grade woven apparel from certified Bangladesh garment manufacturers.',
+        title: 'Woven Garments & Denim B2B Manufacturer in Bangladesh | Apparel Buying House',
+        description: 'B2B Garment Manufacturer & Apparel Buying House for woven apparel and denim export.',
         images: ['/logo.jpg'],
     },
 };

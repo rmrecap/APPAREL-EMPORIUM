@@ -6,11 +6,12 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('================================================================');
-  console.log('🔄 SYNCHRONIZING AUTHENTIC CATEGORIES & PRODUCT TAXONOMY (249)');
+  console.log('🔄 SYNCHRONIZING AUTHENTIC CATEGORIES & PRODUCT TAXONOMY (257)');
   console.log('================================================================');
 
   const categoriesJsonPath = path.join(process.cwd(), 'prisma', 'categories_backup_246.json');
-  const productsJsonPath = path.join(process.cwd(), 'prisma', 'catalog_backup_249_products.json');
+  const products257Path = path.join(process.cwd(), 'prisma', 'catalog_backup_257_products.json');
+  const productsJsonPath = fs.existsSync(products257Path) ? products257Path : path.join(process.cwd(), 'prisma', 'catalog_backup_249_products.json');
 
   if (!fs.existsSync(categoriesJsonPath)) {
     console.warn(`⚠️ Categories JSON not found at ${categoriesJsonPath}`);

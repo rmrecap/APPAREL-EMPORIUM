@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const prisma = new PrismaClient();
-const MIN_EXPECTED_PRODUCTS = 240;
+const MIN_EXPECTED_PRODUCTS = 250;
 const MIN_EXPECTED_CATEGORIES = 200;
 
 async function restoreCategoriesFromJson(catsJsonPath) {
@@ -124,7 +124,8 @@ async function verifyAndProtect() {
     const homeDir = process.env.HOME || process.env.USERPROFILE || '';
     const backupDir = path.join(homeDir, 'db_backups');
     const jsonCatsBackup = path.join(process.cwd(), 'prisma', 'categories_backup_246.json');
-    const jsonBackup = path.join(process.cwd(), 'prisma', 'catalog_backup_249_products.json');
+    const jsonBackup257 = path.join(process.cwd(), 'prisma', 'catalog_backup_257_products.json');
+    const jsonBackup = fs.existsSync(jsonBackup257) ? jsonBackup257 : path.join(process.cwd(), 'prisma', 'catalog_backup_249_products.json');
     const jsonBackupLegacy = path.join(process.cwd(), 'prisma', 'catalog_backup_174_products.json');
 
     if (!fs.existsSync(backupDir)) {

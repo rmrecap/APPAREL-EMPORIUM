@@ -72,8 +72,8 @@ export async function generateMetadata({
     }
 
     return {
-        title: 'Export Garments & Apparel Catalog | AELBD Bangladesh',
-        description: 'Explore our B2B ready-to-export garments catalog: custom knitwear, woven garments, denim, sweaters, and apparel accessories manufactured in Bangladesh.',
+        title: 'B2B Garment Manufacturer & Apparel Buying House in Bangladesh | AELBD Catalog',
+        description: 'Explore our B2B ready-to-export garments catalog: custom OEM/ODM clothing exporter for knitwear, woven garments, denim, sweaters, and apparel accessories manufactured in Bangladesh.',
         alternates: {
             canonical: '/products',
         },
@@ -82,12 +82,46 @@ export async function generateMetadata({
             follow: true,
         },
         openGraph: {
-            title: 'Export Garments & Apparel Catalog | AELBD Bangladesh',
-            description: 'B2B export sourcing catalog for readymade garments, knitwear, woven apparel, and sweaters.',
+            title: 'B2B Garment Manufacturer & Apparel Buying House in Bangladesh | AELBD Catalog',
+            description: 'Leading B2B garment manufacturer and apparel buying house in Bangladesh. Custom OEM/ODM clothing exporter.',
             url: `${baseUrl}/products`,
             images: ['/logo.jpg'],
         }
     };
+}
+
+// Smart responsive pagination range generator with ellipsis windowing
+function getPaginationItems(currentPage: number, totalPages: number): (number | '...')[] {
+    if (totalPages <= 7) {
+        return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    // Near start: 1, 2, 3, 4, 5 ... 20, 21, 22
+    if (currentPage <= 4) {
+        const start = [1, 2, 3, 4, 5];
+        const end = [totalPages - 2, totalPages - 1, totalPages].filter(p => p > 5);
+        return [...start, '...', ...end];
+    }
+
+    // Near end: 1, 2, 3 ... 18, 19, 20, 21, 22
+    if (currentPage >= totalPages - 3) {
+        const start = [1, 2, 3];
+        const end = [totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages].filter(p => p > 3);
+        return [...start, '...', ...end];
+    }
+
+    // In middle: 1, 2 ... currentPage-1, currentPage, currentPage+1 ... totalPages-1, totalPages
+    return [
+        1,
+        2,
+        '...',
+        currentPage - 1,
+        currentPage,
+        currentPage + 1,
+        '...',
+        totalPages - 1,
+        totalPages
+    ];
 }
 
 export default async function ProductsPage({
@@ -318,43 +352,72 @@ export default async function ProductsPage({
                             </div>
                         )}
 
-                        {/* Smart Pagination */}
+                        {/* Smart Responsive Centered Pagination */}
                         {totalPages > 1 && (
-                            <div className="mt-12 flex justify-center items-center gap-2">
-                                {currentPage > 1 && (
-                                    <a
-                                        href={buildQueryString(currentPage - 1)}
-                                        className="w-9 h-9 flex items-center justify-center rounded-xl bg-[#ECE5DC] dark:bg-[#121A2C] text-slate-700 dark:text-slate-300 hover:bg-[#1B2B44] hover:text-white transition-all shadow-xs text-xs font-bold"
-                                    >
-                                        &larr;
-                                    </a>
-                                )}
-
-                                {Array.from({ length: totalPages }).map((_, i) => {
-                                    const pageNum = i + 1;
-                                    return (
+                            <nav aria-label="Product catalog pagination" className="mt-14 mb-4 flex flex-col items-center gap-3">
+                                <div className="flex flex-wrap justify-center items-center gap-1.5 sm:gap-2 max-w-full px-2">
+                                    {currentPage > 1 ? (
                                         <a
-                                            key={i}
-                                            href={buildQueryString(pageNum)}
-                                            className={`w-9 h-9 flex items-center justify-center rounded-xl font-black text-xs transition-all shadow-xs ${currentPage === pageNum
-                                                ? 'bg-[#1B2B44] text-white scale-105 shadow-md'
-                                                : 'bg-[#ECE5DC] dark:bg-[#121A2C] text-slate-700 dark:text-slate-300 hover:bg-[#E0D7CC] dark:hover:bg-[#1A253E]'
-                                                }`}
+                                            href={buildQueryString(currentPage - 1)}
+                                            aria-label="Previous Page"
+                                            className="h-9 px-3 flex items-center justify-center rounded-xl bg-[#ECE5DC] dark:bg-[#121A2C] text-slate-700 dark:text-slate-300 hover:bg-[#1B2B44] hover:text-white transition-all shadow-xs text-xs font-bold gap-1"
                                         >
-                                            {pageNum}
+                                            &larr; <span className="hidden sm:inline">Prev</span>
                                         </a>
-                                    );
-                                })}
+                                    ) : (
+                                        <span className="h-9 px-3 flex items-center justify-center rounded-xl bg-[#ECE5DC]/40 dark:bg-[#121A2C]/40 text-slate-400 dark:text-slate-600 cursor-not-allowed text-xs font-bold gap-1">
+                                            &larr; <span className="hidden sm:inline">Prev</span>
+                                        </span>
+                                    )}
 
-                                {currentPage < totalPages && (
-                                    <a
-                                        href={buildQueryString(currentPage + 1)}
-                                        className="w-9 h-9 flex items-center justify-center rounded-xl bg-[#ECE5DC] dark:bg-[#121A2C] text-slate-700 dark:text-slate-300 hover:bg-[#1B2B44] hover:text-white transition-all shadow-xs text-xs font-bold"
-                                    >
-                                        &rarr;
-                                    </a>
-                                )}
-                            </div>
+                                    {getPaginationItems(currentPage, totalPages).map((item, idx) => {
+                                        if (item === '...') {
+                                            return (
+                                                <span
+                                                    key={`ellipsis-${idx}`}
+                                                    className="w-7 h-9 flex items-center justify-center text-slate-500 dark:text-slate-400 font-black tracking-widest text-xs select-none"
+                                                >
+                                                    ...
+                                                </span>
+                                            );
+                                        }
+
+                                        const pageNum = item;
+                                        const isCurrent = currentPage === pageNum;
+
+                                        return (
+                                            <a
+                                                key={`page-${pageNum}`}
+                                                href={buildQueryString(pageNum)}
+                                                aria-current={isCurrent ? 'page' : undefined}
+                                                className={`min-w-9 h-9 px-2.5 flex items-center justify-center rounded-xl font-black text-xs transition-all shadow-xs ${isCurrent
+                                                    ? 'bg-[#1B2B44] text-white scale-105 shadow-md ring-2 ring-[#1B2B44]/20'
+                                                    : 'bg-[#ECE5DC] dark:bg-[#121A2C] text-slate-700 dark:text-slate-300 hover:bg-[#E0D7CC] dark:hover:bg-[#1A253E]'
+                                                    }`}
+                                            >
+                                                {pageNum}
+                                            </a>
+                                        );
+                                    })}
+
+                                    {currentPage < totalPages ? (
+                                        <a
+                                            href={buildQueryString(currentPage + 1)}
+                                            aria-label="Next Page"
+                                            className="h-9 px-3 flex items-center justify-center rounded-xl bg-[#ECE5DC] dark:bg-[#121A2C] text-slate-700 dark:text-slate-300 hover:bg-[#1B2B44] hover:text-white transition-all shadow-xs text-xs font-bold gap-1"
+                                        >
+                                            <span className="hidden sm:inline">Next</span> &rarr;
+                                        </a>
+                                    ) : (
+                                        <span className="h-9 px-3 flex items-center justify-center rounded-xl bg-[#ECE5DC]/40 dark:bg-[#121A2C]/40 text-slate-400 dark:text-slate-600 cursor-not-allowed text-xs font-bold gap-1">
+                                            <span className="hidden sm:inline">Next</span> &rarr;
+                                        </span>
+                                    )}
+                                </div>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                                    Showing page <span className="font-bold text-slate-700 dark:text-slate-200">{currentPage}</span> of <span className="font-bold text-slate-700 dark:text-slate-200">{totalPages}</span> ({totalProducts} export garments)
+                                </p>
+                            </nav>
                         )}
                     </div>
                 </div>

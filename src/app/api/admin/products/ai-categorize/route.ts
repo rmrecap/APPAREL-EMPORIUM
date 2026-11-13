@@ -279,3 +279,4 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'AI Categorization failed', message: err.message }, { status: 500 });
     }
 }
+

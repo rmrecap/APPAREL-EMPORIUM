@@ -8,22 +8,22 @@ export const dynamic = 'force-dynamic';
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
 
 export const metadata: Metadata = {
-    title: 'Knitwear Sourcing & Export Manufacturing | AELBD Bangladesh',
-    description: 'Premium circular and flat knitwear manufacturing in Bangladesh. Sourcing t-shirts, polo shirts, hoodies, sweatshirts, and activewear with OEKO-TEX certified cotton, sustainable dyes, and strict QA.',
+    title: 'Knitwear Sourcing & B2B Garment Manufacturer in Bangladesh | Apparel Buying House',
+    description: 'Leading B2B Garment Manufacturer and Apparel Buying House for circular and flat knitwear in Bangladesh. Custom OEM/ODM clothing exporter for t-shirts, polo shirts, hoodies, sweatshirts, and activewear with AQL QA.',
     alternates: {
         canonical: `${baseUrl}/products/knitwear`,
     },
     openGraph: {
-        title: 'Knitwear Sourcing & Export Manufacturing | AELBD Bangladesh',
-        description: 'Source export knitwear from Bangladesh: custom t-shirts, polo shirts, fleece hoodies, tracksuits, and activewear.',
+        title: 'Knitwear Sourcing & B2B Garment Manufacturer in Bangladesh | Apparel Buying House',
+        description: 'B2B Garment Manufacturer & Apparel Buying House in Bangladesh: custom OEM/ODM t-shirts, polo shirts, fleece hoodies, tracksuits, and activewear.',
         url: `${baseUrl}/products/knitwear`,
         images: ['/logo.jpg'],
         type: 'website',
     },
     twitter: {
         card: 'summary_large_image',
-        title: 'Knitwear Sourcing & Export Manufacturing | AELBD Bangladesh',
-        description: 'Source export knitwear from Bangladesh: custom t-shirts, polo shirts, fleece hoodies, and activewear.',
+        title: 'Knitwear Sourcing & B2B Garment Manufacturer in Bangladesh | Apparel Buying House',
+        description: 'B2B Garment Manufacturer & Apparel Buying House in Bangladesh: custom OEM/ODM knitwear export.',
         images: ['/logo.jpg'],
     },
 };

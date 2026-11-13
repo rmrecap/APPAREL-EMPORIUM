@@ -8,22 +8,22 @@ export const dynamic = 'force-dynamic';
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
 
 export const metadata: Metadata = {
-    title: 'Sweater Manufacturing & Export Sourcing | AELBD Bangladesh',
-    description: 'Sourcing fine and heavy gauge sweaters (3GG to 14GG) directly from Bangladesh. Cashmere blends, merino wool, cotton acrylic cardigans, pullovers, and seasonal knitwear with automated Shima Seiki knitting.',
+    title: 'Sweater Sourcing & B2B Garment Manufacturer in Bangladesh | Apparel Buying House',
+    description: 'Leading B2B Garment Manufacturer and Apparel Buying House for fine and heavy gauge sweaters (3GG to 14GG) in Bangladesh. Custom OEM/ODM clothing exporter for cardigans, pullovers, and knitwear.',
     alternates: {
         canonical: `${baseUrl}/products/sweater`,
     },
     openGraph: {
-        title: 'Sweater Manufacturing & Export Sourcing | AELBD Bangladesh',
-        description: 'Export sweaters manufactured in Bangladesh: 3GG to 14GG jacquard, intarsia, cable knit pullovers, and cardigans.',
+        title: 'Sweater Sourcing & B2B Garment Manufacturer in Bangladesh | Apparel Buying House',
+        description: 'B2B Garment Manufacturer & Apparel Buying House for export sweaters manufactured in Bangladesh: 3GG to 14GG pullovers and cardigans.',
         url: `${baseUrl}/products/sweater`,
         images: ['/logo.jpg'],
         type: 'website',
     },
     twitter: {
         card: 'summary_large_image',
-        title: 'Sweater Manufacturing & Export Sourcing | AELBD Bangladesh',
-        description: 'Export sweaters manufactured in Bangladesh: 3GG to 14GG pullovers and cardigans.',
+        title: 'Sweater Sourcing & B2B Garment Manufacturer in Bangladesh | Apparel Buying House',
+        description: 'B2B Garment Manufacturer & Apparel Buying House for export sweaters in Bangladesh.',
         images: ['/logo.jpg'],
     },
 };

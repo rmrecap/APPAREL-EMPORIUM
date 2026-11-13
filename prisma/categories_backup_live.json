@@ -1,0 +1,356 @@
+[
+  {
+    "id": "cmumhxfb10000nh1050kn7fa0",
+    "name": "Apparel",
+    "slug": "apparel",
+    "description": "Sourcing and manufacturing category for Apparel",
+    "image": null,
+    "parentId": null,
+    "order": 0,
+    "isActive": true,
+    "createdAt": "2026-09-29T09:50:49.021Z",
+    "_count": {
+      "products": 0
+    },
+    "children": []
+  },
+  {
+    "id": "cmulx6mx00001c7goovxpbfob",
+    "name": "Fashion",
+    "slug": "fashion",
+    "description": null,
+    "image": null,
+    "parentId": null,
+    "order": 1,
+    "isActive": true,
+    "createdAt": "2026-09-29T00:10:06.845Z",
+    "_count": {
+      "products": 0
+    },
+    "children": [
+      {
+        "id": "cmulx6my10003c7goq9p8o72u",
+        "name": "Men's Fashion",
+        "slug": "mens-fashion",
+        "description": null,
+        "image": null,
+        "parentId": "cmulx6mx00001c7goovxpbfob",
+        "order": 0,
+        "isActive": true,
+        "createdAt": "2026-09-29T00:10:06.889Z"
+      },
+      {
+        "id": "cmun0ztqp000010yywdkd3k0i",
+        "name": "Activewear & Hoodies",
+        "slug": "activewear-hoodies-3744",
+        "description": "Manufacturing and export category for Activewear & Hoodies",
+        "image": null,
+        "parentId": "cmulx6mx00001c7goovxpbfob",
+        "order": 0,
+        "isActive": true,
+        "createdAt": "2026-09-30T14:29:54.757Z"
+      },
+      {
+        "id": "cmur4bomu001ieg6z2w6kn0ff",
+        "name": "womens-footwear",
+        "slug": "womens-footwear-0549",
+        "description": "Manufacturing and export category for womens-footwear",
+        "image": null,
+        "parentId": "cmulx6mx00001c7goovxpbfob",
+        "order": 0,
+        "isActive": true,
+        "createdAt": "2026-10-03T17:34:25.545Z"
+      },
+      {
+        "id": "cmur4rvqe001qeg6zhtc4frop",
+        "name": "mens-espadrilles",
+        "slug": "mens-espadrilles-6246",
+        "description": "Manufacturing and export category for mens-espadrilles",
+        "image": null,
+        "parentId": "cmulx6mx00001c7goovxpbfob",
+        "order": 0,
+        "isActive": true,
+        "createdAt": "2026-10-03T17:34:25.553Z"
+      },
+      {
+        "id": "cmufp316j0006e0mlmzh9vc3j",
+        "name": "Knitwear",
+        "slug": "knitwear",
+        "description": null,
+        "image": null,
+        "parentId": "cmulx6mx00001c7goovxpbfob",
+        "order": 1,
+        "isActive": true,
+        "createdAt": "2026-09-24T15:36:44.731Z"
+      },
+      {
+        "id": "cmufp317h000de0ml3o0bry7i",
+        "name": "Woven",
+        "slug": "woven",
+        "description": null,
+        "image": null,
+        "parentId": "cmulx6mx00001c7goovxpbfob",
+        "order": 2,
+        "isActive": true,
+        "createdAt": "2026-09-24T15:36:44.765Z"
+      },
+      {
+        "id": "cmufp318f000ke0mloj2z83xf",
+        "name": "Sweater",
+        "slug": "sweater",
+        "description": null,
+        "image": null,
+        "parentId": "cmulx6mx00001c7goovxpbfob",
+        "order": 3,
+        "isActive": true,
+        "createdAt": "2026-09-24T15:36:44.799Z"
+      },
+      {
+        "id": "cmulx6my80005c7gok8y7mk90",
+        "name": "Women's Fashion",
+        "slug": "womens-fashion",
+        "description": null,
+        "image": null,
+        "parentId": "cmulx6mx00001c7goovxpbfob",
+        "order": 10,
+        "isActive": true,
+        "createdAt": "2026-09-29T00:10:06.896Z"
+      },
+      {
+        "id": "cmulx6mye0007c7gojwpra11v",
+        "name": "Children's Fashion",
+        "slug": "childrens-fashion",
+        "description": null,
+        "image": null,
+        "parentId": "cmulx6mx00001c7goovxpbfob",
+        "order": 20,
+        "isActive": true,
+        "createdAt": "2026-09-29T00:10:06.902Z"
+      }
+    ]
+  },
+  {
+    "id": "cmulx6n0f000rc7gobssabmh7",
+    "name": "Home Textiles",
+    "slug": "hometextiles",
+    "description": null,
+    "image": null,
+    "parentId": null,
+    "order": 2,
+    "isActive": true,
+    "createdAt": "2026-09-29T00:10:06.976Z",
+    "_count": {
+      "products": 0
+    },
+    "children": [
+      {
+        "id": "cmulx6n0m000tc7go921mqchz",
+        "name": "Towel",
+        "slug": "towel",
+        "description": null,
+        "image": null,
+        "parentId": "cmulx6n0f000rc7gobssabmh7",
+        "order": 0,
+        "isActive": true,
+        "createdAt": "2026-09-29T00:10:06.982Z"
+      },
+      {
+        "id": "cmun39gfz004twrdy9s233khk",
+        "name": "Home Collections",
+        "slug": "home-collections",
+        "description": "Manufacturing and sourcing for Home Collections",
+        "image": null,
+        "parentId": "cmulx6n0f000rc7gobssabmh7",
+        "order": 0,
+        "isActive": true,
+        "createdAt": "2026-09-29T19:48:02.303Z"
+      },
+      {
+        "id": "cmulx6n0u000vc7go4c92v6qd",
+        "name": "Bedding",
+        "slug": "bedding",
+        "description": null,
+        "image": null,
+        "parentId": "cmulx6n0f000rc7gobssabmh7",
+        "order": 10,
+        "isActive": true,
+        "createdAt": "2026-09-29T00:10:06.990Z"
+      },
+      {
+        "id": "cmulx6n10000xc7gozi0y8mha",
+        "name": "Curtain",
+        "slug": "curtain",
+        "description": null,
+        "image": null,
+        "parentId": "cmulx6n0f000rc7gobssabmh7",
+        "order": 20,
+        "isActive": true,
+        "createdAt": "2026-09-29T00:10:06.996Z"
+      }
+    ]
+  },
+  {
+    "id": "cmulx6n17000zc7gogaue8fx4",
+    "name": "Footwear",
+    "slug": "footwear",
+    "description": null,
+    "image": null,
+    "parentId": null,
+    "order": 3,
+    "isActive": true,
+    "createdAt": "2026-09-29T00:10:07.003Z",
+    "_count": {
+      "products": 0
+    },
+    "children": [
+      {
+        "id": "cmulx6n1e0011c7gosru9tcnx",
+        "name": "Basic Espadrilles",
+        "slug": "basic-espadrilles",
+        "description": null,
+        "image": null,
+        "parentId": "cmulx6n17000zc7gogaue8fx4",
+        "order": 0,
+        "isActive": true,
+        "createdAt": "2026-09-29T00:10:07.010Z"
+      },
+      {
+        "id": "cmun39gp1006nwrdy0zateu5q",
+        "name": "Footwear Collections",
+        "slug": "footwear-collections",
+        "description": "Manufacturing and sourcing for Footwear Collections",
+        "image": null,
+        "parentId": "cmulx6n17000zc7gogaue8fx4",
+        "order": 0,
+        "isActive": true,
+        "createdAt": "2026-09-29T19:48:02.630Z"
+      },
+      {
+        "id": "cmulx6n1k0013c7go03hpacdv",
+        "name": "Fashion Espadrilles",
+        "slug": "fashion-espadrilles",
+        "description": null,
+        "image": null,
+        "parentId": "cmulx6n17000zc7gogaue8fx4",
+        "order": 10,
+        "isActive": true,
+        "createdAt": "2026-09-29T00:10:07.016Z"
+      }
+    ]
+  },
+  {
+    "id": "cmufp3197000re0mlmb5dz0iw",
+    "name": "Accessories",
+    "slug": "accessories",
+    "description": null,
+    "image": null,
+    "parentId": null,
+    "order": 4,
+    "isActive": true,
+    "createdAt": "2026-09-24T15:36:44.827Z",
+    "_count": {
+      "products": 0
+    },
+    "children": [
+      {
+        "id": "cmulx6n1z0017c7gou63elmaf",
+        "name": "Scarves",
+        "slug": "scarves",
+        "description": null,
+        "image": null,
+        "parentId": "cmufp3197000re0mlmb5dz0iw",
+        "order": 0,
+        "isActive": true,
+        "createdAt": "2026-09-29T00:10:07.031Z"
+      },
+      {
+        "id": "cmun39grf0071wrdyi5o5l0p5",
+        "name": "Accessory Collections",
+        "slug": "accessory-collections",
+        "description": "Manufacturing and sourcing for Accessory Collections",
+        "image": null,
+        "parentId": "cmufp3197000re0mlmb5dz0iw",
+        "order": 0,
+        "isActive": true,
+        "createdAt": "2026-09-29T19:48:02.715Z"
+      },
+      {
+        "id": "cmufsiqes003dd0c31gge1isy",
+        "name": "Garment Trims & Notions",
+        "slug": "acc-trims",
+        "description": null,
+        "image": null,
+        "parentId": "cmufp3197000re0mlmb5dz0iw",
+        "order": 1,
+        "isActive": true,
+        "createdAt": "2026-09-24T17:12:56.117Z"
+      },
+      {
+        "id": "cmulx6n260019c7goc3ybqz5d",
+        "name": "Hats / Caps",
+        "slug": "hats-caps",
+        "description": null,
+        "image": null,
+        "parentId": "cmufp3197000re0mlmb5dz0iw",
+        "order": 1,
+        "isActive": true,
+        "createdAt": "2026-09-29T00:10:07.039Z"
+      },
+      {
+        "id": "cmufsiqfk003pd0c3a1qungzb",
+        "name": "Fashion Accessories",
+        "slug": "acc-fashion",
+        "description": null,
+        "image": null,
+        "parentId": "cmufp3197000re0mlmb5dz0iw",
+        "order": 2,
+        "isActive": true,
+        "createdAt": "2026-09-24T17:12:56.145Z"
+      },
+      {
+        "id": "cmulx6n2k001bc7gop19buhp8",
+        "name": "Gloves",
+        "slug": "gloves",
+        "description": null,
+        "image": null,
+        "parentId": "cmufp3197000re0mlmb5dz0iw",
+        "order": 2,
+        "isActive": true,
+        "createdAt": "2026-09-29T00:10:07.052Z"
+      },
+      {
+        "id": "cmufsiqg9003zd0c3j60g1h72",
+        "name": "Packaging & Sourcing",
+        "slug": "acc-packaging",
+        "description": null,
+        "image": null,
+        "parentId": "cmufp3197000re0mlmb5dz0iw",
+        "order": 3,
+        "isActive": true,
+        "createdAt": "2026-09-24T17:12:56.169Z"
+      },
+      {
+        "id": "cmulx6n2r001dc7go831cu0go",
+        "name": "Socks",
+        "slug": "socks",
+        "description": null,
+        "image": null,
+        "parentId": "cmufp3197000re0mlmb5dz0iw",
+        "order": 3,
+        "isActive": true,
+        "createdAt": "2026-09-29T00:10:07.059Z"
+      },
+      {
+        "id": "cmulx6n2x001fc7gos99y5g55",
+        "name": "Gift Box",
+        "slug": "gift-box",
+        "description": null,
+        "image": null,
+        "parentId": "cmufp3197000re0mlmb5dz0iw",
+        "order": 4,
+        "isActive": true,
+        "createdAt": "2026-09-29T00:10:07.066Z"
+      }
+    ]
+  }
+]

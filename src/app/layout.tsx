@@ -20,10 +20,10 @@ const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
 export const metadata: Metadata = {
     metadataBase: new URL(baseUrl),
     title: {
-        default: 'Apparel Emporium | Trusted Garments Sourcing Partner in Bangladesh',
+        default: 'Apparel Emporium | B2B Garment Manufacturer & Apparel Buying House in Bangladesh',
         template: '%s | Apparel Emporium (AELBD)',
     },
-    description: '100% Export Oriented Readymade Garments, Home Textiles, Footwear and Accessories Buying House in Bangladesh. Globally Compliant & Ethically Audited Partner Factories.',
+    description: 'Leading B2B Garment Manufacturer, Apparel Buying House, and Custom OEM/ODM Clothing Exporter in Uttara, Dhaka, Bangladesh. Globally Compliant & Ethically Audited Partner Factories.',
     alternates: {
         canonical: './',
     },
@@ -39,8 +39,8 @@ export const metadata: Metadata = {
         },
     },
     openGraph: {
-        title: 'Apparel Emporium | Trusted Garments Sourcing Partner in Bangladesh',
-        description: '100% Export Oriented Readymade Garments Buying House in Bangladesh. Certified compliance, custom tech-pack development, and global shipping.',
+        title: 'Apparel Emporium | B2B Garment Manufacturer & Apparel Buying House in Bangladesh',
+        description: 'Leading B2B Garment Manufacturer, Apparel Buying House, and Custom OEM/ODM Clothing Exporter in Bangladesh. Sourcing circular knitwear, flat knitwear, woven garments, denim, and outerwear.',
         url: baseUrl,
         siteName: 'Apparel Emporium (AELBD)',
         images: [
@@ -56,8 +56,8 @@ export const metadata: Metadata = {
     },
     twitter: {
         card: 'summary_large_image',
-        title: 'Apparel Emporium | Trusted Garments Sourcing Partner in Bangladesh',
-        description: '100% Export Oriented Readymade Garments Buying House in Bangladesh. Certified compliance, custom tech-pack development, and global shipping.',
+        title: 'Apparel Emporium | B2B Garment Manufacturer & Apparel Buying House in Bangladesh',
+        description: 'Leading B2B Garment Manufacturer, Apparel Buying House, and Custom OEM/ODM Clothing Exporter in Bangladesh.',
         images: ['/logo.jpg'],
     },
     icons: {
@@ -70,26 +70,36 @@ export const metadata: Metadata = {
     },
 };
 
-// Organization, LocalBusiness, Services, FAQs, & Product Offers JSON-LD Structured Data
+// B2B Buying House, Garment Manufacturer, Services, FAQs & Custom Sourcing JSON-LD Structured Data
 const organizationSchema = {
     '@context': 'https://schema.org',
     '@graph': [
         {
             '@type': ['Organization', 'LocalBusiness'],
             '@id': `${baseUrl}/#organization`,
-            'name': 'Apparel Emporium Ltd.',
+            'name': 'Apparel Emporium',
             'alternateName': 'AELBD',
-            'url': baseUrl,
+            'url': `${baseUrl}/`,
+            'description': 'Leading B2B Garment Manufacturer, Apparel Buying House, and OEM/ODM Clothing Exporter in Uttara, Dhaka, Bangladesh.',
+            'knowsAbout': [
+                'Garment Manufacturing',
+                'Apparel Buying House Services',
+                'Custom OEM & Private Label Clothing',
+                'Circular Knitwear',
+                'Flat Knitwear',
+                'Woven Garments',
+                'Denim & Outerwear Export'
+            ],
             'telephone': '+88 02 4895 5519',
             'email': 'info@aelbd.net',
-            'priceRange': '$2.50 - $45.00 USD',
+            'priceRange': 'Custom Bulk Pricing (FOB/CIF/DDP)',
             'currenciesAccepted': 'USD, EUR, GBP, BDT',
-            'paymentAccepted': 'Cash, Bank Wire (T/T), Letter of Credit (L/C)',
+            'paymentAccepted': 'Bank Wire (T/T), Letter of Credit (L/C)',
             'logo': {
                 '@type': 'ImageObject',
                 '@id': `${baseUrl}/#logo`,
                 'url': `${baseUrl}/logo.jpg`,
-                'caption': 'Apparel Emporium Ltd. - Bangladesh Garments Buying House'
+                'caption': 'Apparel Emporium - Garment Buying House & OEM Clothing Manufacturer Bangladesh'
             },
             'image': `${baseUrl}/logo.jpg`,
             'sameAs': [
@@ -101,14 +111,14 @@ const organizationSchema = {
                     '@type': 'ContactPoint',
                     'telephone': '+88 02 4895 5519',
                     'contactType': 'customer service',
-                    'areaServed': 'Global',
+                    'areaServed': 'Worldwide',
                     'availableLanguage': ['English', 'Bengali']
                 }
             ],
             'address': {
                 '@type': 'PostalAddress',
                 'streetAddress': 'House # 03 (2nd Floor), Road # 12, Sector # 13, Uttara Model Town',
-                'addressLocality': 'Dhaka',
+                'addressLocality': 'Uttara, Dhaka',
                 'postalCode': '1230',
                 'addressCountry': 'BD'
             },
@@ -124,12 +134,13 @@ const organizationSchema = {
                     'opens': '09:00',
                     'closes': '19:00'
                 }
-            ]
+            ],
+            'areaServed': 'Worldwide'
         },
         {
             '@type': 'WebSite',
             '@id': `${baseUrl}/#website`,
-            'url': baseUrl,
+            'url': `${baseUrl}/`,
             'name': 'Apparel Emporium',
             'description': 'Export-Oriented Readymade Garments Buying House and Sourcing Partner in Bangladesh',
             'publisher': {
@@ -152,20 +163,16 @@ const organizationSchema = {
             'serviceType': 'Apparel Manufacturing & Export Sourcing',
             'provider': { '@id': `${baseUrl}/#organization` },
             'description': 'End-to-end garments merchandising, manufacturing, and export sourcing from Bangladesh for Knitwear, Woven, Sweaters, Denim, and Outerwear.',
-            'offers': {
-                '@type': 'Offer',
-                'price': '0',
-                'priceCurrency': 'USD',
-                'description': 'Free initial tech-pack consultation and cost quotation'
-            }
+            'areaServed': 'Worldwide'
         },
         {
             '@type': 'Service',
             '@id': `${baseUrl}/#service-qa`,
-            'name': 'Garments Quality Assurance & AQL 2.5 Inspection',
-            'serviceType': 'Quality Inspection',
+            'name': 'Quality Assurance (AQL Inspection Standards & Pre-Shipment QC)',
+            'serviceType': 'Garments Quality Inspection & Compliance Audit',
             'provider': { '@id': `${baseUrl}/#organization` },
-            'description': 'On-site factory quality audits, inline inspection, pre-shipment inspection (AQL 2.5 standard), and compliance verification.'
+            'description': 'On-site factory quality audits, inline inspection, pre-shipment inspection (AQL 1.5/2.5 standard), and compliance verification.',
+            'areaServed': 'Worldwide'
         },
         {
             '@type': 'FAQPage',
@@ -184,7 +191,7 @@ const organizationSchema = {
                     'name': 'What are the typical FOB pricing ranges for garments sourced through Apparel Emporium?',
                     'acceptedAnswer': {
                         '@type': 'Answer',
-                        'text': 'FOB pricing ranges from $2.50 to $6.50 USD for basic knit t-shirts and polos, $8.00 to $18.00 USD for denim jeans and woven trousers, and $15.00 to $45.00 USD for technical jackets and outerwear, subject to fabric composition and order volume.'
+                        'text': 'FOB pricing is custom-tailored based on volume, fabric GSM, and construction. Inquiries and tech packs are evaluated for competitive bulk manufacturing quotes under FOB, CIF, or DDP incoterms.'
                     }
                 },
                 {
@@ -192,34 +199,29 @@ const organizationSchema = {
                     'name': 'How can international buyers submit a Request for Quotation (RFQ)?',
                     'acceptedAnswer': {
                         '@type': 'Answer',
-                        'text': 'Buyers can submit tech packs, fabric requirements, and target pricing directly via our online contact portal at https://aelbd.net/contact or by emailing info@aelbd.net.'
+                        'text': 'Buyers can submit tech packs, fabric requirements, and target pricing directly via our online RFQ portal at https://aelbd.net/request-quote or by emailing info@aelbd.net.'
                     }
                 }
             ]
         },
         {
             '@type': 'ItemList',
-            '@id': `${baseUrl}/#core-products`,
-            'name': 'Export Garments Sourcing Product Catalog',
+            'name': 'B2B Custom Garment Manufacturing & Sourcing Categories',
             'itemListElement': [
                 {
                     '@type': 'ListItem',
                     'position': 1,
                     'item': {
-                        '@type': 'Product',
+                        '@type': 'Service',
                         'name': 'Custom OEM Cotton T-Shirts & Polos',
-                        'description': '100% combed cotton, CVC, or TC jersey knit t-shirts and polo shirts with custom GSM, embroidery, and printing.',
-                        'image': `${baseUrl}/images/categories/knitwear.jpg`,
-                        'sku': 'AEL-KNIT-001',
-                        'offers': {
-                            '@type': 'Offer',
-                            'url': `${baseUrl}/products`,
-                            'priceCurrency': 'USD',
-                            'price': '3.50',
-                            'priceValidUntil': '2027-12-31',
-                            'itemCondition': 'https://schema.org/NewCondition',
-                            'availability': 'https://schema.org/InStock',
-                            'seller': { '@id': `${baseUrl}/#organization` }
+                        'serviceType': 'B2B Custom Garment Manufacturing & Private Label Sourcing',
+                        'provider': {
+                            '@id': `${baseUrl}/#organization`
+                        },
+                        'areaServed': 'Worldwide',
+                        'availableChannel': {
+                            '@type': 'ServiceChannel',
+                            'serviceUrl': `${baseUrl}/products/knitwear`
                         }
                     }
                 },
@@ -227,20 +229,16 @@ const organizationSchema = {
                     '@type': 'ListItem',
                     'position': 2,
                     'item': {
-                        '@type': 'Product',
+                        '@type': 'Service',
                         'name': 'Export Denim Jeans & Trousers',
-                        'description': 'High-grade stretch and rigid cotton denim pants with custom enzyme, bleach, and distress washing.',
-                        'image': `${baseUrl}/images/categories/woven.jpg`,
-                        'sku': 'AEL-DENIM-002',
-                        'offers': {
-                            '@type': 'Offer',
-                            'url': `${baseUrl}/products`,
-                            'priceCurrency': 'USD',
-                            'price': '9.50',
-                            'priceValidUntil': '2027-12-31',
-                            'itemCondition': 'https://schema.org/NewCondition',
-                            'availability': 'https://schema.org/InStock',
-                            'seller': { '@id': `${baseUrl}/#organization` }
+                        'serviceType': 'B2B Woven & Denim Garment Manufacturing',
+                        'provider': {
+                            '@id': `${baseUrl}/#organization`
+                        },
+                        'areaServed': 'Worldwide',
+                        'availableChannel': {
+                            '@type': 'ServiceChannel',
+                            'serviceUrl': `${baseUrl}/products/woven`
                         }
                     }
                 },
@@ -248,20 +246,16 @@ const organizationSchema = {
                     '@type': 'ListItem',
                     'position': 3,
                     'item': {
-                        '@type': 'Product',
+                        '@type': 'Service',
                         'name': 'Winter Outerwear & Technical Jackets',
-                        'description': 'Windproof, water-resistant insulated jackets, hoodies, and softshell coats for international buyers.',
-                        'image': `${baseUrl}/images/categories/sweaters.jpg`,
-                        'sku': 'AEL-OUTER-003',
-                        'offers': {
-                            '@type': 'Offer',
-                            'url': `${baseUrl}/products`,
-                            'priceCurrency': 'USD',
-                            'price': '18.50',
-                            'priceValidUntil': '2027-12-31',
-                            'itemCondition': 'https://schema.org/NewCondition',
-                            'availability': 'https://schema.org/InStock',
-                            'seller': { '@id': `${baseUrl}/#organization` }
+                        'serviceType': 'B2B Technical Outerwear & Jacket Manufacturing',
+                        'provider': {
+                            '@id': `${baseUrl}/#organization`
+                        },
+                        'areaServed': 'Worldwide',
+                        'availableChannel': {
+                            '@type': 'ServiceChannel',
+                            'serviceUrl': `${baseUrl}/products/sweater`
                         }
                     }
                 }

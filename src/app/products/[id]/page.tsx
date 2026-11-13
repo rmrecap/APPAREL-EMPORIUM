@@ -126,30 +126,25 @@ export default async function ProductDetailPage({ params }: PageProps) {
         include: { category: true }
     });
 
-    // ── Schema.org Product & BreadcrumbList JSON-LD ─────────────────────────
+    // ── Schema.org B2B Garment Manufacturing Service & BreadcrumbList JSON-LD ──
     const productImages = extractProductImages(product.images, '/images/3d/white_tshirt.jpg');
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
 
-    const productSchema = {
+    const b2bServiceSchema = {
         '@context': 'https://schema.org',
-        '@type': 'Product',
+        '@type': 'Service',
         'name': product.name,
-        'image': productImages.map(img => img.startsWith('http') ? img : `${baseUrl}${img.startsWith('/') ? '' : '/'}${img}`),
-        'description': product.shortDescription || product.description,
-        'brand': {
-            '@type': 'Brand',
-            'name': 'Apparel Emporium'
+        'serviceType': `B2B Custom Garment Sourcing & Manufacturing - ${product.category?.name || 'Garments'}`,
+        'provider': {
+            '@type': 'Organization',
+            '@id': `${baseUrl}/#organization`,
+            'name': 'Apparel Emporium',
+            'url': baseUrl,
         },
+        'description': product.shortDescription || product.description,
+        'image': productImages.map(img => img.startsWith('http') ? img : `${baseUrl}${img.startsWith('/') ? '' : '/'}${img}`),
+        'areaServed': 'Worldwide',
         'category': product.category?.name || 'Garments',
-        'offers': {
-            '@type': 'AggregateOffer',
-            'priceCurrency': 'USD',
-            'availability': 'https://schema.org/InStock',
-            'seller': {
-                '@type': 'Organization',
-                'name': 'Apparel Emporium Ltd.'
-            }
-        }
     };
 
     const breadcrumbSchema = {
@@ -167,7 +162,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
         <>
             <script
                 type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(b2bServiceSchema) }}
             />
             <script
                 type="application/ld+json"
