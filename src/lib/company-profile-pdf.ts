@@ -1,6 +1,7 @@
 import { jsPDF } from 'jspdf';
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 import { prisma } from './prisma';
 
 /* ─────────────────────────────────────────────────────────────
@@ -54,35 +55,108 @@ function getImageDimensions(buffer: Buffer): { width: number; height: number } |
 }
 
 /* ─────────────────────────────────────────────────────────────
-   Helper: Safely load image as base64 string with dimensions
+   Helper: Extract first image URL from string, JSON array, or object
+───────────────────────────────────────────────────────────────── */
+function extractFirstImageUrl(raw: any): string | null {
+    if (!raw) return null;
+    if (Array.isArray(raw) && raw.length > 0) {
+        const first = raw[0];
+        return typeof first === 'string' ? first : (first?.url || first?.src || first?.image || null);
+    }
+    if (typeof raw === 'string') {
+        const trimmed = raw.trim();
+        if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+            try {
+                const parsed = JSON.parse(trimmed);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    const first = parsed[0];
+                    return typeof first === 'string' ? first : (first?.url || first?.src || first?.image || null);
+                } else if (parsed && typeof parsed === 'object') {
+                    return parsed.url || parsed.src || parsed.image || null;
+                }
+            } catch { }
+        }
+        return trimmed.replace(/^["']|["']$/g, '');
+    }
+    return null;
+}
+
+function getCacheFilename(url: string): string {
+    const ext = path.extname(url.split('?')[0]) || '.jpg';
+    const hash = crypto.createHash('md5').update(url).digest('hex').slice(0, 16);
+    const base = path.basename(url.split('?')[0]).replace(/[^a-zA-Z0-9._-]/g, '_');
+    return `cached_${hash}_${base}`;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Helper: Ensure all remote images are downloaded to disk cache
+───────────────────────────────────────────────────────────────── */
+async function ensureImagesCached(products: { images: any }[]) {
+    const cacheDir = path.join(process.cwd(), 'public', 'uploads', 'cache');
+    if (!fs.existsSync(cacheDir)) {
+        fs.mkdirSync(cacheDir, { recursive: true });
+    }
+
+    const missingUrls: string[] = [];
+    for (const p of products) {
+        const url = extractFirstImageUrl(p.images);
+        if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+            const cacheFile = path.join(cacheDir, getCacheFilename(url));
+            if (!fs.existsSync(cacheFile) || fs.statSync(cacheFile).size < 100) {
+                missingUrls.push(url);
+            }
+        }
+    }
+
+    if (missingUrls.length === 0) return;
+
+    const batchSize = 10;
+    for (let i = 0; i < missingUrls.length; i += batchSize) {
+        const batch = missingUrls.slice(i, i + batchSize);
+        await Promise.all(batch.map(async (url) => {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 6000);
+                const res = await fetch(url, { signal: controller.signal });
+                clearTimeout(timeoutId);
+                if (res.ok) {
+                    const buf = Buffer.from(await res.arrayBuffer());
+                    const cacheFile = path.join(cacheDir, getCacheFilename(url));
+                    fs.writeFileSync(cacheFile, buf);
+                }
+            } catch { }
+        }));
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Helper: Safely load image as base64 string with dimensions (sync)
 ───────────────────────────────────────────────────────────────── */
 function getLocalImageBase64(imgUrl: string | null | undefined): { format: 'JPEG' | 'PNG'; data: string; width?: number; height?: number } | null {
     if (!imgUrl) return null;
 
     try {
-        let cleanPath = imgUrl.trim();
-        if (cleanPath.startsWith('[') && cleanPath.endsWith(']')) {
-            try {
-                const parsed = JSON.parse(cleanPath);
-                if (Array.isArray(parsed) && parsed.length > 0) {
-                    cleanPath = parsed[0];
-                }
-            } catch { }
+        const cleanUrl = extractFirstImageUrl(imgUrl);
+        if (!cleanUrl) return null;
+
+        let localPath: string;
+        if (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://')) {
+            const cacheDir = path.join(process.cwd(), 'public', 'uploads', 'cache');
+            localPath = path.join(cacheDir, getCacheFilename(cleanUrl));
+        } else {
+            let cleanPath = cleanUrl.split('?')[0].replace(/^["']|["']$/g, '');
+            if (cleanPath.startsWith('/')) cleanPath = cleanPath.substring(1);
+            localPath = path.join(process.cwd(), 'public', cleanPath);
         }
 
-        cleanPath = cleanPath.split('?')[0].replace(/^["']|["']$/g, '');
-        if (cleanPath.startsWith('/')) cleanPath = cleanPath.substring(1);
-
-        const localPath = path.join(process.cwd(), 'public', cleanPath);
-        if (fs.existsSync(localPath)) {
+        if (fs.existsSync(localPath) && fs.statSync(localPath).size > 100) {
             const ext = path.extname(localPath).toLowerCase();
             const format: 'JPEG' | 'PNG' = ext === '.png' ? 'PNG' : 'JPEG';
             const buf = fs.readFileSync(localPath);
             const dims = getImageDimensions(buf);
-            const base64 = buf.toString('base64');
             return {
                 format,
-                data: `data:image/${ext === '.png' ? 'png' : 'jpeg'};base64,${base64}`,
+                data: `data:image/${ext === '.png' ? 'png' : 'jpeg'};base64,${buf.toString('base64')}`,
                 width: dims?.width,
                 height: dims?.height
             };
@@ -114,6 +188,9 @@ export async function generateCompanyProfilePDF(): Promise<Buffer> {
         include: { category: true },
         orderBy: { updatedAt: 'desc' },
     });
+
+    // 3.1 Ensure any missing remote images are cached to disk
+    await ensureImagesCached(products);
 
     // 4. Dynamic strings from settings with sanitized buyer-centric fallbacks
     const companyName = settings.company_name || 'Apparel Emporium';
