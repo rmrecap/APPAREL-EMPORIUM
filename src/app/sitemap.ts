@@ -4,9 +4,9 @@ import { prisma } from '@/lib/prisma';
 export const dynamic = 'force-dynamic';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.aelbd.net';
 
-    // Static Routes with appropriate priority and change frequency
+    // Static Routes with appropriate priority and change frequency (Noindex / quote forms excluded)
     const staticPages: { route: string; priority: number; changeFrequency: 'daily' | 'weekly' | 'monthly' }[] = [
         { route: '', priority: 1.0, changeFrequency: 'daily' },
         { route: '/products', priority: 0.9, changeFrequency: 'daily' },
@@ -14,7 +14,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         { route: '/about', priority: 0.8, changeFrequency: 'monthly' },
         { route: '/support', priority: 0.8, changeFrequency: 'weekly' },
         { route: '/contact', priority: 0.8, changeFrequency: 'monthly' },
-        { route: '/request-quote', priority: 0.8, changeFrequency: 'monthly' },
         { route: '/blog', priority: 0.7, changeFrequency: 'weekly' },
         { route: '/factories', priority: 0.7, changeFrequency: 'monthly' },
         { route: '/faqs', priority: 0.7, changeFrequency: 'monthly' },

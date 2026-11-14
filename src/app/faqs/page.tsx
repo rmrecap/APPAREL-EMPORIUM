@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     title: 'Frequently Asked Questions (FAQ) | Apparel Emporium (AELBD)',
     description: 'Frequently asked questions regarding apparel sourcing from Bangladesh: MOQ requirements, sample lead times, FOB pricing, factory audits, and quality control.',
     alternates: {
-        canonical: '/faqs',
+        canonical: 'https://www.aelbd.net/faqs',
     },
 };
 

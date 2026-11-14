@@ -10,11 +10,13 @@ export async function middleware(req: NextRequest) {
         return new NextResponse('Access Denied: Malformed Subrequest Header', { status: 403 });
     }
 
-    // ── PRIORITY 0.5: Enforce Canonical Domain (301 Redirect www to non-www) ──
-    const host = req.headers.get('host') || '';
-    if (host.toLowerCase().startsWith('www.')) {
-        const cleanHost = host.replace(/^www\./i, '');
-        const redirectUrl = new URL(req.nextUrl.pathname + req.nextUrl.search, `https://${cleanHost}`);
+    // ── PRIORITY 0.5: Enforce Canonical WWW Domain (301 Permanent Redirect non-www to www) ──
+    const host = (req.headers.get('host') || '').toLowerCase();
+    const proto = req.headers.get('x-forwarded-proto') || '';
+
+    // If request arrives at non-www (aelbd.net) or unencrypted HTTP on aelbd domain, 301 Permanent Redirect to https://www.aelbd.net
+    if (host === 'aelbd.net' || (host === 'www.aelbd.net' && proto === 'http')) {
+        const redirectUrl = new URL(req.nextUrl.pathname + req.nextUrl.search, 'https://www.aelbd.net');
         return NextResponse.redirect(redirectUrl, { status: 301 });
     }
 
@@ -219,12 +221,12 @@ Apparel Emporium is a premier buying house and garment exporter headquartered in
 - **Address:** House # 03 (2nd Floor), Road # 12, Sector # 13, Uttara Model Town, Dhaka-1230, Bangladesh
 - **Phone:** +88 02 4895 5519, +88 096 6691 2038
 - **Email:** info@aelbd.net, kamal@aelbd.net
-- **Website:** https://aelbd.net
+- **Website:** https://www.aelbd.net
 
 ## Agent Resources
-- Full Documentation: https://aelbd.net/llms.txt
-- MCP Server Card: https://aelbd.net/.well-known/mcp/server-card.json
-- Products Catalog: https://aelbd.net/products
+- Full Documentation: https://www.aelbd.net/llms.txt
+- MCP Server Card: https://www.aelbd.net/.well-known/mcp/server-card.json
+- Products Catalog: https://www.aelbd.net/products
 `;
     }
 
@@ -239,8 +241,8 @@ Over 170+ export garments styles across Knitwear, Woven, Denim, Sweaters, and Ou
 3. **Sweaters & Flat Knits:** 3GG/5GG heavy gauge pullovers, 12GG fine gauge cardigans.
 4. **Jackets & Outerwear:** Windproof parkas, softshell jackets, padded winter coats.
 
-- To search products via API: \`GET https://aelbd.net/api/products?search=<keyword>\`
-- To submit an inquiry: https://aelbd.net/contact
+- To search products via API: \`GET https://www.aelbd.net/api/products?search=<keyword>\`
+- To submit an inquiry: https://www.aelbd.net/contact
 `;
     }
 
@@ -261,13 +263,13 @@ Established in Dhaka, Bangladesh, Apparel Emporium is a trusted buying house com
 - **Head Office:** House # 03 (2nd Floor), Road # 12, Sector # 13, Uttara Model Town, Dhaka-1230, Bangladesh
 - **Telephone:** +88 02 4895 5519, +88 096 6691 2038
 - **Email:** info@aelbd.net, kamal@aelbd.net
-- **RFQ Submission:** https://aelbd.net/contact
+- **RFQ Submission:** https://www.aelbd.net/contact
 `;
     }
 
     return `# Apparel Emporium Ltd. — ${path}
 
-Visit https://aelbd.net for full details or view https://aelbd.net/llms.txt for agent documentation.
+Visit https://www.aelbd.net for full details or view https://www.aelbd.net/llms.txt for agent documentation.
 `;
 }
 

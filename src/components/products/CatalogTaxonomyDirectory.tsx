@@ -200,7 +200,8 @@ export default function CatalogTaxonomyDirectory({ initialTaxonomy }: Props) {
                   No matching category found for &quot;{searchQuery}&quot;.
                 </p>
                 <Link
-                  href={`/request-quote?product=${encodeURIComponent(searchQuery)}`}
+                  href={`/request-quote?product=${encodeURIComponent((searchQuery || '').replace(/\s+/g, ' ').trim())}`}
+                  rel="nofollow"
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#142338] text-white text-xs font-bold hover:bg-blue-600 transition-all shadow-sm"
                 >
                   <span>Request Custom Quote</span>

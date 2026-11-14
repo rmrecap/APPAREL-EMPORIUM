@@ -44,7 +44,7 @@ export default function B2BCategoryPage({
     faqs,
     products,
 }: B2BCategoryPageProps) {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.aelbd.net';
     const canonicalUrl = `${baseUrl}/products/${slug}`;
 
     // Structured Data: BreadcrumbList + CollectionPage + FAQPage

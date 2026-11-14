@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     title: 'Careers & Opportunities | Apparel Emporium (AELBD)',
     description: 'Join the Apparel Emporium team in Dhaka, Bangladesh. Career opportunities for apparel merchandisers, quality assurance auditors, pattern masters, and supply chain specialists.',
     alternates: {
-        canonical: '/careers',
+        canonical: 'https://www.aelbd.net/careers',
     },
 };
 

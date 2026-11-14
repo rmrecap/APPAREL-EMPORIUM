@@ -17,12 +17,12 @@ export const metadata: Metadata = {
         'sedex bsci certified garment factory'
     ],
     alternates: {
-        canonical: 'https://aelbd.net/global-sourcing',
+        canonical: 'https://www.aelbd.net/global-sourcing',
     },
     openGraph: {
         title: 'Global Apparel Sourcing Markets | Apparel Emporium Bangladesh',
         description: 'B2B apparel manufacturing & export corridors for USA, UK, Europe, UAE, Australia & Canada with verified compliance & duty benefits.',
-        url: 'https://aelbd.net/global-sourcing',
+        url: 'https://www.aelbd.net/global-sourcing',
         siteName: 'Apparel Emporium',
         type: 'website',
     },
@@ -119,7 +119,7 @@ const FAQS = [
 ];
 
 export default function GlobalSourcingPage() {
-    const baseUrl = 'https://aelbd.net';
+    const baseUrl = 'https://www.aelbd.net';
     const canonicalUrl = `${baseUrl}/global-sourcing`;
 
     // Structured Data Schemas

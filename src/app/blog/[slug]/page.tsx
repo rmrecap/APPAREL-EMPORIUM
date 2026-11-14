@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         }
     });
     if (!post) return { title: 'Post Not Found' };
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.aelbd.net';
 
     const effectiveTitle = (slug === 'bsci-vs-sedex-compliance-standards-guide' || decodedSlug === 'bsci-vs-sedex-compliance-standards-guide')
         ? 'BSCI vs SEDEX (SMETA): Apparel Compliance Guide for Global Buyers [2026]'
@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         title: effectiveTitle,
         description: effectiveDescription,
         alternates: {
-            canonical: `/blog/${post.slug}`,
+            canonical: `https://www.aelbd.net/blog/${post.slug}`,
         },
         openGraph: {
             title: effectiveTitle,
@@ -81,7 +81,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         decodedSlug = decodeURIComponent(slug);
     } catch { }
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.aelbd.net';
     const [post, recentPosts] = await Promise.all([
         prisma.blogPost.findFirst({
             where: {

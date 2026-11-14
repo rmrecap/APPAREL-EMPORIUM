@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 export const dynamic = 'force-dynamic';
 
 export default async function robots(): Promise<MetadataRoute.Robots> {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.aelbd.net';
 
     try {
         const customSetting = await prisma.siteSetting.findUnique({
@@ -65,6 +65,12 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
                     '/buyer-portal/',
                     '/compare',
                     '/api/',
+                    '/request-quote',
+                    '/*?q=*',
+                    '/*?product=*',
+                    '/*?page=*',
+                    '/*?category=*',
+                    '/*?sort=*',
                 ],
             },
         ],

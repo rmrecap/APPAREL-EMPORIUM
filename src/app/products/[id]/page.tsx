@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { notFound, redirect } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import ProductDetail3DView from '@/components/products/ProductDetail3DView';
 import { Metadata } from 'next';
 import { extractProductImages, extractFeaturedImage } from '@/lib/utils';
@@ -34,20 +34,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         };
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.aelbd.net';
     const firstImgRel = extractFeaturedImage(product.images, '/images/3d/white_tshirt.jpg');
     const firstImg = firstImgRel.startsWith('http') ? firstImgRel : `${baseUrl}${firstImgRel.startsWith('/') ? '' : '/'}${firstImgRel}`;
+    const productSlug = product.slug || params.id;
 
     return {
         title: `${product.name} Wholesale Manufacturing & Sourcing | AELBD`,
         description: product.shortDescription || `Explore specifications, MOQ, and wholesale production details for ${product.name}.`,
         alternates: {
-            canonical: `/products/${encodeURIComponent(product.slug)}`,
+            canonical: `https://www.aelbd.net/products/${encodeURIComponent(productSlug)}`,
         },
         openGraph: {
             title: `${product.name} | Apparel Emporium B2B Sourcing`,
             description: product.shortDescription || `Explore specifications, MOQ, and wholesale production details for ${product.name}.`,
-            url: `${baseUrl}/products/${encodeURIComponent(product.slug)}`,
+            url: `https://www.aelbd.net/products/${encodeURIComponent(productSlug)}`,
             images: [{ url: firstImg, alt: product.name }],
             type: 'website',
         },
@@ -81,9 +82,9 @@ export default async function ProductDetailPage({ params }: PageProps) {
         notFound();
     }
 
-    // ── 301 Permanent Redirect from raw ID to canonical slug ──────────────
+    // ── 301/308 Permanent Redirect from raw ID to canonical slug ──────────────
     if (params.id === product.id && product.slug && params.id !== product.slug) {
-        redirect(`/products/${encodeURIComponent(product.slug)}`);
+        permanentRedirect(`/products/${encodeURIComponent(product.slug)}`);
     }
 
     // Query related products in same category (or fallback to active products)

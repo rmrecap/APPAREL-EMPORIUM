@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     title: 'Terms of Service | Apparel Emporium (AELBD)',
     description: 'Terms of Service and B2B export sourcing agreements for Apparel Emporium (AELBD). Specifications on proto-sampling, order confirmations, quality control, and L/C payment.',
     alternates: {
-        canonical: '/terms',
+        canonical: 'https://www.aelbd.net/terms',
     },
 };
 

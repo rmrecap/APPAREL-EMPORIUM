@@ -23,11 +23,11 @@
 - **Payment Terms:** Irrevocable Letter of Credit (L/C at sight) or T/T wire transfer.
 
 ## Key Navigation Links
-- [Homepage](https://aelbd.net/): 3D visual showcase, core sourcing divisions, and company overview.
-- [Product Catalog](https://aelbd.net/products): Comprehensive live database of 170+ export garments styles.
-- [About Us](https://aelbd.net/about): Management message from Md. Kamal Hossain, corporate heritage, and Dhaka showroom.
-- [Contact & RFQ](https://aelbd.net/contact): Submit tech packs, request quotations, and schedule factory visits.
-- [Company Profile (PDF)](https://aelbd.net/company-profile.pdf): Downloadable corporate brochure and audit credentials.
+- [Homepage](https://www.aelbd.net/): 3D visual showcase, core sourcing divisions, and company overview.
+- [Product Catalog](https://www.aelbd.net/products): Comprehensive live database of 170+ export garments styles.
+- [About Us](https://www.aelbd.net/about): Management message from Md. Kamal Hossain, corporate heritage, and Dhaka showroom.
+- [Contact & RFQ](https://www.aelbd.net/contact): Submit tech packs, request quotations, and schedule factory visits.
+- [Company Profile (PDF)](https://www.aelbd.net/company-profile.pdf): Downloadable corporate brochure and audit credentials.
 - [MCP Server Card](https://aelbd.net/.well-known/mcp/server-card.json): SEP-1649 Model Context Protocol server manifest for automated agents.
 
 ## Corporate Contact

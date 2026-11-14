@@ -191,14 +191,20 @@ export default function FeaturedProducts({ headings, showDecor = false, showIcon
 
                                 {/* Dual 3D Buttons */}
                                 <div className="flex flex-col gap-2 pt-2 border-t border-slate-100 dark:border-white/5">
-                                    <Link
-                                        href={`/request-quote?product=${encodeURIComponent(product.name)}`}
-                                        className="w-full py-2.5 px-3 rounded-xl font-bold text-xs uppercase tracking-wider text-center transition-all duration-200 active:scale-95 shadow-sm
-                                        bg-[#2D2A26] hover:bg-black text-white
-                                        dark:bg-[#94A3B8] dark:hover:bg-white dark:text-slate-900"
-                                    >
-                                        Add to Quote
-                                    </Link>
+                                    {(() => {
+                                        const cleanName = (product.name || '').replace(/\s+/g, ' ').trim();
+                                        return (
+                                            <Link
+                                                href={`/request-quote?product=${encodeURIComponent(cleanName)}`}
+                                                rel="nofollow"
+                                                className="w-full py-2.5 px-3 rounded-xl font-bold text-xs uppercase tracking-wider text-center transition-all duration-200 active:scale-95 shadow-sm
+                                                bg-[#2D2A26] hover:bg-black text-white
+                                                dark:bg-[#94A3B8] dark:hover:bg-white dark:text-slate-900"
+                                            >
+                                                Add to Quote
+                                            </Link>
+                                        );
+                                    })()}
 
                                     <Link
                                         href={`/contact?subject=Inquiry%20about%20${encodeURIComponent(product.name)}`}

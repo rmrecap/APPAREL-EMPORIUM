@@ -16,7 +16,7 @@ export async function GET() {
             },
         });
     } catch (e) {
-        return new NextResponse('# Apparel Emporium Ltd. (AELBD)\nhttps://aelbd.net', {
+        return new NextResponse('# Apparel Emporium Ltd. (AELBD)\nhttps://www.aelbd.net', {
             headers: { 'Content-Type': 'text/plain; charset=utf-8' },
         });
     }

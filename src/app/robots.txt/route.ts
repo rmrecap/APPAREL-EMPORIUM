@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.aelbd.net';
 
     let customRobots = '';
     try {
@@ -30,7 +30,7 @@ export async function GET() {
         });
     }
 
-    const content = `# Robots.txt for Apparel Emporium (https://aelbd.net)
+    const content = `# Robots.txt for Apparel Emporium (https://www.aelbd.net)
 Content-Signal: search=yes, ai-train=no
 
 User-agent: *
@@ -40,9 +40,12 @@ Disallow: /executive-login
 Disallow: /buyer-portal/
 Disallow: /compare
 Disallow: /api/
+Disallow: /request-quote
 Disallow: /*?q=*
 Disallow: /*?product=*
 Disallow: /*?page=*
+Disallow: /*?category=*
+Disallow: /*?sort=*
 
 Host: ${baseUrl.replace(/^https?:\/\//, '')}
 Sitemap: ${baseUrl}/sitemap.xml

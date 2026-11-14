@@ -15,7 +15,7 @@ import FloatingWhatsApp from '@/components/layout/FloatingWhatsApp';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.aelbd.net';
 
 export const metadata: Metadata = {
     metadataBase: new URL(baseUrl),
@@ -24,9 +24,6 @@ export const metadata: Metadata = {
         template: '%s | Apparel Emporium (AELBD)',
     },
     description: 'Leading B2B Garment Manufacturer, Apparel Buying House, and Custom OEM/ODM Clothing Exporter in Uttara, Dhaka, Bangladesh. Globally Compliant & Ethically Audited Partner Factories.',
-    alternates: {
-        canonical: './',
-    },
     robots: {
         index: true,
         follow: true,
@@ -199,7 +196,7 @@ const organizationSchema = {
                     'name': 'How can international buyers submit a Request for Quotation (RFQ)?',
                     'acceptedAnswer': {
                         '@type': 'Answer',
-                        'text': 'Buyers can submit tech packs, fabric requirements, and target pricing directly via our online RFQ portal at https://aelbd.net/request-quote or by emailing info@aelbd.net.'
+                        'text': 'Buyers can submit tech packs, fabric requirements, and target pricing directly via our online RFQ portal at https://www.aelbd.net/request-quote or by emailing info@aelbd.net.'
                     }
                 }
             ]

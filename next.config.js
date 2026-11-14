@@ -36,6 +36,21 @@ const nextConfig = {
             }
         ],
     },
+    async redirects() {
+        return [
+            {
+                source: '/:path*',
+                has: [
+                    {
+                        type: 'host',
+                        value: 'aelbd.net',
+                    },
+                ],
+                destination: 'https://www.aelbd.net/:path*',
+                permanent: true,
+            },
+        ];
+    },
     async rewrites() {
         return [
             {

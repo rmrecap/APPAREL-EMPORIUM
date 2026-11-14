@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.aelbd.net';
 
 export const metadata: Metadata = {
     title: 'B2B Garments Sourcing Services, QC & Buyer FAQs | AELBD',
     description: 'Comprehensive B2B garments sourcing services in Bangladesh: factory vetting, tech-pack fitting, inline AQL quality control, lab dips, and export customs logistics.',
     alternates: {
-        canonical: '/support',
+        canonical: 'https://www.aelbd.net/support',
     },
     openGraph: {
         title: 'B2B Garments Sourcing Services, QC & Buyer FAQs | AELBD',

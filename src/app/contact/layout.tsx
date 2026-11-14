@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.aelbd.net';
 
 export const metadata: Metadata = {
     title: 'Contact Apparel Emporium | Garments Sourcing Office Dhaka',
     description: 'Contact our apparel merchandising and sourcing team in Dhaka, Bangladesh. Inquire about custom garment manufacturing, tech-pack sampling, and factory audits.',
     alternates: {
-        canonical: '/contact',
+        canonical: 'https://www.aelbd.net/contact',
     },
     openGraph: {
         title: 'Contact Apparel Emporium | Garments Sourcing Office Dhaka',

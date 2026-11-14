@@ -23,6 +23,9 @@ export const dynamic = 'force-dynamic';
 export const metadata = {
     title: 'Apparel Emporium | B2B Garment Manufacturer & Apparel Buying House in Bangladesh',
     description: 'Leading B2B Garment Manufacturer, Apparel Buying House, and Custom OEM/ODM Clothing Exporter in Bangladesh. Providing high-standard quality assurance (AQL inspection), ethical manufacturing, and worldwide export delivery.',
+    alternates: {
+        canonical: 'https://www.aelbd.net',
+    },
 };
 
 export default async function HomePage() {

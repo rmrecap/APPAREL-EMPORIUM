@@ -1,12 +1,16 @@
 import type { Metadata } from 'next';
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.aelbd.net';
 
 export const metadata: Metadata = {
     title: 'Request Garments Sourcing Quotation & RFQ | AELBD',
     description: 'Submit your custom garment manufacturing inquiry or tech-pack specifications. Receive transparent FOB costing, MOQ details, and sample production schedules from Dhaka.',
     alternates: {
-        canonical: '/request-quote',
+        canonical: 'https://www.aelbd.net/request-quote',
+    },
+    robots: {
+        index: false,
+        follow: true,
     },
     openGraph: {
         title: 'Request Garments Sourcing Quotation & RFQ | AELBD',

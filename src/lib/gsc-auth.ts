@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 
 export const GSC_SITE_URL = 'sc-domain:aelbd.net';
-export const APP_BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
+export const APP_BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.aelbd.net';
 
 /**
  * Robust Google Service Account Auth Resolver

@@ -5,7 +5,7 @@ import B2BCategoryPage from '@/components/products/B2BCategoryPage';
 
 export const dynamic = 'force-dynamic';
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.aelbd.net';
 
 export const metadata: Metadata = {
     title: 'Knitwear Sourcing & B2B Garment Manufacturer in Bangladesh | Apparel Buying House',

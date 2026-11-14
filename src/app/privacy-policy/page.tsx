@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     title: 'Privacy Policy | Apparel Emporium (AELBD)',
     description: 'Privacy Policy and data protection standards for Apparel Emporium (AELBD). Learn how we safeguard buyer tech packs, corporate communications, and RFQ inquiries.',
     alternates: {
-        canonical: '/privacy-policy',
+        canonical: 'https://www.aelbd.net/privacy-policy',
     },
 };
 

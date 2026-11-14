@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     title: 'Manufacturing Facilities & Factory Network | Apparel Emporium (AELBD)',
     description: 'Explore our ethically audited garment manufacturing partner factories in Bangladesh: circular knitting, woven garment assembly, sweater flat-knitting, and eco-dyeing facilities.',
     alternates: {
-        canonical: '/factories',
+        canonical: 'https://www.aelbd.net/factories',
     },
 };
 

@@ -17,10 +17,10 @@ export async function generateMetadata({
 }: {
     searchParams: { category?: string; q?: string; page?: string; product?: string; fabric?: string; moq?: string; sort?: string };
 }): Promise<Metadata> {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.aelbd.net';
     
-    // Stop Query Parameter Bloat: Force noindex, follow on search, pagination, product query, or filters
-    const hasQueryBloat = Boolean(searchParams.q || searchParams.page || searchParams.product || searchParams.fabric || searchParams.moq || searchParams.sort);
+    // Stop Query Parameter Bloat: Force noindex, follow on search, category filter, pagination, product query, or filters
+    const hasQueryBloat = Boolean(searchParams.category || searchParams.q || searchParams.page || searchParams.product || searchParams.fabric || searchParams.moq || searchParams.sort);
 
     if (searchParams.category) {
         const catSlug = searchParams.category.toLowerCase();
@@ -28,9 +28,9 @@ export async function generateMetadata({
             return {
                 title: `${catSlug.charAt(0).toUpperCase() + catSlug.slice(1)} Sourcing & Export Manufacturing | AELBD`,
                 alternates: {
-                    canonical: `/products/${catSlug}`,
+                    canonical: `https://www.aelbd.net/products/${catSlug}`,
                 },
-                robots: hasQueryBloat ? { index: false, follow: true } : { index: true, follow: true },
+                robots: { index: false, follow: true },
             };
         }
 
@@ -47,9 +47,9 @@ export async function generateMetadata({
                 title: `${cat.name} Sourcing & Export Manufacturing | AELBD`,
                 description: cat.description || `Source export-quality ${cat.name.toLowerCase()} manufactured in certified Bangladesh garment factories. Custom tech-pack development, private label, and volume production.`,
                 alternates: {
-                    canonical: `/products`,
+                    canonical: 'https://www.aelbd.net/products',
                 },
-                robots: hasQueryBloat ? { index: false, follow: true } : { index: true, follow: true },
+                robots: { index: false, follow: true },
                 openGraph: {
                     title: `${cat.name} Sourcing & Export Manufacturing | AELBD`,
                     description: `Custom ${cat.name.toLowerCase()} production and export sourcing in Bangladesh.`,
@@ -66,7 +66,7 @@ export async function generateMetadata({
             description: searchParams.q ? `Browse garment manufacturing catalog search results for ${searchParams.q}.` : 'Export apparel catalog filtered results.',
             robots: { index: false, follow: true },
             alternates: {
-                canonical: '/products',
+                canonical: 'https://www.aelbd.net/products',
             },
         };
     }
@@ -75,7 +75,7 @@ export async function generateMetadata({
         title: 'B2B Garment Manufacturer & Apparel Buying House in Bangladesh | AELBD Catalog',
         description: 'Explore our B2B ready-to-export garments catalog: custom OEM/ODM clothing exporter for knitwear, woven garments, denim, sweaters, and apparel accessories manufactured in Bangladesh.',
         alternates: {
-            canonical: '/products',
+            canonical: 'https://www.aelbd.net/products',
         },
         robots: {
             index: true,

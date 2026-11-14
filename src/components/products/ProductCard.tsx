@@ -215,13 +215,19 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
                     >
                         Specs
                     </Link>
-                    <Link
-                        href={`/request-quote?product=${encodeURIComponent(product.name)}`}
-                        className="flex-1 text-center py-2 px-3 text-xs font-bold text-white bg-[#1B2B44] hover:bg-[#111C2E] dark:bg-blue-600 dark:hover:bg-blue-500 rounded-xl shadow-md dark:shadow-blue-600/30 transition-all active:scale-95 flex items-center justify-center gap-1"
-                    >
-                        <span>Quote</span>
-                        <ChevronRight size={13} className="stroke-[2.5]" />
-                    </Link>
+                    {(() => {
+                        const cleanProductName = (product.name || (product as any).title || '').replace(/\s+/g, ' ').trim();
+                        return (
+                            <Link
+                                href={`/request-quote?product=${encodeURIComponent(cleanProductName)}`}
+                                rel="nofollow"
+                                className="flex-1 text-center py-2 px-3 text-xs font-bold text-white bg-[#1B2B44] hover:bg-[#111C2E] dark:bg-blue-600 dark:hover:bg-blue-500 rounded-xl shadow-md dark:shadow-blue-600/30 transition-all active:scale-95 flex items-center justify-center gap-1"
+                            >
+                                <span>Quote</span>
+                                <ChevronRight size={13} className="stroke-[2.5]" />
+                            </Link>
+                        );
+                    })()}
                 </div>
             </div>
         </div>
