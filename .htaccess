@@ -3,10 +3,10 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
     
-    # Enforce HTTPS & 301 Redirect www.aelbd.net to https://aelbd.net
-    RewriteCond %{HTTP_HOST} ^www\.aelbd\.net$ [NC,OR]
-    RewriteCond %{HTTPS} off
-    RewriteRule ^(.*)$ https://aelbd.net/$1 [L,R=301]
+    # Enforce HTTPS & 301 Redirect non-www (aelbd.net) to https://www.aelbd.net
+    RewriteCond %{HTTPS} off [OR]
+    RewriteCond %{HTTP_HOST} ^aelbd\.net$ [NC]
+    RewriteRule ^(.*)$ https://www.aelbd.net/$1 [L,R=301]
 
     # Mitigate CVE-2025-29927: prevent external spoofing of internal Next.js middleware header
     <IfModule mod_headers.c>
