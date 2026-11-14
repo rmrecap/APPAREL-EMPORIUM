@@ -14,6 +14,7 @@ function run(cmd, desc) {
             env: {
                 ...process.env,
                 NEXT_DEBUG_BUILD: '1',
+                NEXT_PRIVATE_WORKERS: '1',
                 NODE_OPTIONS: '--max-old-space-size=1280 --stack-trace-limit=100',
                 UV_THREADPOOL_SIZE: '1'
             }
@@ -265,6 +266,7 @@ async function main() {
     // 8. BUILD NEXT.JS PRODUCTION APPLICATION
     console.log('\n🏗️ [BUILD] Compiling Next.js production build...');
     process.env.NEXT_DEBUG_BUILD = '1';
+    process.env.NEXT_PRIVATE_WORKERS = '1';
     try {
         const userConfigPath = path.join(cwd, 'next.config.js');
         if (fs.existsSync(userConfigPath)) {
