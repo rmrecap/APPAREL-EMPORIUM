@@ -36,6 +36,14 @@ const nextConfig = {
             }
         ],
     },
+    async rewrites() {
+        return [
+            {
+                source: '/company-profile.pdf',
+                destination: '/api/company-profile/pdf',
+            },
+        ];
+    },
     async headers() {
         return [
             // ── CORS for External API (Product Uploader Tool) ──────────────────

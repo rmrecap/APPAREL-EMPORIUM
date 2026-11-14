@@ -9,40 +9,40 @@ import { Vision3DIcon, Mission3DIcon, Values3DIcon, Flowchart3DIcon } from '../.
 
 const OFFICE_GALLERY = [
     {
-        src: '/images/office/showroom_lounge_wide.jpg?v=20261106_2',
-        title: 'Showroom & Buyer Meeting Lounge',
-        tag: 'Executive Lounge',
-        desc: 'Spacious negotiation lounge with direct access to garment development collections for international buyers.'
+        src: '/images/office/luxury_executive_showroom.jpg',
+        title: 'Executive Garments Showroom & Sampling Studio',
+        tag: 'Executive Showroom',
+        desc: 'State-of-the-art apparel showcase and sampling studio featuring illuminated 3D brand architecture, comprehensive textile swatch boards, executive meeting table, and curated garment racks.'
     },
     {
-        src: '/images/office/knit_woven_double_rack.jpg?v=20261106_2',
+        src: '/images/office/luxury_buyer_lounge.jpg',
+        title: 'International Buyer Negotiation Suite',
+        tag: 'Buyer Lounge',
+        desc: 'Spacious showroom lounge with executive conference facilities, architectural mood boards, and dedicated sample displays for international apparel buyers.'
+    },
+    {
+        src: '/images/office/luxury_executive_boardroom.jpg',
+        title: 'Corporate Conference Boardroom & Strategy Suite',
+        tag: 'Strategic Operations',
+        desc: 'Executive boardroom equipped with acoustic architectural timber paneling, illuminated Apparel Emporium emblem, and sample merchandising development displays.'
+    },
+    {
+        src: '/images/office/knit_woven_double_rack.jpg',
         title: 'Sampling Development Racks',
         tag: 'Knit & Woven Racks',
         desc: 'Over 500+ active apparel samples spanning knitwear, woven shirts, casual tops, and seasonal activewear.'
     },
     {
-        src: '/images/office/boardroom_conference_table.jpg?v=20261106_2',
-        title: 'Corporate Conference Boardroom',
-        tag: 'Strategic Operations',
-        desc: 'Dedicated meeting facility where our merchandising, technical, and QA executives align on production milestones.'
-    },
-    {
-        src: '/images/office/sample_racks_shirts.jpg?v=20261106_2',
-        title: 'Garments Display & Sourcing Floor',
-        tag: 'Apparel Collections',
-        desc: 'Curated selection of polos, tees, swimwear, casual shirts, and trousers ready for international private label sourcing.'
-    },
-    {
-        src: '/images/office/apparel_collection_racks.jpg?v=20261106_2',
-        title: 'Apparel Collection & Trims Showcase',
+        src: '/images/office/apparel_collection_racks.jpg',
+        title: 'Apparel Collection & Swatches Showcase',
         tag: 'Design & Variety',
-        desc: 'Vibrant casual wear, shorts, and fabric swatches demonstrating multi-category sourcing breadth.'
+        desc: 'Curated selection of polos, casual wear, shorts, and fabric swatches demonstrating multi-category sourcing breadth.'
     },
     {
-        src: '/images/office/meeting_room_perspective.jpg?v=20261106_2',
+        src: '/images/office/vertical_sample_display.jpg',
         title: 'Buyer Interaction & Fit Review Floor',
         tag: 'Uttara Model Town HQ',
-        desc: 'Comfortable environment for international buyers to conduct sample evaluations, fit reviews, and costings.'
+        desc: 'High-end environment for international buyers to conduct sample evaluations, fit reviews, and development costings.'
     }
 ];
 
@@ -88,19 +88,29 @@ export default function AboutPage() {
 
     const heroSlides = [
         {
-            src: '/images/office/knit_woven_double_rack.jpg?v=20261106_2',
+            src: '/images/office/luxury_executive_showroom.jpg',
+            title: 'Executive Garments Showroom',
+            subtitle: 'Uttara Model Town HQ, Dhaka'
+        },
+        {
+            src: '/images/office/luxury_buyer_lounge.jpg',
+            title: 'International Buyer Lounge',
+            subtitle: 'Executive Negotiation Suite'
+        },
+        {
+            src: '/images/office/knit_woven_double_rack.jpg',
             title: 'Garments Sampling Studio',
-            subtitle: 'Uttara Model Town, Dhaka'
+            subtitle: '500+ Active Development Racks'
         },
         {
-            src: '/images/office/showroom_lounge_wide.jpg?v=20261106_2',
-            title: 'Showroom & Meeting Lounge',
-            subtitle: 'Buyer Negotiation Suite'
+            src: '/images/office/luxury_executive_boardroom.jpg',
+            title: 'Executive Conference Boardroom',
+            subtitle: 'Global Operations & QA Coordination'
         },
         {
-            src: '/images/office/boardroom_conference_table.jpg?v=20261106_2',
-            title: 'Executive Conference Room',
-            subtitle: 'Production & Sourcing Operations'
+            src: '/images/office/apparel_collection_racks.jpg',
+            title: 'Showroom Collection & Swatches',
+            subtitle: 'Fabric & Trims Merchandising'
         }
     ];
 

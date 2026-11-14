@@ -5,8 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useSettings } from '@/context/SettingsContext';
 import { usePathname } from 'next/navigation';
-import { 
-    Mail, MapPin, Phone, MessageCircle, Globe, Building2, UserCheck, ArrowRight, ShieldCheck 
+import {
+    Mail, MapPin, Phone, MessageCircle, Globe, Building2, UserCheck, ArrowRight, ShieldCheck
 } from 'lucide-react';
 
 type MenuItem = {
@@ -75,16 +75,16 @@ export default function Footer() {
     return (
         <footer className="bg-[#121620] dark:bg-[#060A12] text-slate-300 pt-16 pb-12 border-t border-slate-800/80 dark:border-white/5 transition-colors duration-500">
             <div className="max-w-7xl mx-auto px-5 sm:px-6">
-                
+
                 {/* Main Grid: Left Corporate Info Card + Right Navigation Columns */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 mb-14">
-                    
+
                     {/* ══════════ LEFT COLUMN (5 Cols): Corporate HQ & Proprietor Desk ══════════ */}
                     <div className="lg:col-span-5 space-y-4">
-                        
+
                         {/* 3D Glassmorphic Corporate Badge */}
                         <div className="rounded-3xl p-5 sm:p-6 bg-gradient-to-b from-white/[0.08] to-white/[0.02] dark:from-white/[0.05] dark:to-transparent border border-white/10 shadow-[0_15px_35px_rgba(0,0,0,0.35)] backdrop-blur-md space-y-4">
-                            
+
                             {/* Brand Header */}
                             <div className="flex items-start justify-between gap-3">
                                 <div>
@@ -110,17 +110,12 @@ export default function Footer() {
 
                             {/* Proprietor Identification Pill */}
                             <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.04] border border-white/10">
-                                <div className="w-10 h-10 rounded-xl overflow-hidden border border-amber-400/40 dark:border-cyan-400/40 shadow-md shrink-0 bg-slate-800">
-                                    <img
-                                        src="/images/office/ceo_kamal_hossain_aelbd.jpg?v=20261106_2"
-                                        alt={proprietorName}
-                                        className="w-full h-full object-cover object-top"
-                                    />
+                                <div className="w-8 h-8 rounded-xl bg-amber-500/15 dark:bg-cyan-500/15 border border-amber-400/30 dark:border-cyan-400/30 flex items-center justify-center shrink-0 text-amber-400 dark:text-cyan-400">
+                                    <UserCheck size={16} />
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                    <div className="text-[10px] font-bold uppercase tracking-widest text-amber-400/90 dark:text-cyan-400/90 flex items-center gap-1">
-                                        <UserCheck size={11} />
-                                        <span>{proprietorTitle}</span>
+                                    <div className="text-[10px] font-bold uppercase tracking-widest text-amber-400/90 dark:text-cyan-400/90">
+                                        {proprietorTitle}
                                     </div>
                                     <div className="text-xs sm:text-[13px] font-black text-white tracking-tight truncate">
                                         {proprietorName}
@@ -187,7 +182,7 @@ export default function Footer() {
 
                     {/* ══════════ RIGHT COLUMNS (7 Cols): Quick Navigation & Categories ══════════ */}
                     <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-10 pt-2 text-center sm:text-left">
-                        
+
                         {/* Column 1: Company */}
                         <div className="space-y-3.5">
                             <h4 className="text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center sm:justify-start gap-1.5">

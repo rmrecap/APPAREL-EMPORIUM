@@ -3,23 +3,23 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { 
-    Scissors, 
-    X, 
-    CheckCircle2, 
-    ShieldCheck, 
-    Layers, 
-    Cpu, 
-    Globe, 
+import {
+    Scissors,
+    X,
+    CheckCircle2,
+    ShieldCheck,
+    Layers,
+    Cpu,
+    Globe,
     FileCheck2,
     ArrowRight
 } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
-import { 
-    GarmentButton3D, 
-    Scissors3D, 
-    NeedleWithThread3D, 
-    ThreadSpool3D 
+import {
+    GarmentButton3D,
+    Scissors3D,
+    NeedleWithThread3D,
+    ThreadSpool3D
 } from './Garment3DElements';
 
 interface ProductionProcessProps {
@@ -41,14 +41,14 @@ export default function ProductionProcess3D({ headings, data, showDecor = false,
 
     // Content from Admin Dashboard or Defaults
     const parsedData = typeof data === 'string' ? (() => { try { return JSON.parse(data); } catch { return {}; } })() : (data || {});
-    
+
     const defaultHeading = 'Introducing Apparel Emporium';
     const defaultP1 = 'Apparel Emporium is a Bangladesh-based apparel sourcing partner, exporter, and small-scale manufacturer.';
     const defaultP2 = "With an integrated production and sourcing network, we maintain close attention to quality, workmanship, and timely delivery at every stage. Whether you’re looking stylish casual wear and sophisticated formalwear to customized design, we offer flexible solutions tailored to each client's unique requirements.";
     const defaultP3 = 'At Apparel Emporium, we believe successful partnerships are built on quality, transparency, ethical practices, and trust. Our commitment is not simply to supply garments, but to build long-term relationships by delivering dependable service in the global apparel industry.';
 
-    const heading = (headings?.production_process_heading && headings.production_process_heading !== 'Our Premium Production Process') 
-        ? headings.production_process_heading 
+    const heading = (headings?.production_process_heading && headings.production_process_heading !== 'Our Premium Production Process')
+        ? headings.production_process_heading
         : (parsedData.heading && parsedData.heading !== 'Our Premium Production Process' ? parsedData.heading : defaultHeading);
 
     const p1 = (headings?.production_process_p1 && !headings.production_process_p1.includes('leading apparel sourcing and manufacturing partner based in Bangladesh'))
@@ -104,46 +104,46 @@ export default function ProductionProcess3D({ headings, data, showDecor = false,
     }, [isModalOpen]);
 
     const categories = [
-        { 
-            num: '01', 
-            title: 'Knitwear & Jersey Essentials', 
-            desc: 'T-shirts, polo shirts, tank tops, hoodies, sweatshirts, and joggers tailored with premium single jersey, pique, interlock, and rib fabrics with custom washes.', 
-            icon: Layers 
+        {
+            num: '01',
+            title: 'Knitwear & Jersey Essentials',
+            desc: 'T-shirts, polo shirts, tank tops, hoodies, sweatshirts, and joggers tailored with premium single jersey, pique, interlock, and rib fabrics with custom washes.',
+            icon: Layers
         },
-        { 
-            num: '02', 
-            title: 'Woven Garments & Tailoring', 
-            desc: 'Casual & formal shirts, denim jeans, twill chinos, cargo trousers, and light jackets with precision stitching and tailored buyer fits.', 
-            icon: Scissors 
+        {
+            num: '02',
+            title: 'Woven Garments & Tailoring',
+            desc: 'Casual & formal shirts, denim jeans, twill chinos, cargo trousers, and light jackets with precision stitching and tailored buyer fits.',
+            icon: Scissors
         },
-        { 
-            num: '03', 
-            title: 'Sweaters & Heavy Knitcraft', 
-            desc: '3GG to 12GG gauge flat-knit pullovers, cardigans, and knitwear crafted from soft cotton, acrylic, cashmere-touch, and blended yarns.', 
-            icon: Cpu 
+        {
+            num: '03',
+            title: 'Sweaters & Heavy Knitcraft',
+            desc: '3GG to 12GG gauge flat-knit pullovers, cardigans, and knitwear crafted from soft cotton, acrylic, cashmere-touch, and blended yarns.',
+            icon: Cpu
         },
-        { 
-            num: '04', 
-            title: 'Fashion & Performance Activewear', 
-            desc: 'Contemporary casual dresses, performance sportswear, gym apparel, and custom-styled fashion wear developed directly from buyer tech packs.', 
-            icon: FileCheck2 
+        {
+            num: '04',
+            title: 'Fashion & Performance Activewear',
+            desc: 'Contemporary casual dresses, performance sportswear, gym apparel, and custom-styled fashion wear developed directly from buyer tech packs.',
+            icon: FileCheck2
         },
-        { 
-            num: '05', 
-            title: 'Home Textiles & Terry Linen', 
-            desc: 'High-absorbency terry towels, bathrobes, bed sheets, duvet covers, pillowcases, and kitchen linen crafted for lasting softness and durability.', 
-            icon: ShieldCheck 
+        {
+            num: '05',
+            title: 'Home Textiles & Terry Linen',
+            desc: 'High-absorbency terry towels, bathrobes, bed sheets, duvet covers, pillowcases, and kitchen linen crafted for lasting softness and durability.',
+            icon: ShieldCheck
         },
-        { 
-            num: '06', 
-            title: 'Accessories & Custom Footwear', 
-            desc: 'Knitted socks, caps, canvas/casual shoes, woven belts, shopping tote bags, and custom trims tailored to client specifications.', 
-            icon: Globe 
+        {
+            num: '06',
+            title: 'Accessories & Custom Footwear',
+            desc: 'Knitted socks, caps, canvas/casual shoes, woven belts, shopping tote bags, and custom trims tailored to client specifications.',
+            icon: Globe
         }
     ];
 
     return (
-        <section 
+        <section
             id="production-process"
             aria-labelledby="production-process-heading"
             className="relative py-16 sm:py-24 bg-[#DDD8CF] dark:bg-[#080D1A] transition-colors duration-500 overflow-hidden"
@@ -197,7 +197,7 @@ export default function ProductionProcess3D({ headings, data, showDecor = false,
             <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
 
                 {/* 3D Interactive Container matching Mockup */}
-                <div 
+                <div
                     className="relative"
                     style={{ perspective: '1400px' }}
                 >
@@ -214,8 +214,8 @@ export default function ProductionProcess3D({ headings, data, showDecor = false,
                             dark:shadow-[0_25px_60px_rgba(0,0,0,0.7),inset_0_1px_2px_rgba(255,255,255,0.1)]
                             p-6 sm:p-10 lg:p-12"
                         style={{
-                            transform: isHovered 
-                                ? `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale3d(1.01, 1.01, 1.01)` 
+                            transform: isHovered
+                                ? `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale3d(1.01, 1.01, 1.01)`
                                 : 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
                             transformStyle: 'preserve-3d',
                             transition: isHovered ? 'transform 0.12s ease-out' : 'transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)',
@@ -223,7 +223,7 @@ export default function ProductionProcess3D({ headings, data, showDecor = false,
                         }}
                     >
                         {/* Dynamic Interactive Glare */}
-                        <div 
+                        <div
                             className="absolute inset-0 pointer-events-none transition-opacity duration-300 rounded-[28px] sm:rounded-[36px]"
                             style={{
                                 opacity: isHovered ? 0.35 : 0,
@@ -233,7 +233,7 @@ export default function ProductionProcess3D({ headings, data, showDecor = false,
 
                         {/* 2-Column Integrated Layout */}
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-                            
+
                             {/* Left Column: 3D Beveled Mannequin Studio Compartment (Pure visual, NO text baked in) */}
                             <div className="lg:col-span-5 relative">
                                 <div className="relative aspect-square w-full max-w-[380px] mx-auto rounded-3xl overflow-hidden
@@ -245,25 +245,25 @@ export default function ProductionProcess3D({ headings, data, showDecor = false,
                                     {/* Light Mode 3D Studio Visual */}
                                     <div className="absolute inset-0 dark:opacity-0 opacity-100 transition-opacity duration-500">
                                         <Image
-                                            src="/images/3d/mannequin_studio_light.jpg"
-                                            alt="Apparel Emporium 3D Garment Mannequin Studio (Light)"
+                                            src="/images/3d/luxury_office_showroom_light.jpg"
+                                            alt="Apparel Emporium 3D Executive Showroom & Sampling Studio (Light)"
                                             fill
                                             priority
                                             fetchPriority="high"
                                             sizes="(max-width: 640px) 340px, (max-width: 1024px) 380px, 400px"
                                             className="object-cover w-full h-full transition-transform duration-700 hover:scale-105"
-                                            quality={82}
+                                            quality={90}
                                         />
                                     </div>
                                     {/* Dark Mode 3D Studio Visual */}
                                     <div className="absolute inset-0 opacity-0 dark:opacity-100 transition-opacity duration-500">
                                         <Image
-                                            src="/images/3d/mannequin_studio_dark.jpg"
-                                            alt="Apparel Emporium 3D Garment Mannequin Studio (Dark)"
+                                            src="/images/3d/luxury_office_showroom_dark.jpg"
+                                            alt="Apparel Emporium 3D Executive Showroom & Sampling Studio (Dark)"
                                             fill
                                             sizes="(max-width: 640px) 340px, (max-width: 1024px) 380px, 400px"
                                             className="object-cover w-full h-full transition-transform duration-700 hover:scale-105"
-                                            quality={82}
+                                            quality={90}
                                         />
                                     </div>
                                 </div>
@@ -271,11 +271,11 @@ export default function ProductionProcess3D({ headings, data, showDecor = false,
 
                             {/* Right Column: Live Glassmorphism Content (100% Coded & Admin Controlled) */}
                             <div className="lg:col-span-7 flex flex-col justify-center space-y-5 sm:space-y-6">
-                                
+
                                 {/* Live Title (Editable from Admin) */}
                                 {heading && (
-                                    <h2 
-                                        id="production-process-heading" 
+                                    <h2
+                                        id="production-process-heading"
                                         className="text-2xl sm:text-4xl lg:text-[40px] font-bold tracking-tight leading-tight font-heading
                                         text-slate-900 dark:text-[#ECD4A5]"
                                     >
@@ -340,19 +340,19 @@ export default function ProductionProcess3D({ headings, data, showDecor = false,
 
             {/* ── MODAL: APPAREL EMPORIUM SOURCING CAPABILITIES ── */}
             {isModalOpen && (
-                <div 
+                <div
                     role="dialog"
                     aria-modal="true"
                     aria-labelledby="proc-modal-title"
                     className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8 animate-in fade-in duration-200"
                 >
-                    <div 
+                    <div
                         className="fixed inset-0 bg-slate-950/75 backdrop-blur-md transition-opacity"
                         onClick={() => setIsModalOpen(false)}
                     />
 
                     <div className="relative w-full max-w-4xl max-h-[90vh] bg-[#F3EFE8]/98 dark:bg-[#0B1324]/98 border border-white/80 dark:border-cyan-500/35 ring-1 ring-[#D8D2C5]/70 dark:ring-cyan-400/20 rounded-[32px] shadow-[0_30px_70px_rgba(0,0,0,0.22),inset_0_2px_4px_rgba(255,255,255,0.95)] dark:shadow-[0_0_60px_rgba(6,182,212,0.25),0_30px_70px_rgba(0,0,0,0.85)] overflow-hidden flex flex-col z-10 animate-in zoom-in-95 duration-200">
-                        
+
                         {/* 3D Header */}
                         <div className="p-6 sm:p-8 border-b border-[#D8D2C5]/70 dark:border-cyan-500/20 flex items-start justify-between bg-gradient-to-b from-[#FAF7F2] to-[#ECE6DC] dark:from-[#091120] dark:to-[#0E1B30]">
                             <div>
@@ -382,7 +382,7 @@ export default function ProductionProcess3D({ headings, data, showDecor = false,
                                 {categories.map((cat, i) => {
                                     const IconComponent = cat.icon;
                                     return (
-                                        <div 
+                                        <div
                                             key={i}
                                             className="p-5 rounded-2xl bg-[#FAF7F2] dark:bg-[#0E1A30]/90 border border-[#DDD6C8] dark:border-cyan-500/25 shadow-[0_6px_16px_rgba(150,145,135,0.18),inset_0_1px_2px_rgba(255,255,255,0.95)] dark:shadow-[0_6px_18px_rgba(0,0,0,0.5),inset_0_1px_2px_rgba(255,255,255,0.04)] hover:shadow-[0_12px_24px_rgba(150,145,135,0.28)] dark:hover:shadow-[0_0_24px_rgba(6,182,212,0.25)] hover:border-[#C4BCAD] dark:hover:border-cyan-400/60 hover:-translate-y-0.5 transition-all flex flex-col justify-between"
                                         >

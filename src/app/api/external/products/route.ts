@@ -4,6 +4,7 @@ import { extractApiKey, verifyApiKey } from '@/lib/api-auth';
 import { corsHeaders, handlePreflight, withCors } from '../cors';
 import { normalizeIncomingImages } from '@/lib/image-parser';
 import { resolveOrCreateCategory } from '@/lib/category-resolver';
+import { autoClassifyProductTaxonomy } from '@/lib/product-classifier';
 import fs from 'fs';
 import path from 'path';
 
@@ -92,16 +93,32 @@ export async function POST(req: NextRequest) {
         const productDescription = body.description || body.shortDescription || body.desc || body.details || body.content || `${productName} manufactured for global B2B export by Apparel Emporium.`;
         const shortDescription = body.shortDescription || productDescription.substring(0, 160);
 
-        // 3. Category Resolution (guaranteed never to crash)
-        const requestedCat = body.categoryId || body.categorySlug || body.category || body.subCategory || body.divisionType || 'Apparel';
-        const resolvedCategory = await resolveOrCreateCategory(requestedCat);
+        // 3. Autonomous Taxonomy & Department Classification
+        const classified = autoClassifyProductTaxonomy({
+            name: productName,
+            title: productName,
+            category: body.category || body.categorySlug,
+            department: body.department,
+            divisionType: body.divisionType,
+            subCategory: body.subCategory,
+            description: productDescription,
+            shortDescription: shortDescription,
+            tags: body.tags,
+        });
+
+        // 4. Category Resolution (guaranteed never to crash, gender & department scoped)
+        const requestedCat = body.categoryId || body.categorySlug || body.category || body.subCategory || classified.subCategory || body.divisionType || 'Apparel';
+        const resolvedCategory = await resolveOrCreateCategory(requestedCat, 'Apparel', {
+            department: classified.department,
+            productName: productName,
+        });
         const resolvedCategoryId = resolvedCategory.id;
 
-        // 4. Image Extraction (handles images, imageUrl, photo, gallery, coverImage, base64, etc.)
+        // 5. Image Extraction (handles images, imageUrl, photo, gallery, coverImage, base64, etc.)
         const finalImageUrls = normalizeIncomingImages(body, uploadedFiles);
         const imagesJson = JSON.stringify(finalImageUrls);
 
-        // 5. Auto-publish status check
+        // 6. Auto-publish status check
         const autoPublishSetting = await prisma.siteSetting.findUnique({
             where: { key: 'api_products_auto_publish' }
         });
@@ -109,7 +126,7 @@ export async function POST(req: NextRequest) {
         const finalIsActive = body.isActive !== undefined ? Boolean(body.isActive) : defaultAutoPublish;
         const finalStatus = body.status || (finalIsActive ? 'PUBLISHED' : 'DRAFT');
 
-        // 6. Pricing & Tiers
+        // 7. Pricing & Tiers
         let tieredPricingStr = '[]';
         if (body.tieredPricing) {
             tieredPricingStr = typeof body.tieredPricing === 'string'
@@ -161,9 +178,9 @@ export async function POST(req: NextRequest) {
             description: productDescription,
             shortDescription: shortDescription,
             categoryId: resolvedCategoryId,
-            department: body.department || 'Menswear',
-            subCategory: body.subCategory || resolvedCategory.name || 'General',
-            divisionType: body.divisionType || 'Knit',
+            department: classified.department,
+            subCategory: body.subCategory || classified.subCategory || resolvedCategory.name || 'General',
+            divisionType: classified.divisionType,
             brand: body.brand || 'Apparel Emporium',
             fabricComposition: body.fabricComposition || body.fabric || null,
             fabricConstruction: body.fabricConstruction || null,

@@ -227,9 +227,26 @@ export async function POST(req: NextRequest) {
 
         const productTitle = title || name || body.productName || (styleNo ? `Style ${styleNo}` : 'New Product');
 
+        // Automatic Intelligent Classification & Discipline Protection (Runs first to guarantee gender & category integrity)
+        const classified = autoClassifyProductTaxonomy({
+            name: productTitle,
+            title: productTitle,
+            category: typeof category === 'string' ? category : undefined,
+            categoryName: typeof category === 'string' ? category : undefined,
+            department: department,
+            divisionType: divisionType,
+            subCategory: subCategory,
+            description: description,
+            shortDescription: shortDescription,
+            tags: tags,
+        });
+
         // ৩. ক্যাটাগরি রেজোলিউশন (ক্যাটাগরি আইডি না থাকলে নাম বা স্লাগ দিয়ে স্বয়ংক্রিয় তৈরি বা ম্যাচ)
-        const requestedCat = categoryId || category || subCategory || divisionType || 'Apparel';
-        const resolvedCategory = await resolveOrCreateCategory(requestedCat);
+        const requestedCat = categoryId || category || subCategory || classified.subCategory || divisionType || 'Apparel';
+        const resolvedCategory = await resolveOrCreateCategory(requestedCat, 'Apparel', {
+            department: classified.department,
+            productName: productTitle,
+        });
         const resolvedCategoryId = resolvedCategory.id;
 
         // ৪. স্লাগ ও এসকেইউ ফরম্যাটিং
@@ -275,20 +292,6 @@ export async function POST(req: NextRequest) {
         const defaultAutoPublish = autoPublishSetting ? autoPublishSetting.value !== 'false' : true;
         const finalIsActive = isActive !== undefined ? Boolean(isActive) : defaultAutoPublish;
         const finalStatus = status || (finalIsActive ? 'PUBLISHED' : 'DRAFT');
-
-        // Automatic Intelligent Classification & Discipline Protection
-        const classified = autoClassifyProductTaxonomy({
-            name: productTitle,
-            title: productTitle,
-            category: typeof category === 'string' ? category : resolvedCategory.name,
-            categoryName: resolvedCategory.name,
-            department: department,
-            divisionType: divisionType,
-            subCategory: subCategory,
-            description: description,
-            shortDescription: shortDescription,
-            tags: tags,
-        });
 
         // ৬. ডাটাবেসে সেভ করা (Prisma Create / Upsert)
         const productData = {

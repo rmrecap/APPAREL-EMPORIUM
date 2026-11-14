@@ -6,7 +6,11 @@ import { prisma } from './prisma';
  * If creation fails for any reason, falls back to the first available category.
  * NEVER throws an exception or returns null/undefined.
  */
-export async function resolveOrCreateCategory(rawCat: any, fallbackName = 'Apparel'): Promise<{ id: string; name: string; slug: string }> {
+export async function resolveOrCreateCategory(
+    rawCat: any,
+    fallbackName = 'Apparel',
+    options?: { department?: string; productName?: string }
+): Promise<{ id: string; name: string; slug: string }> {
     let catName = '';
     let catSlug = '';
 
@@ -29,8 +33,95 @@ export async function resolveOrCreateCategory(rawCat: any, fallbackName = 'Appar
         catSlug = catName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'apparel';
     }
 
+    const dept = options?.department || '';
+    const pName = (options?.productName || '').toLowerCase();
+    const isWomen = dept.toLowerCase().includes('women') || /\b(women|womens|woman|ladies|lady)\b/i.test(pName);
+    const isKids = dept.toLowerCase().includes('kid') || /\b(kid|kids|child|baby|toddler|boy|boys|girl|girls)\b/i.test(pName);
+    const isMen = (dept.toLowerCase().includes('men') && !isWomen) || (/\b(men|mens|man|gent)\b/i.test(pName) && !isWomen);
+
     try {
-        // Try finding by exact slug or exact name
+        // 1. Department-scoped matching to prevent cross-gender category contamination
+        if (isWomen) {
+            const womenMatched = await prisma.category.findFirst({
+                where: {
+                    AND: [
+                        {
+                            OR: [
+                                { slug: catSlug },
+                                { name: catName },
+                                { slug: { contains: catSlug } },
+                                { name: { contains: catName } }
+                            ]
+                        },
+                        {
+                            OR: [
+                                { slug: { contains: 'women' } },
+                                { parent: { slug: { contains: 'women' } } },
+                                { parent: { name: { contains: 'Women' } } }
+                            ]
+                        }
+                    ]
+                }
+            });
+            if (womenMatched) return { id: womenMatched.id, name: womenMatched.name, slug: womenMatched.slug };
+        } else if (isKids) {
+            const kidsMatched = await prisma.category.findFirst({
+                where: {
+                    AND: [
+                        {
+                            OR: [
+                                { slug: catSlug },
+                                { name: catName },
+                                { slug: { contains: catSlug } },
+                                { name: { contains: catName } }
+                            ]
+                        },
+                        {
+                            OR: [
+                                { slug: { contains: 'kid' } },
+                                { slug: { contains: 'baby' } },
+                                { parent: { slug: { contains: 'kid' } } },
+                                { parent: { name: { contains: 'Kid' } } }
+                            ]
+                        }
+                    ]
+                }
+            });
+            if (kidsMatched) return { id: kidsMatched.id, name: kidsMatched.name, slug: kidsMatched.slug };
+        } else if (isMen) {
+            const menMatched = await prisma.category.findFirst({
+                where: {
+                    AND: [
+                        {
+                            OR: [
+                                { slug: catSlug },
+                                { name: catName },
+                                { slug: { contains: catSlug } },
+                                { name: { contains: catName } }
+                            ]
+                        },
+                        {
+                            OR: [
+                                { slug: { contains: 'men' } },
+                                { parent: { slug: { contains: 'men' } } },
+                                { parent: { name: { contains: 'Men' } } }
+                            ]
+                        },
+                        {
+                            NOT: [
+                                { slug: { contains: 'women' } },
+                                { name: { contains: 'Women' } },
+                                { parent: { slug: { contains: 'women' } } },
+                                { parent: { name: { contains: 'Women' } } }
+                            ]
+                        }
+                    ]
+                }
+            });
+            if (menMatched) return { id: menMatched.id, name: menMatched.name, slug: menMatched.slug };
+        }
+
+        // 2. Exact match fallback
         let matched = await prisma.category.findFirst({
             where: {
                 OR: [
@@ -44,7 +135,7 @@ export async function resolveOrCreateCategory(rawCat: any, fallbackName = 'Appar
             return { id: matched.id, name: matched.name, slug: matched.slug };
         }
 
-        // Try case-insensitive substring search in case of slight variance
+        // 3. Substring match fallback
         matched = await prisma.category.findFirst({
             where: {
                 OR: [

@@ -842,16 +842,48 @@ export function buildCategoryPrismaFilter(
 
   // Men's Fashion Umbrella & Groups
   if (norm === 'mens-fashion') {
-    return { department: 'Menswear', divisionType: { in: ['Knit', 'Woven', 'Sweater'] } };
+    return {
+      department: 'Menswear',
+      divisionType: { in: ['Knit', 'Woven', 'Sweater'] },
+      NOT: [
+        { name: { contains: 'Women' } },
+        { name: { contains: 'Ladies' } },
+        { name: { contains: 'Girl' } }
+      ]
+    };
   }
   if (norm === 'men-circular-knit' || norm === 'knitwear-mens' || norm === 'men-knitwear' || norm === 'men-knit-fashion') {
-    return { department: 'Menswear', divisionType: 'Knit' };
+    return {
+      department: 'Menswear',
+      divisionType: 'Knit',
+      NOT: [
+        { name: { contains: 'Women' } },
+        { name: { contains: 'Ladies' } },
+        { name: { contains: 'Girl' } }
+      ]
+    };
   }
   if (norm === 'men-flat-knit' || norm === 'sweater-mens' || norm === 'men-sweater' || norm === 'men-sweater-fashion') {
-    return { department: 'Menswear', divisionType: 'Sweater' };
+    return {
+      department: 'Menswear',
+      divisionType: 'Sweater',
+      NOT: [
+        { name: { contains: 'Women' } },
+        { name: { contains: 'Ladies' } },
+        { name: { contains: 'Girl' } }
+      ]
+    };
   }
   if (norm === 'men-woven' || norm === 'woven-mens' || norm === 'men-woven-fashion') {
-    return { department: 'Menswear', divisionType: 'Woven' };
+    return {
+      department: 'Menswear',
+      divisionType: 'Woven',
+      NOT: [
+        { name: { contains: 'Women' } },
+        { name: { contains: 'Ladies' } },
+        { name: { contains: 'Girl' } }
+      ]
+    };
   }
 
   // Women's Fashion Umbrella & Groups
@@ -963,7 +995,14 @@ export function buildCategoryPrismaFilter(
     return {
       AND: [
         baseFilter,
-        { department: 'Menswear' }
+        { department: 'Menswear' },
+        {
+          NOT: [
+            { name: { contains: 'Women' } },
+            { name: { contains: 'Ladies' } },
+            { name: { contains: 'Girl' } }
+          ]
+        }
       ]
     };
   }

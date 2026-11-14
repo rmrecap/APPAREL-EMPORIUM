@@ -142,32 +142,39 @@ export default function ContactPage() {
 
     const contactShowrooms = [
         {
-            src: '/images/office/showroom_lounge_wide.jpg?v=20261106_2',
-            title: 'Corporate Showroom & Meeting Lounge',
-            tag: 'Buyer Negotiation Lounge',
-            label: 'Showroom Lounge',
-            desc: 'Central conference table and apparel sample racks at our Uttara Model Town, Dhaka headquarters.'
+            src: '/images/office/luxury_executive_showroom.jpg',
+            title: 'Executive Showroom & Sampling Studio',
+            tag: 'Sampling Studio',
+            label: 'Sampling Room',
+            desc: 'State-of-the-art apparel showcase and sampling studio featuring illuminated 3D brand architecture, comprehensive textile swatch boards, and curated garment racks.'
         },
         {
-            src: '/images/office/knit_woven_double_rack.jpg?v=20261106_2',
+            src: '/images/office/luxury_buyer_lounge.jpg',
+            title: 'International Buyer Negotiation Suite',
+            tag: 'Buyer Lounge',
+            label: 'Buyer Suite',
+            desc: 'Spacious daylight showroom lounge with executive meeting table, architectural mood boards, and dedicated sample displays for international buyers.'
+        },
+        {
+            src: '/images/office/luxury_executive_boardroom.jpg',
+            title: 'Corporate Conference Boardroom & Strategy Suite',
+            tag: 'Strategic Operations',
+            label: 'Boardroom',
+            desc: 'Executive boardroom equipped with acoustic architectural timber paneling, illuminated Apparel Emporium emblem, and sample merchandising development displays.'
+        },
+        {
+            src: '/images/office/knit_woven_double_rack.jpg',
             title: 'Two-Tier Sample Development Racks',
             tag: 'Sampling Development',
             label: 'Sample Racks',
             desc: 'Over 500+ active apparel samples ready for fit tests, fabric handfeel evaluation, and buyer review.'
         },
         {
-            src: '/images/office/boardroom_conference_table.jpg?v=20261106_2',
-            title: 'Corporate Conference Boardroom',
-            tag: 'Strategic Operations',
-            label: 'Boardroom',
-            desc: 'Executive boardroom where our merchandising and QA executives coordinate with global buyers.'
-        },
-        {
-            src: '/images/office/sample_racks_shirts.jpg?v=20261106_2',
-            title: 'Apparel Display & Merchandising',
-            tag: 'Product Catalog',
-            label: 'Collections',
-            desc: 'Knitwear, polos, shorts, and woven tops organized for seasonal sourcing selection.'
+            src: '/images/office/apparel_collection_racks.jpg',
+            title: 'Showroom Collection & Swatches Showcase',
+            tag: 'Apparel Collections',
+            label: 'Collection Floor',
+            desc: 'Curated selection of polos, casual wear, shorts, and fabric swatches demonstrating multi-category sourcing breadth.'
         }
     ];
 
@@ -287,29 +294,12 @@ export default function ContactPage() {
                             {/* Proprietor Leadership Card */}
                             <div className="mb-3 p-2.5 sm:p-3 rounded-2xl bg-white/60 dark:bg-white/[0.04] border border-white/80 dark:border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.04)] flex items-center justify-between gap-3">
                                 <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                                    <div 
-                                        onClick={() => setLightboxItem({
-                                            src: '/images/office/ceo_kamal_hossain_aelbd.jpg?v=20261106_2',
-                                            title: proprietorName,
-                                            tag: `${proprietorTitle} • ${companyName}`,
-                                            desc: 'Leading apparel sourcing, merchandising, and factory network partnerships at Apparel Emporium.'
-                                        })}
-                                        className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl overflow-hidden border border-amber-500/40 dark:border-cyan-400/40 shadow-md shrink-0 bg-slate-200 dark:bg-slate-800 cursor-pointer group relative"
-                                        title="Click to view CEO portrait"
-                                    >
-                                        <img
-                                            src="/images/office/ceo_kamal_hossain_aelbd.jpg?v=20261106_2"
-                                            alt={proprietorName}
-                                            className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-110"
-                                        />
-                                        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                            <Maximize2 size={12} className="text-white drop-shadow" />
-                                        </div>
+                                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/15 dark:bg-cyan-500/15 border border-amber-500/30 dark:border-cyan-400/30 flex items-center justify-center shrink-0 text-amber-600 dark:text-cyan-400">
+                                        <UserCheck size={18} />
                                     </div>
                                     <div className="min-w-0">
-                                        <div className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-cyan-400 flex items-center gap-1">
-                                            <UserCheck size={11} />
-                                            <span>{proprietorTitle} &bull; {companyName}</span>
+                                        <div className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-cyan-400">
+                                            {proprietorTitle} &bull; {companyName}
                                         </div>
                                         <div className="text-xs sm:text-sm font-black text-slate-900 dark:text-white truncate">
                                             {proprietorName}
@@ -540,19 +530,10 @@ export default function ContactPage() {
                 {/* ═══════════════════════ LOWER FLOATING ROW ═══════════════════════ */}
                 <section className="relative py-8 sm:py-12">
 
-                    {/* Centered Large 3D Globe with orbit rings */}
+                    {/* Centered Large 3D Interactive Globe with orbit rings */}
                     <div className="flex justify-center">
-                        <div className="floating-reverse w-32 h-32 sm:w-44 sm:h-44 flex items-center justify-center">
-                            <img
-                                src={globeLight}
-                                alt="3D Global Network"
-                                className="w-full h-full object-contain dark:hidden drop-shadow-[0_18px_32px_rgba(140,135,125,0.45)]"
-                            />
-                            <img
-                                src={globeDark}
-                                alt="3D Global Network Dark"
-                                className="w-full h-full object-contain hidden dark:block drop-shadow-[0_0_36px_rgba(6,182,212,0.65)]"
-                            />
+                        <div className="floating-reverse w-40 h-40 sm:w-48 sm:h-48 flex items-center justify-center">
+                            <Coded3DGlobe size={175} className="mx-auto" />
                         </div>
                     </div>
 
