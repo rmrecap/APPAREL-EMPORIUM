@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 const FAQS_DATA = [
     {
         question: "What is the typical Minimum Order Quantity (MOQ) for custom garments?",
-        answer: "Our MOQs are structured around fabric knitting and dye-lot minimums. For standard knitwear (T-shirts, polos, hoodies), MOQs typically start at 500 to 1,000 pieces per style/colorway. For woven garments and denim, MOQs range between 1,000 and 3,000 pieces. For custom yarn-dyed sweaters, typical MOQs are 500 to 800 pieces."
+        answer: "Our MOQs are flexible and structured strictly around buyer requirements and fabric dye-lot parameters. Our dedicated merchandising team works closely with partner mills to accommodate emerging private labels as well as large-scale retail volume programs on a custom quotation basis."
     },
     {
         question: "How long does it take to develop proto samples and lab dips?",

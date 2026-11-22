@@ -256,15 +256,6 @@ export default function Footer() {
 
                 {/* WebMCP Tools & Schema Semantic Markup for Agents */}
                 <div className="sr-only" aria-hidden="true">
-                    {/* Non-JS Accessible Pricing & Sourcing Offer */}
-                    <div itemScope itemType="https://schema.org/AggregateOffer">
-                        <span itemProp="priceCurrency">USD</span>
-                        <span itemProp="lowPrice">2.50</span>
-                        <span itemProp="highPrice">45.00</span>
-                        <span itemProp="offerCount">174</span>
-                        <a href="/contact#pricing-rfq" itemProp="url">Export Garments FOB Pricing & RFQ Guide</a>
-                    </div>
-
                     {/* WebMCP Tool: searchCatalog */}
                     <form
                         role="search"

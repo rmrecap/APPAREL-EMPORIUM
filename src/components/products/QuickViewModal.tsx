@@ -84,7 +84,15 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
                             <span className="text-[10px] uppercase font-black text-gray-400 tracking-tighter">Minimum Order</span>
                             <div className="flex items-center gap-2">
                                 <Package size={16} className="text-primary" />
-                                <span className="font-bold text-sm text-gray-900 dark:text-white">{specs['MOQ'] || '500 Pcs'}</span>
+                                <span className="font-bold text-sm text-gray-900 dark:text-white">
+                                    {(() => {
+                                        const raw = specs['MOQ'] || (product as any).minOrder;
+                                        if (!raw || /^\s*\d+\s*(pcs|pieces)?\s*$/i.test(String(raw).trim())) {
+                                            return 'As Per Buyer Requirement';
+                                        }
+                                        return raw;
+                                    })()}
+                                </span>
                             </div>
                         </div>
                         <div className="space-y-1">
@@ -98,7 +106,7 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
 
                     {/* Full Spec List (Condensed) */}
                     <div className="space-y-3 mb-10">
-                        {Object.entries(specs).slice(0, 4).map(([k, v]) => (
+                        {Object.entries(specs).filter(([k]) => k.toUpperCase() !== 'MOQ').slice(0, 4).map(([k, v]) => (
                             <div key={k} className="flex justify-between items-center text-sm py-2 border-b border-gray-100 dark:border-gray-800">
                                 <span className="text-gray-500 font-medium">{k}</span>
                                 <span className="text-gray-900 dark:text-gray-200 font-bold">{v as string}</span>

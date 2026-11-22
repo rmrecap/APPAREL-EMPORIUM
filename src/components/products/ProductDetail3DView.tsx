@@ -3,7 +3,7 @@
 import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { 
-    Download, MessageSquare, CheckCircle2, X, ZoomIn, ZoomOut, Maximize2, Sparkles, ShieldCheck, MessageCircle
+    Download, MessageSquare, CheckCircle2, X, ZoomIn, ZoomOut, Maximize2, Sparkles, ShieldCheck, MessageCircle, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import RecordProductVisit from './RecordProductVisit';
 import Coded3DGlobe from './Coded3DGlobe';
@@ -267,6 +267,27 @@ export default function ProductDetail3DView({
     const productWhatsAppUrl = whatsappClean ? `https://wa.me/${whatsappClean}?text=${encodeURIComponent(`Hello Apparel Emporium, I would like to inquire about the product: ${product.name} (SKU: ${product.sku || 'N/A'}). Please share pricing, MOQ, and sample options.`)}` : '';
 
     const [activeImage, setActiveImage] = useState<string>(images[0] || DEFAULT_PRODUCT_IMAGE);
+    const currentIndex = Math.max(0, images.indexOf(activeImage));
+
+    const handlePrevImage = (e?: React.MouseEvent) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        if (images.length <= 1) return;
+        const prevIdx = (currentIndex - 1 + images.length) % images.length;
+        setActiveImage(images[prevIdx]);
+    };
+
+    const handleNextImage = (e?: React.MouseEvent) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        if (images.length <= 1) return;
+        const nextIdx = (currentIndex + 1) % images.length;
+        setActiveImage(images[nextIdx]);
+    };
 
     React.useEffect(() => {
         if (images.length > 0 && !images.includes(activeImage)) {
@@ -496,6 +517,33 @@ export default function ProductDetail3DView({
                                         <span>{isZooming ? 'Pan to inspect fabric (2.8x)' : 'Roll over image to zoom'}</span>
                                     </div>
                                 </div>
+
+                                {/* Responsive Image Navigation Arrows (Left & Right) */}
+                                {images.length > 1 && (
+                                    <>
+                                        <button
+                                            type="button"
+                                            onClick={handlePrevImage}
+                                            aria-label="Previous image"
+                                            className="absolute left-2.5 sm:left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center bg-white/85 dark:bg-slate-900/85 hover:bg-white dark:hover:bg-slate-800 text-slate-800 dark:text-cyan-300 border border-white/90 dark:border-cyan-500/30 shadow-[0_6px_20px_rgba(0,0,0,0.12)] dark:shadow-[0_0_18px_rgba(56,189,248,0.3)] hover:scale-110 active:scale-95 transition-all cursor-pointer backdrop-blur-md select-none group/arrow"
+                                            title="Previous Image"
+                                        >
+                                            <ChevronLeft size={22} className="sm:w-6 sm:h-6 transition-transform group-hover/arrow:-translate-x-0.5" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={handleNextImage}
+                                            aria-label="Next image"
+                                            className="absolute right-2.5 sm:right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center bg-white/85 dark:bg-slate-900/85 hover:bg-white dark:hover:bg-slate-800 text-slate-800 dark:text-cyan-300 border border-white/90 dark:border-cyan-500/30 shadow-[0_6px_20px_rgba(0,0,0,0.12)] dark:shadow-[0_0_18px_rgba(56,189,248,0.3)] hover:scale-110 active:scale-95 transition-all cursor-pointer backdrop-blur-md select-none group/arrow"
+                                            title="Next Image"
+                                        >
+                                            <ChevronRight size={22} className="sm:w-6 sm:h-6 transition-transform group-hover/arrow:translate-x-0.5" />
+                                        </button>
+                                        <div className="absolute top-4 left-4 z-20 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-black/45 text-white/95 backdrop-blur-md border border-white/10 shadow-xs pointer-events-none">
+                                            {currentIndex + 1} / {images.length}
+                                        </div>
+                                    </>
+                                )}
                             </div>
 
                             {/* Clean Centered Row of 3D Extruded Thumbnail Cards Directly Underneath (No Scrollbar, Cross-Browser) */}
@@ -840,6 +888,28 @@ export default function ProductDetail3DView({
                             className="flex-1 w-full h-full overflow-hidden flex items-center justify-center p-6 sm:p-10 relative cursor-grab active:cursor-grabbing select-none bg-gradient-to-b from-[#FAF7F2]/50 to-[#EAE4D9]/40 dark:from-[#070D18]/90 dark:to-[#0A1424]/90"
                             onMouseMove={handleMouseMove}
                         >
+                            {images.length > 1 && (
+                                <>
+                                    <button
+                                        type="button"
+                                        onClick={handlePrevImage}
+                                        aria-label="Previous image"
+                                        className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full flex items-center justify-center bg-black/60 hover:bg-black/85 text-white backdrop-blur-md transition-all cursor-pointer shadow-lg hover:scale-110 active:scale-95 select-none"
+                                        title="Previous Image"
+                                    >
+                                        <ChevronLeft size={24} />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleNextImage}
+                                        aria-label="Next image"
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full flex items-center justify-center bg-black/60 hover:bg-black/85 text-white backdrop-blur-md transition-all cursor-pointer shadow-lg hover:scale-110 active:scale-95 select-none"
+                                        title="Next Image"
+                                    >
+                                        <ChevronRight size={24} />
+                                    </button>
+                                </>
+                            )}
                             <img
                                 src={activeImage}
                                 alt={product.name}

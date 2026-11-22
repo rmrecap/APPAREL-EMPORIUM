@@ -192,8 +192,14 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
                             <span className="block text-[9px] text-slate-500 dark:text-slate-400 uppercase font-black tracking-wider">
                                 Min. Order
                             </span>
-                            <span className="block text-xs font-bold text-slate-900 dark:text-white truncate" title={specs['MOQ'] || (product as any).minOrder || 'Custom'}>
-                                {specs['MOQ'] || (product as any).minOrder || 'Custom'}
+                            <span className="block text-xs font-bold text-slate-900 dark:text-white truncate" title={specs['MOQ'] || (product as any).minOrder || 'As Per Requirement'}>
+                                {(() => {
+                                    const raw = specs['MOQ'] || (product as any).minOrder;
+                                    if (!raw || /^\s*\d+\s*(pcs|pieces)?\s*$/i.test(String(raw).trim())) {
+                                        return 'As Per Requirement';
+                                    }
+                                    return raw;
+                                })()}
                             </span>
                         </div>
                         <div className="spec-box-3d rounded-xl px-2.5 py-1.5 min-w-0">

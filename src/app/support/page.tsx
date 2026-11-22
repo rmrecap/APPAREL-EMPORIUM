@@ -67,7 +67,7 @@ export default function SupportPage() {
     const faqs = [
         {
             q: 'What is your typical Minimum Order Quantity (MOQ)?',
-            a: 'Our flexible sourcing network accommodates MOQs starting from 300 to 500 pcs per style for custom tech-packs, with capability to scale to 50,000+ pcs for bulk seasonal programs.'
+            a: 'Our flexible sourcing network accommodates custom MOQ requirements tailored strictly to your tech-pack specifications, fabric knitting/weaving minimums, and commercial delivery timelines.'
         },
         {
             q: 'How long does sample development take?',

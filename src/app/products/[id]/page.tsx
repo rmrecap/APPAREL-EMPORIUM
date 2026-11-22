@@ -129,7 +129,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
     // ── Schema.org B2B Garment Manufacturing Service & BreadcrumbList JSON-LD ──
     const productImages = extractProductImages(product.images, '/images/3d/white_tshirt.jpg');
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aelbd.net';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.aelbd.net';
 
     const b2bServiceSchema = {
         '@context': 'https://schema.org',

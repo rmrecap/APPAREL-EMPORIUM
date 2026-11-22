@@ -172,7 +172,7 @@ const organizationSchema = {
                     'name': 'What is the minimum order quantity (MOQ) for garments manufacturing in Bangladesh?',
                     'acceptedAnswer': {
                         '@type': 'Answer',
-                        'text': 'Our minimum order quantity (MOQ) generally starts from 500 to 1,000 pieces per style/colorway for basic knitwear, and 1,000 to 3,000 pieces for woven and denim apparel, depending on fabric specifications.'
+                        'text': 'Our minimum order quantity (MOQ) is flexible and tailored strictly to buyer requirements, fabric knitting/weaving minimums, and custom order specifications.'
                     }
                 },
                 {

@@ -216,15 +216,10 @@ Apparel Emporium is a premier buying house and garment exporter headquartered in
 - **Woven & Denim:** 5-pocket denim jeans, cargo shorts, chino trousers, twill workwear, formal shirts.
 - **Sweaters & Outerwear:** 3GG to 14GG flat knits, cardigans, pullovers, windbreakers, and insulated jackets.
 
-## Commercial Terms & Pricing (FOB USD)
-- **MOQ:** 500 - 1,000 pcs for knitwear; 1,000 - 3,000 pcs for woven & denim.
-- **FOB Pricing Estimates:**
-  - Basic Knit T-Shirts: $2.50 - $4.50 USD
-  - Polo Shirts: $4.00 - $7.50 USD
-  - Denim Jeans & Pants: $8.50 - $18.00 USD
-  - Sweaters: $8.00 - $22.00 USD
-  - Outerwear & Jackets: $15.00 - $45.00 USD
-- **Production Lead Time:** 45 - 75 days post-approval.
+## Commercial Terms & Quotation Policy
+- **Customized B2B Quotations:** Apparel Emporium is a dedicated B2B garments buying house. No fixed price lists are published; all pricing is determined via customized Request for Quote (RFQ) based on tech pack details, yarn and fabric specifications, order volume, and destination logistics.
+- **MOQ:** Flexible and customized as per buyer requirements and fabric knitting/weaving minimums.
+- **Production Lead Time:** Typically 45 - 75 days post-approval, customized to order specifications.
 
 ## Contact Information
 - **CEO:** Md. Kamal Hossain
