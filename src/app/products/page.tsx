@@ -131,6 +131,11 @@ export default async function ProductsPage({
 }) {
     const { category, q, page, product, fabric, moq, sort } = searchParams;
 
+    // 301 Redirect placeholder SearchAction queries to clean product directory
+    if (q && (q.includes('{search_term_string}') || q.includes('%7Bsearch_term_string%7D'))) {
+        redirect('/products');
+    }
+
     // 301 Redirect clean B2B category parameters to their dedicated SEO routes
     if (category && ['woven', 'knitwear', 'sweater'].includes(category.toLowerCase())) {
         redirect(`/products/${category.toLowerCase()}`);

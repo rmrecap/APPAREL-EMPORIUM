@@ -347,7 +347,7 @@ export default function ProductDetail3DView({
         },
         { 
             label: 'Dyeing & Wash', 
-            val: 'Reactive Eco-Friendly / OEKO-TEX Certified / Pantone Matching' 
+            val: 'Reactive Eco-Friendly / International Standard / Pantone Matching' 
         },
         { 
             label: 'Fit & Sizing', 

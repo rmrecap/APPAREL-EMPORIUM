@@ -209,7 +209,7 @@ export async function generateCompanyProfilePDF(): Promise<Buffer> {
         'Our unwavering mission is delivering reliable apparel sourcing aligned strictly with buyer-defined quality specifications and ethical supply chains.';
     const ceoP2 = settings.ceo_p2 && !/AQL/i.test(settings.ceo_p2) ? settings.ceo_p2 :
         'With over 15 years of industry leadership, our dedicated merchandising and quality assurance teams guarantee total production transparency and buyer satisfaction.';
-    const ceoSignoff = settings.ceo_signoff || `${settings.proprietor_name || 'Md. Kamal Hossain'}, ${settings.proprietor_title || 'Proprietor'}, Apparel Emporium`;
+    const ceoSignoff = settings.ceo_signoff || `${settings.proprietor_name || 'Md. Kamal Hossain'}, ${settings.proprietor_title === 'Proprietor' ? 'CEO' : (settings.proprietor_title || 'CEO')}, Apparel Emporium`;
 
     const vision = settings.vision_text || 'To be the most trusted, socially compliant, and quality-driven garments buying house in South Asia for world-class fashion brands.';
     const mission = settings.mission_text || 'To engineer sustainable garment manufacturing partnerships, offering complete end-to-end merchandising from design to FOB shipment.';

@@ -161,7 +161,7 @@ export async function POST(req: NextRequest) {
                                     phone: "+88 02 4895 5519",
                                     email: "info@aelbd.net",
                                     address: "House # 03 (2nd Floor), Road # 12, Sector # 13, Uttara Model Town, Dhaka-1230, Bangladesh",
-                                    certifications: ["BSCI", "SEDEX", "OEKO-TEX Standard 100", "GOTS"]
+                                    certifications: ["Audited Social Compliance", "International Environmental Norms", "ISO 9001 Quality Benchmarks"]
                                 }, null, 2)
                             }
                         ]

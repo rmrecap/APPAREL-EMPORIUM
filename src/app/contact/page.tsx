@@ -115,7 +115,7 @@ export default function ContactPage() {
 
     const companyName     = settings.company_name         || 'Apparel Emporium';
     const proprietorName  = settings.proprietor_name      || 'Md. Kamal Hossain';
-    const proprietorTitle = settings.proprietor_title     || 'Proprietor';
+    const ceoTitle        = (settings.proprietor_title && settings.proprietor_title !== 'Proprietor') ? settings.proprietor_title : 'CEO';
     const addressLabel    = settings.contact_address_label || 'Address Icon';
     const addressValue    = settings.contact_address       || settings.company_address || 'House # 03 (2nd Floor), Road # 12, Sector # 13, Uttara Model Town, Dhaka- 1230, Bangladesh';
     const emailLabel      = settings.contact_email_label   || 'Email Icon';
@@ -291,7 +291,7 @@ export default function ContactPage() {
                                 {contactSubtitle}
                             </p>
 
-                            {/* Proprietor Leadership Card */}
+                            {/* CEO Leadership Card */}
                             <div className="mb-3 p-2.5 sm:p-3 rounded-2xl bg-white/60 dark:bg-white/[0.04] border border-white/80 dark:border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.04)] flex items-center justify-between gap-3">
                                 <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                                     <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/15 dark:bg-cyan-500/15 border border-amber-500/30 dark:border-cyan-400/30 flex items-center justify-center shrink-0 text-amber-600 dark:text-cyan-400">
@@ -299,7 +299,7 @@ export default function ContactPage() {
                                     </div>
                                     <div className="min-w-0">
                                         <div className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-cyan-400">
-                                            {proprietorTitle} &bull; {companyName}
+                                            {ceoTitle} &bull; {companyName}
                                         </div>
                                         <div className="text-xs sm:text-sm font-black text-slate-900 dark:text-white truncate">
                                             {proprietorName}

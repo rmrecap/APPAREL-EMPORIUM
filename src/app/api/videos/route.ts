@@ -34,7 +34,7 @@ const DEMO_GARMENT_VIDEOS = [
     {
         messageId: 103,
         fileId: 'https://assets.mixkit.co/videos/preview/mixkit-spinning-yarn-on-a-textile-factory-loom-41584-large.mp4',
-        title: 'OEKO-TEX Certified Circular Knitting & Yarn Spinning',
+        title: 'Eco-Friendly Circular Knitting & Yarn Spinning',
         caption: 'BCI combed cotton yarn spinning and automated jacquard circular knitting operations adhering to strict eco-friendly chemical compliance.',
         duration: 42,
         thumbnailUrl: 'https://images.unsplash.com/photo-1574634534894-89d7576c8259?w=800&auto=format&fit=crop&q=80',

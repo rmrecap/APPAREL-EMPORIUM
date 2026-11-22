@@ -134,10 +134,10 @@ export default function B2BCategoryPage({
                     {/* Trust Badges */}
                     <div className="flex flex-wrap items-center gap-3 pt-2">
                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                            <ShieldCheck className="w-4 h-4" /> BSCI &amp; SEDEX SMETA Audited
+                            <ShieldCheck className="w-4 h-4" /> Audited Manufacturing Partners
                         </span>
                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                            <Award className="w-4 h-4" /> OEKO-TEX Standard 100 / GOTS
+                            <Award className="w-4 h-4" /> International Social &amp; Safety Compliance
                         </span>
                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
                             <Factory className="w-4 h-4" /> Direct Bangladesh Factory Pricing

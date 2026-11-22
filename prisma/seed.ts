@@ -279,7 +279,7 @@ async function main() {
         // ── General Company Info ──
         { key: 'company_name', value: 'Apparel Emporium', group: 'general' },
         { key: 'proprietor_name', value: 'Md. Kamal Hossain', group: 'general' },
-        { key: 'proprietor_title', value: 'Proprietor', group: 'general' },
+        { key: 'proprietor_title', value: 'CEO', group: 'general' },
         { key: 'company_tagline', value: 'Your Trusted Garments Sourcing Partner in Bangladesh', group: 'general' },
         { key: 'company_email', value: 'kamal@aelbd.net', group: 'general' },
         { key: 'contact_email', value: 'kamal@aelbd.net', group: 'contact' },

@@ -59,10 +59,10 @@ export default function Footer() {
     const linksToRender = footerMenus.length > 0 ? footerMenus.filter(m => !m.parentId) : DEFAULT_LINKS;
     const year = new Date().getFullYear();
 
-    // Corporate data with exact updated values from the proprietor signature card
+    // Corporate data with exact updated values from the leadership card
     const companyName = settings.company_name || 'Apparel Emporium';
     const proprietorName = settings.proprietor_name || 'Md. Kamal Hossain';
-    const proprietorTitle = settings.proprietor_title || 'Proprietor';
+    const ceoTitle = (settings.proprietor_title && settings.proprietor_title !== 'Proprietor') ? settings.proprietor_title : 'CEO';
     const address = settings.contact_address || settings.company_address || 'House # 03 (2nd Floor), Road # 12, Sector # 13, Uttara Model Town, Dhaka- 1230, Bangladesh';
     const telephone = settings.contact_phone || settings.company_phone || '+88 02 4895 5519, 096 6691 2038';
     const cellWhatsApp = (settings.contact_whatsapp || settings.whatsapp_number || '').trim();
@@ -79,24 +79,26 @@ export default function Footer() {
                 {/* Main Grid: Left Corporate Info Card + Right Navigation Columns */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 mb-14">
 
-                    {/* ══════════ LEFT COLUMN (5 Cols): Corporate HQ & Proprietor Desk ══════════ */}
+                    {/* ══════════ LEFT COLUMN (5 Cols): Corporate HQ & Executive Leadership Desk ══════════ */}
                     <div className="lg:col-span-5 space-y-4">
 
                         {/* 3D Glassmorphic Corporate Badge */}
                         <div className="rounded-3xl p-5 sm:p-6 bg-gradient-to-b from-white/[0.08] to-white/[0.02] dark:from-white/[0.05] dark:to-transparent border border-white/10 shadow-[0_15px_35px_rgba(0,0,0,0.35)] backdrop-blur-md space-y-4">
 
-                            {/* Brand Header */}
+                            {/* Brand Header with Authentic Header Logo for Dark Backgrounds */}
                             <div className="flex items-start justify-between gap-3">
                                 <div>
-                                    <div className="flex items-center gap-2 mb-1.5">
-                                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white shadow-[0_2px_8px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,1)] border border-slate-200">
-                                            <span className="text-[#DC2626] text-base sm:text-lg font-black tracking-tight font-heading">
-                                                APPAREL
-                                            </span>
-                                            <span className="text-black text-base sm:text-lg font-black tracking-tight font-heading">
-                                                EMPORIUM
-                                            </span>
-                                        </div>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Link href="/" className="inline-block group">
+                                            <Image
+                                                src={settings.header_logo_dark || settings.logo_dark || '/uploads/logos/apparel-emporium-logo-dark.png'}
+                                                alt={companyName}
+                                                width={240}
+                                                height={35}
+                                                priority
+                                                className="h-8 sm:h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+                                            />
+                                        </Link>
                                     </div>
                                     <p className="text-xs text-slate-300 font-semibold mt-1 tracking-tight">
                                         A Window of Fashion, Home Textile, Footwear &amp; Accessories
@@ -108,14 +110,14 @@ export default function Footer() {
                                 </span>
                             </div>
 
-                            {/* Proprietor Identification Pill */}
+                            {/* CEO Leadership Identification Pill */}
                             <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.04] border border-white/10">
                                 <div className="w-8 h-8 rounded-xl bg-amber-500/15 dark:bg-cyan-500/15 border border-amber-400/30 dark:border-cyan-400/30 flex items-center justify-center shrink-0 text-amber-400 dark:text-cyan-400">
                                     <UserCheck size={16} />
                                 </div>
                                 <div className="min-w-0 flex-1">
                                     <div className="text-[10px] font-bold uppercase tracking-widest text-amber-400/90 dark:text-cyan-400/90">
-                                        {proprietorTitle}
+                                        {ceoTitle}
                                     </div>
                                     <div className="text-xs sm:text-[13px] font-black text-white tracking-tight truncate">
                                         {proprietorName}
@@ -246,7 +248,7 @@ export default function Footer() {
                         All Rights Reserved, {companyName} {year} &bull; Head Office: {address}
                     </p>
                     <div className="text-[11px] text-slate-400 flex items-center gap-4">
-                        <span>Proprietor: <strong className="text-slate-300">{proprietorName}</strong></span>
+                        <span>CEO: <strong className="text-slate-300">{proprietorName}</strong></span>
                         <span>&bull;</span>
                         <a href={`mailto:${email}`} className="hover:text-white transition-colors">{email}</a>
                     </div>

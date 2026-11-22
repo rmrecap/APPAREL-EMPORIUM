@@ -14,7 +14,7 @@ export default function B2BLeadMagnetSection({
     sourcePage = 'Website',
     defaultCategory = 'all',
     title = 'Request 2026 Factory Compliance Profile & Line Sheet',
-    subtitle = 'Instant access to audited factory certifications (BSCI, SEDEX, OEKO-TEX, GOTS), machinery inventories, and wholesale production pricing.'
+    subtitle = 'Instant access to audited factory compliance profiles, machinery inventories, and wholesale production pricing.'
 }: B2BLeadMagnetProps) {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -96,7 +96,7 @@ Direct Contact: ${phone || 'N/A'}`
                             <FileCheck className="w-5 h-5 text-emerald-400 mt-0.5 shrink-0" />
                             <div>
                                 <h4 className="text-sm font-bold text-white">Full Social Audit Reports</h4>
-                                <p className="text-xs text-gray-400">BSCI (A/B), SEDEX SMETA 4-Pillar, WRAP Gold</p>
+                                <p className="text-xs text-gray-400">Audited Partner Units, International Labor &amp; Safety Norms</p>
                             </div>
                         </div>
 

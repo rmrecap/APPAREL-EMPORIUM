@@ -9,7 +9,7 @@ const SEED_DATA = [
     {
         id: 'seed-1',
         title: 'Organic Cotton T-Shirts — 50,000 pcs',
-        description: 'Bulk order of GOTS-certified organic cotton crew-neck tees shipped to a European retail chain.',
+        description: 'Bulk order of organic cotton crew-neck tees shipped to a European retail chain.',
         category: 'Knitwear',
         buyer: 'Nordic Retail Group',
         buyerCountry: 'Sweden',

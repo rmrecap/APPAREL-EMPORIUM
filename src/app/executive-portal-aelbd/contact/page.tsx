@@ -41,8 +41,8 @@ const CONTACT_CARD_FIELDS: FieldDef[] = [
 ];
 
 const CONTACT_CHANNELS_FIELDS: FieldDef[] = [
-    { key: 'proprietor_name', label: 'Proprietor / Executive Name', placeholder: 'Md. Kamal Hossain', hint: 'Displayed in corporate leadership cards, signatures and footer.' },
-    { key: 'proprietor_title', label: 'Proprietor Designation / Role', placeholder: 'Proprietor', hint: 'Official leadership title.' },
+    { key: 'proprietor_name', label: 'CEO / Executive Name', placeholder: 'Md. Kamal Hossain', hint: 'Displayed in corporate leadership cards, signatures and footer.' },
+    { key: 'proprietor_title', label: 'CEO Designation / Role', placeholder: 'CEO', hint: 'Official leadership title.' },
     { key: 'contact_address_label', label: 'Address Pill — Label', placeholder: 'Address Icon' },
     {
         key: 'contact_address',

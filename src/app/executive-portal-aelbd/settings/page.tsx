@@ -170,12 +170,12 @@ export default function SettingsPage() {
                             <input name="company_tagline" type="text" value={formData.company_tagline || ''} onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary/50 transition-shadow" />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold mb-2">Proprietor Name</label>
+                            <label className="block text-sm font-semibold mb-2">CEO Name</label>
                             <input name="proprietor_name" type="text" placeholder="Md. Kamal Hossain" value={formData.proprietor_name || ''} onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary/50 transition-shadow" />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold mb-2">Proprietor Title / Role</label>
-                            <input name="proprietor_title" type="text" placeholder="Proprietor" value={formData.proprietor_title || ''} onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary/50 transition-shadow" />
+                            <label className="block text-sm font-semibold mb-2">CEO Title / Role</label>
+                            <input name="proprietor_title" type="text" placeholder="CEO" value={formData.proprietor_title || ''} onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary/50 transition-shadow" />
                         </div>
                         <div>
                             <label className="block text-sm font-semibold mb-2">Founded Year</label>

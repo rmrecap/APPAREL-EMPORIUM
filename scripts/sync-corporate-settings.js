@@ -42,7 +42,7 @@ async function main() {
     const corporateSettings = [
         { key: 'company_name', value: 'Apparel Emporium', group: 'general' },
         { key: 'proprietor_name', value: 'Md. Kamal Hossain', group: 'corporate' },
-        { key: 'proprietor_title', value: 'Proprietor', group: 'corporate' },
+        { key: 'proprietor_title', value: 'CEO', group: 'corporate' },
         { key: 'company_address', value: 'House # 03 (2nd Floor), Road # 12, Sector # 13, Uttara Model Town, Dhaka- 1230, Bangladesh', group: 'contact' },
         { key: 'company_phone', value: '+88 02 4895 5519, 096 6691 2038', group: 'contact' },
         { key: 'whatsapp_number', value: '', group: 'contact' },

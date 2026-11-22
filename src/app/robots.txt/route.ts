@@ -42,10 +42,7 @@ Disallow: /compare
 Disallow: /api/
 Disallow: /request-quote
 Disallow: /*?q=*
-Disallow: /*?product=*
-Disallow: /*?page=*
-Disallow: /*?category=*
-Disallow: /*?sort=*
+Disallow: /*search_term_string*
 
 Host: ${baseUrl.replace(/^https?:\/\//, '')}
 Sitemap: ${baseUrl}/sitemap.xml

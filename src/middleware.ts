@@ -20,6 +20,16 @@ export async function middleware(req: NextRequest) {
         return NextResponse.redirect(redirectUrl, { status: 301 });
     }
 
+    // Legacy sitemaps redirect (/page-sitemap.xml, /sitemap_index.xml, etc. -> /sitemap.xml)
+    if (req.nextUrl.pathname.match(/^\/(page-sitemap|post-sitemap|sitemap_index|category-sitemap)\.xml$/i)) {
+        return NextResponse.redirect(new URL('/sitemap.xml', 'https://www.aelbd.net'), { status: 301 });
+    }
+
+    // Sanitize SearchAction placeholder crawler requests
+    if (req.nextUrl.search.includes('search_term_string')) {
+        return NextResponse.redirect(new URL('/products', 'https://www.aelbd.net'), { status: 301 });
+    }
+
     const path = req.nextUrl.pathname;
     const method = req.method;
 
@@ -217,7 +227,7 @@ Apparel Emporium is a premier buying house and garment exporter headquartered in
 - **Production Lead Time:** 45 - 75 days post-approval.
 
 ## Contact Information
-- **Proprietor & CEO:** Md. Kamal Hossain
+- **CEO:** Md. Kamal Hossain
 - **Address:** House # 03 (2nd Floor), Road # 12, Sector # 13, Uttara Model Town, Dhaka-1230, Bangladesh
 - **Phone:** +88 02 4895 5519, +88 096 6691 2038
 - **Email:** info@aelbd.net, kamal@aelbd.net

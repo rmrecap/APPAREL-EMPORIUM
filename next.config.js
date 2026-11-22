@@ -49,6 +49,26 @@ const nextConfig = {
                 destination: 'https://www.aelbd.net/:path*',
                 permanent: true,
             },
+            {
+                source: '/page-sitemap.xml',
+                destination: '/sitemap.xml',
+                permanent: true,
+            },
+            {
+                source: '/post-sitemap.xml',
+                destination: '/sitemap.xml',
+                permanent: true,
+            },
+            {
+                source: '/sitemap_index.xml',
+                destination: '/sitemap.xml',
+                permanent: true,
+            },
+            {
+                source: '/category-sitemap.xml',
+                destination: '/sitemap.xml',
+                permanent: true,
+            },
         ];
     },
     async rewrites() {
