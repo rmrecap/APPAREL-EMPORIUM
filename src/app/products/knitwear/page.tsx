@@ -57,30 +57,30 @@ export default async function KnitwearCategoryPage() {
             description: '100% Combed BCI/Organic Cotton, CVC, Poly-Cotton, Modal blends.',
         },
         {
-            label: 'Weight (GSM)',
-            value: '140 GSM - 420 GSM',
-            description: 'Lightweight summer t-shirts to heavy brushed winter fleece.',
+            label: 'Hands-On Supervision',
+            value: 'Active Floor Oversight',
+            description: 'Unlike passive buying agencies, our technical team actively monitors daily factory floor progress from pattern grading to carton packing.',
         },
         {
-            label: 'Production Lead Time',
-            value: '45 - 60 Days',
-            description: 'Fast-track supply chain from knitting to container dispatch.',
+            label: 'Technical Mastery',
+            value: '40–50 Yrs Senior Expertise',
+            description: 'Guided by senior garment masters with 40-50 years of hands-on industry experience auditing fabric tension, stitch density, and wash tolerances.',
         },
         {
-            label: 'Audits & Standards',
-            value: 'GOTS, BSCI, SEDEX (SMETA), OEKO-TEX 100',
-            description: 'Environmentally responsible dyeing with zero hazardous discharges.',
+            label: 'Buyer Ownership',
+            value: '100% Quality Accountability',
+            description: 'We treat every buyer order as our own creation—delivering complete transparency, zero-defect AQL control, and full compliance dossiers upon request.',
         },
     ];
 
     const manufacturingSpecsTable = [
         {
             parameter: 'Yarn & Fiber Grades',
-            specification: '100% Combed Ring-Spun Cotton, BCI Cotton, GOTS Certified Organic Cotton, CVC (60/40, 80/20), Recycled Polyester (GRS), Viscose/Rayon',
+            specification: '100% Combed Ring-Spun Cotton, BCI Cotton, Organic Cotton blends, CVC (60/40, 80/20), Recycled Polyester, Viscose/Rayon',
             buyerNote: '24s, 26s, 30s, 32s, 40s yarn counts from certified spinning mills.'
         },
         {
-            parameter: 'Knit Knit Constructions',
+            parameter: 'Knit Constructions',
             specification: 'Single Jersey, Interlock, 1x1 / 2x2 Rib, Pique / Lacoste, French Terry (unbrushed), Polar & Cotton Fleece (brushed), Waffle',
             buyerNote: 'Circular knit machines (Mayer & Cie, Terrot) ensuring zero torquing or spirality.'
         },
@@ -91,8 +91,8 @@ export default async function KnitwearCategoryPage() {
         },
         {
             parameter: 'Minimum Order Quantity (MOQ)',
-            specification: '1,000 – 1,500 pcs per style for basic knitwear; 2,000 pcs for custom yarn dyed stripes',
-            buyerNote: 'Can be split across 2-3 colorways and full size range (XS to 3XL).'
+            specification: 'Flexible and tailored strictly per tech-pack, fabric batch minimums, and buyer order volume',
+            buyerNote: 'Can be split across multiple colorways and full size range (XS to 3XL).'
         },
         {
             parameter: 'Sampling Turnaround',
@@ -100,9 +100,9 @@ export default async function KnitwearCategoryPage() {
             buyerNote: 'Rapid sample execution directly handled by dedicated sampling merchandisers.'
         },
         {
-            parameter: 'Bulk Production Lead Time',
-            specification: '45 – 60 days from final lab-dip, size-set, and accessories approval',
-            buyerNote: 'Vertically integrated partner mills enable rapid 45-day turnaround.'
+            parameter: 'Bulk Production Timeline',
+            specification: 'Customized production schedules aligned with destination country, port logistics, and seasonal requirements',
+            buyerNote: 'Vertically integrated partner mills enable rapid turnaround.'
         },
         {
             parameter: 'Dyeing & Printing Capabilities',
@@ -115,9 +115,9 @@ export default async function KnitwearCategoryPage() {
             buyerNote: 'Inline seam tension, color shading, stitch density (SPI), and final random checks.'
         },
         {
-            parameter: 'Social & Eco Compliance',
-            specification: 'amfori BSCI, SEDEX SMETA (4-Pillar), OEKO-TEX Standard 100, GOTS Organic, WRAP, RSC Accord',
-            buyerNote: 'Zero audit duplication; shared SMETA platform access for buyers.'
+            parameter: 'Social & Factory Compliance',
+            specification: 'Fully audited partner factories adhering to international labor and safety standards; detailed compliance dossiers provided upon request',
+            buyerNote: 'Complete transparency with on-the-ground technical supervision on every production line.'
         }
     ];
 
@@ -136,12 +136,12 @@ export default async function KnitwearCategoryPage() {
             answer: 'We manufacture full ranges of circular and flat knitwear including crewneck and V-neck t-shirts, pique polo shirts, heavy French Terry hoodies, brushed fleece sweatshirts, joggers, athletic tank tops, and loungewear.',
         },
         {
-            question: 'What is your standard MOQ and lead time for knitwear production in Bangladesh?',
-            answer: 'Our standard MOQ is 1,000 to 1,500 pieces per style across 2-3 colors. Bulk lead time is 45 to 60 days from pre-production approval, with initial proto samples delivered in 5 to 7 days.',
+            question: 'How do you determine MOQ and production lead times for knitwear?',
+            answer: 'Our MOQs and production timelines are flexible and tailored strictly to buyer tech packs, yarn availability, and order volumes. Fast-track options are available for ongoing retail programs.',
         },
         {
-            question: 'Can you provide organic, recycled, and OEKO-TEX certified fabrics?',
-            answer: 'Yes, we supply GOTS certified 100% organic cotton, BCI (Better Cotton Initiative) cotton, and GRS certified recycled polyester blends with complete scope transaction certificates (TC).',
+            question: 'Can you provide sustainable and certified organic cotton fabrics?',
+            answer: 'Yes, we supply organic cotton, BCI cotton, and recycled polyester blends with complete mill test reports and transaction documentation.',
         },
         {
             question: 'What quality control and inspection protocols are maintained?',
@@ -154,7 +154,7 @@ export default async function KnitwearCategoryPage() {
             slug="knitwear"
             categoryName="Knitwear"
             h1="Knitwear & Jersey Apparel Manufacturing & Sourcing in Bangladesh"
-            subheading="Source high-volume, export-quality circular and flat knitwear (T-shirts, polo shirts, fleece hoodies, tracksuits) manufactured with OEKO-TEX certified cotton in Bangladesh."
+            subheading="Source high-volume, export-quality circular and flat knitwear (T-shirts, polo shirts, fleece hoodies, tracksuits) manufactured with premium cotton in Bangladesh."
             description="Bangladesh is the global leader in knitwear manufacturing, offering unparalleled cost efficiency, vertically integrated mills, and skilled craftsmanship. Apparel Emporium manages your entire knit sourcing pipeline—from yarn selection and lab dips to garment assembly, custom branding, and shipping logistics."
             specHighlights={specHighlights}
             manufacturingSpecsTable={manufacturingSpecsTable}

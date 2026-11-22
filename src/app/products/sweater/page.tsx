@@ -57,19 +57,19 @@ export default async function SweaterCategoryPage() {
             description: 'Coarse chunky cables to ultra-fine gauge corporate pullovers.',
         },
         {
-            label: 'Yarn Compositions',
-            value: 'Cotton, Acrylic, Merino, Lambswool, Cashmere Blends',
-            description: 'Cotton-acrylic (50/50), 100% Cotton, Chenille, and recycled yarns.',
+            label: 'Hands-On Supervision',
+            value: 'Active Floor Oversight',
+            description: 'Unlike passive buying agencies, our technical team actively monitors daily factory floor progress from pattern grading to carton packing.',
         },
         {
-            label: 'Knitting Technology',
-            value: 'Computerized Jacquard & Intarsia',
-            description: 'Automated German Stoll & Japanese Shima Seiki flatbed machines.',
+            label: 'Technical Mastery',
+            value: '40–50 Yrs Senior Expertise',
+            description: 'Guided by senior garment masters with 40-50 years of hands-on industry experience auditing fabric tension, stitch density, and wash tolerances.',
         },
         {
-            label: 'Compliance Standards',
-            value: 'BSCI, SMETA, WRAP, OEKO-TEX',
-            description: 'Strict needle-detection protocols and calibrated linking machines.',
+            label: 'Buyer Ownership',
+            value: '100% Quality Accountability',
+            description: 'We treat every buyer order as our own creation—delivering complete transparency, zero-defect AQL control, and full compliance dossiers upon request.',
         },
     ];
 
@@ -81,22 +81,22 @@ export default async function SweaterCategoryPage() {
         },
         {
             parameter: 'Yarn Compositions',
-            specification: '100% Cotton, 50/50 Cotton/Acrylic, 100% Cashmere-like Acrylic, Merino Wool Blends, Lambswool, Mohair, Chenille, Alpaca blends',
+            specification: '100% Cotton, 50/50 Cotton/Acrylic, Cashmere-feel Acrylic, Merino Wool Blends, Lambswool, Mohair, Chenille, Alpaca blends',
             buyerNote: 'High yarn twist stability and anti-pilling treatments (tested to ISO 12945-2).'
         },
         {
             parameter: 'Minimum Order Quantity (MOQ)',
-            specification: '1,200 – 1,500 pcs per style for running in-stock yarns; 2,500 pcs for custom dyed/spun blends',
-            buyerNote: 'Flexible color breakdowns (e.g. 500 pcs per colorway).'
+            specification: 'Flexible and tailored strictly per tech-pack, yarn spinning minimums, and buyer order volume',
+            buyerNote: 'Flexible color breakdowns tailored to private label and retail collections.'
         },
         {
-            parameter: 'Sampling Lead Time',
+            parameter: 'Sampling Turnaround',
             specification: 'Yarn swatch & stitch tension: 3 – 5 days; Proto / Fit Sample: 7 – 10 days; Salesman Sample (SMS): 15 – 20 days',
             buyerNote: 'Experienced sweater programmers delivering precision computer stitch files.'
         },
         {
-            parameter: 'Bulk Production Lead Time',
-            specification: '45 – 60 days from final yarn lot & linking approval (up to 70 days for imported custom wool)',
+            parameter: 'Bulk Production Timeline',
+            specification: 'Customized production schedules aligned with destination country, port logistics, and seasonal requirements',
             buyerNote: 'Scheduled container loading at Chittagong port with moisture-controlled packaging.'
         },
         {
@@ -115,9 +115,9 @@ export default async function SweaterCategoryPage() {
             buyerNote: 'Dimensional stability, loop formation, weight per dozen, and wash test validation.'
         },
         {
-            parameter: 'Factory Social Audits',
-            specification: 'amfori BSCI (A/B), SEDEX SMETA 4-Pillar, WRAP Certified, OEKO-TEX Standard 100, RSC Accord Safety',
-            buyerNote: 'Shared SEDEX reports prevent duplicate third-party audit expenses.'
+            parameter: 'Social & Factory Compliance',
+            specification: 'Fully audited partner factories adhering to international labor and safety standards; detailed compliance dossiers provided upon request',
+            buyerNote: 'Complete transparency with on-the-ground technical supervision on every production line.'
         }
     ];
 
@@ -136,8 +136,8 @@ export default async function SweaterCategoryPage() {
             answer: 'Our partner facilities are equipped with computerized flat knitting machines from world-class makers Stoll (Germany) and Shima Seiki (Japan), capable of complex intarsia, multi-color jacquards, and structured rib textures.',
         },
         {
-            question: 'What are the MOQ and lead time requirements for sweater manufacturing in Bangladesh?',
-            answer: 'For standard running yarns (cotton, cotton-acrylic, acrylic), MOQs start from 1,200 to 1,500 pieces per style. Bulk production lead time is 45 to 60 days following PPS and trim approvals.',
+            question: 'How do you determine MOQ and production lead times for sweater manufacturing?',
+            answer: 'Our MOQs and production timelines are flexible and customized based on your tech pack, yarn spinning schedules, and order volume. We tailor timelines to meet buyer seasonal fall/winter retail delivery schedules.',
         },
         {
             question: 'How do you prevent needle breakage and guarantee buyer safety?',

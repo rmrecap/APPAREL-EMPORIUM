@@ -7,6 +7,7 @@ import { Eye, Columns2, Check, ChevronRight } from 'lucide-react';
 import { useAddToCompare } from '@/hooks/useAddToCompare';
 import { useSettings } from '@/context/SettingsContext';
 import { extractFeaturedImage } from '@/lib/utils';
+import { recordProductInterest } from '@/lib/visitorAffinity';
 
 interface ProductCardProps {
     product: Product;
@@ -112,6 +113,7 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
                 {/* Floating 3D Garment Image Frame */}
                 <Link
                     href={`/products/${product.slug}`}
+                    onClick={() => recordProductInterest(product)}
                     className="relative w-full h-full flex items-center justify-center z-10 p-1"
                 >
                     <div className="relative w-full h-full flex items-center justify-center rounded-xl overflow-hidden">
@@ -130,7 +132,7 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
                 {/* Interactive Quick View & Compare Overlay */}
                 <div className="absolute inset-0 bg-black/25 dark:bg-black/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center p-4 z-20">
                     <button
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); onQuickView?.(product); }}
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); recordProductInterest(product); onQuickView?.(product); }}
                         className="bg-white/95 dark:bg-slate-900/95 text-slate-900 dark:text-white font-bold text-xs px-5 py-2.5 rounded-full flex items-center gap-1.5 shadow-xl hover:scale-105 transition-transform"
                     >
                         <Eye size={14} /> Quick Specs

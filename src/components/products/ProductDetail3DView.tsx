@@ -9,6 +9,7 @@ import RecordProductVisit from './RecordProductVisit';
 import Coded3DGlobe from './Coded3DGlobe';
 import { useSettings } from '@/context/SettingsContext';
 import { extractProductImages, DEFAULT_PRODUCT_IMAGE } from '@/lib/utils';
+import { recordProductInterest, rankProductsByAffinity } from '@/lib/visitorAffinity';
 
 interface ProductDetail3DViewProps {
     product: any;
@@ -294,6 +295,34 @@ export default function ProductDetail3DView({
             setActiveImage(images[0]);
         }
     }, [product.images]);
+
+    // Dynamic Visitor Affinity Tracking & Client-Side Re-ranking
+    const [recommendations, setRecommendations] = useState<any[]>(relatedProducts);
+
+    React.useEffect(() => {
+        // Record visitor interest in category, subcategory and tags
+        recordProductInterest(product);
+
+        // Dynamically rank related products according to visitor affinity profile
+        if (relatedProducts && relatedProducts.length > 0) {
+            const ranked = rankProductsByAffinity(relatedProducts, product.id);
+            setRecommendations(ranked);
+        }
+    }, [product.id, product.category, product.subCategory, relatedProducts]);
+
+    // Keyboard Arrow Navigation for Product Images
+    React.useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (images.length <= 1) return;
+            if (e.key === 'ArrowLeft') {
+                handlePrevImage();
+            } else if (e.key === 'ArrowRight') {
+                handleNextImage();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [currentIndex, images]);
     const [isQuoteOpen, setIsQuoteOpen] = useState(false);
     const [formLoading, setFormLoading] = useState(false);
     const [formSuccess, setFormSuccess] = useState(false);
@@ -731,14 +760,21 @@ export default function ProductDetail3DView({
                 </section>
 
 
-                {/* ═══════════════════════ SECTION 3: RELATED PRODUCTS (3 Cards with Radiant Glow) ═══════════════════════ */}
+                {/* ═══════════════════════ SECTION 3: RECOMMENDED PRODUCTS (Affinity Re-ranked 3 Cards) ═══════════════════════ */}
                 <section className="pt-6 sm:pt-8 border-t border-slate-300/50 dark:border-white/10 space-y-6">
-                    <h2 className="section-heading text-xl sm:text-2xl font-black uppercase tracking-tight font-heading">
-                        Related Products
-                    </h2>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div>
+                            <h2 className="section-heading text-xl sm:text-2xl font-black uppercase tracking-tight font-heading">
+                                Recommended For You
+                            </h2>
+                            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                                Export garment selections dynamically curated based on your category focus and sourcing interest
+                            </p>
+                        </div>
+                    </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                        {relatedProducts.slice(0, 3).map((rel) => {
+                        {recommendations.slice(0, 3).map((rel) => {
                             const relImgs = extractProductImages(rel.images, DEFAULT_PRODUCT_IMAGE);
                             const relImg = relImgs[0] || DEFAULT_PRODUCT_IMAGE;
 

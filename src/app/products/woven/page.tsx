@@ -57,19 +57,19 @@ export default async function WovenCategoryPage() {
             description: '100% Cotton, CVC, TC blends, Spandex stretch, and Lyocell.',
         },
         {
-            label: 'Production Lead Time',
-            value: '45 - 60 Days',
-            description: 'From lab-dip & fit approval to FOB Chittagong port container loading.',
+            label: 'Hands-On Supervision',
+            value: 'Active Floor Oversight',
+            description: 'Unlike passive buying agencies, our technical team actively monitors daily factory floor progress from pattern grading to carton packing.',
         },
         {
-            label: 'Minimum Order Quantity',
-            value: '1,000 - 3,000 Pcs',
-            description: 'Per style with flexible color breakdowns (S-XXL sizes).',
+            label: 'Technical Mastery',
+            value: '40–50 Yrs Senior Expertise',
+            description: 'Guided by senior garment masters with 40-50 years of hands-on industry experience auditing fabric tension, stitch density, and wash tolerances.',
         },
         {
-            label: 'Audits & Compliance',
-            value: 'BSCI, SEDEX (SMETA), OEKO-TEX, WRAP',
-            description: 'Fully certified Tier-1 partner factories with zero audit duplication.',
+            label: 'Buyer Ownership',
+            value: '100% Quality Accountability',
+            description: 'We treat every buyer order as our own creation—delivering complete transparency, zero-defect AQL control, and full compliance dossiers upon request.',
         },
     ];
 
@@ -77,7 +77,7 @@ export default async function WovenCategoryPage() {
         {
             parameter: 'Fabric Compositions',
             specification: '100% Combed Cotton, CVC (60/40, 80/20), TC (65/35), Cotton-Elastane (98/2), Lyocell/Tencel, Linen blends',
-            buyerNote: 'Mill-sourced or imported greige fabric with full Oeko-Tex certification.'
+            buyerNote: 'Mill-sourced or imported greige fabric with complete technical laboratory test reports.'
         },
         {
             parameter: 'Fabric Weaves & Weights',
@@ -86,17 +86,17 @@ export default async function WovenCategoryPage() {
         },
         {
             parameter: 'Minimum Order Quantity (MOQ)',
-            specification: '1,000 pcs per style for in-stock fabrics; 2,500 – 3,000 pcs for custom woven mill runs',
-            buyerNote: 'Flexible color/size breakdown (typically 2-3 colorways per style).'
+            specification: 'Flexible and tailored strictly per tech-pack, fabric mill minimums, and buyer order volume',
+            buyerNote: 'Flexible color/size breakdown tailored to private label and retail collections.'
         },
         {
-            parameter: 'Sampling Lead Time',
+            parameter: 'Sampling Turnaround',
             specification: 'Proto / Fit Sample: 5 – 7 days; Salesman Sample (SMS) in actual fabric: 15 days',
             buyerNote: 'Full CAD pattern grading & 3D virtual fit simulation available.'
         },
         {
-            parameter: 'Bulk Production Lead Time',
-            specification: '45 – 60 days from final PPS (Pre-Production Sample) & trim approval',
+            parameter: 'Bulk Production Timeline',
+            specification: 'Customized production schedules aligned with destination country, port logistics, and seasonal requirements',
             buyerNote: 'Express fast-track options available for repeating retail programs.'
         },
         {
@@ -107,12 +107,12 @@ export default async function WovenCategoryPage() {
         {
             parameter: 'Quality Inspection Benchmark',
             specification: 'AQL 1.5 Major Defects / AQL 2.5 Minor Defects (MIL-STD-105E)',
-            buyerNote: 'Pre-production, In-line, and Final Random Inspection (FRI) reports supplied.'
+            buyerNote: 'Pre-production, In-line, and Final Random Inspection (FRI) reports supplied directly to buyers.'
         },
         {
-            parameter: 'Social & Technical Audits',
-            specification: 'amfori BSCI (Grade A/B), SEDEX SMETA (4-Pillar), OEKO-TEX Standard 100, WRAP, RSC Accord Safety',
-            buyerNote: 'Dual certified facilities eliminate buyer audit re-inspection fees.'
+            parameter: 'Social & Factory Compliance',
+            specification: 'Fully audited partner factories adhering to international labor and safety standards; detailed compliance dossiers provided upon request',
+            buyerNote: 'Complete transparency with on-the-ground technical supervision on every production line.'
         },
         {
             parameter: 'Incoterms & Shipping Ports',
@@ -136,16 +136,16 @@ export default async function WovenCategoryPage() {
             answer: 'We manufacture full ranges of woven apparel including men’s, women’s, and children’s denim jeans, casual and dress shirts, chinos, cargo pants, shorts, padded jackets, twill outerwear, and formal trousers.',
         },
         {
-            question: 'What is the standard MOQ and lead time for woven garments in Bangladesh?',
-            answer: 'Our standard MOQ ranges from 1,000 to 3,000 pieces per style. Bulk production lead time is 45 to 60 days following PPS and trim approval, with proto sampling delivered within 5 to 7 days.',
+            question: 'How do you determine MOQ and production lead times for woven garments?',
+            answer: 'Our MOQs and production timelines are flexible and customized based on your tech pack, fabric availability, and order volume. We tailor timelines to meet buyer seasonal retail delivery schedules with fast-track options available.',
         },
         {
             question: 'What quality control standards are applied during woven production?',
-            answer: 'Every order undergoes strict 4-point fabric inspection prior to spreading, in-line process audits, and final AQL 1.5/2.5 random inspections before packing into export master cartons.',
+            answer: 'Every order undergoes strict 4-point fabric inspection prior to spreading, in-line process audits by senior technical masters, and final AQL 1.5/2.5 random inspections before packing into export master cartons.',
         },
         {
-            question: 'Are your woven manufacturing partner factories BSCI and SEDEX audited?',
-            answer: 'Yes, 100% of our partner factories in Bangladesh hold valid BSCI, SEDEX (SMETA 4-pillar), WRAP, and OEKO-TEX Standard 100 certifications, ensuring ethical labor and zero audit duplication for buyers.',
+            question: 'How do you ensure ethical manufacturing and factory compliance?',
+            answer: 'We partner exclusively with verified export-grade garment manufacturers adhering to strict labor safety and ethical workplace practices. Full factory compliance dossiers and audit records are shared transparently upon buyer request.',
         },
     ];
 
@@ -154,8 +154,8 @@ export default async function WovenCategoryPage() {
             slug="woven"
             categoryName="Woven"
             h1="Export Woven Garments Manufacturing & Sourcing in Bangladesh"
-            subheading="Source high-grade woven apparel (casual shirts, denim jeans, chinos, trousers, jackets) from ethically audited, BSCI & SEDEX compliant partner factories in Bangladesh."
-            description="Apparel Emporium delivers end-to-end woven garment sourcing solutions for international fashion brands, department stores, and private label importers. From technical weave development to high-tech denim washes and strict AQL 1.5 quality control, our dedicated manufacturing network guarantees consistency and competitive pricing."
+            subheading="Source high-grade woven apparel (casual shirts, denim jeans, chinos, trousers, jackets) from ethically audited partner manufacturing facilities in Bangladesh."
+            description="Apparel Emporium delivers end-to-end woven garment sourcing solutions for international fashion brands, department stores, and private label importers. From technical weave development to high-tech denim washes and strict AQL 1.5 quality control, our dedicated hands-on team guarantees superior consistency and reliable global delivery."
             specHighlights={specHighlights}
             manufacturingSpecsTable={manufacturingSpecsTable}
             manufacturingPoints={manufacturingPoints}
