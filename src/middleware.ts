@@ -263,7 +263,7 @@ Established in Dhaka, Bangladesh, Apparel Emporium is a trusted buying house com
 
 - **Managing Director & CEO:** Md. Kamal Hossain
 - **Showroom & Head Office:** Uttara Model Town, Sector 13, Road 12, House 03 (2nd Floor), Dhaka-1230.
-- **Certifications:** Audited partner facilities adhering to BSCI, SEDEX, OEKO-TEX, GOTS, and WRAP.
+- **Compliance:** Audited partner facilities adhering strictly to international labor, environmental, and quality safety standards.
 `;
     }
 

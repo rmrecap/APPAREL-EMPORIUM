@@ -8,7 +8,7 @@
 - **Sweaters & Outerwear:** Flat-knit sweaters (3GG to 14GG), cardigans, pullovers, windbreakers, puffers, and softshell jackets.
 - **Undergarments & Activewear:** Boxer briefs, leggings, sports bras, moisture-wicking gymwear.
 - **Quality Assurance:** Full-time merchandising oversight, inline quality inspections, and pre-shipment AQL 2.5 final audits.
-- **Compliance Standards:** Partner factories are BSCI, SEDEX, OEKO-TEX Standard 100, GOTS, WRAP, and ISO certified.
+- **Compliance Standards:** Partner manufacturing units adhere strictly to international labor, environmental, and quality safety standards with comprehensive third-party audits.
 
 ## Commercial Terms & Pricing
 - **FOB Pricing Estimates (USD):**
@@ -28,13 +28,13 @@
 - [About Us](https://www.aelbd.net/about): Management message from Md. Kamal Hossain, corporate heritage, and Dhaka showroom.
 - [Contact & RFQ](https://www.aelbd.net/contact): Submit tech packs, request quotations, and schedule factory visits.
 - [Company Profile (PDF)](https://www.aelbd.net/company-profile.pdf): Downloadable corporate brochure and audit credentials.
-- [MCP Server Card](https://aelbd.net/.well-known/mcp/server-card.json): SEP-1649 Model Context Protocol server manifest for automated agents.
+- [MCP Server Card](https://www.aelbd.net/.well-known/mcp/server-card.json): SEP-1649 Model Context Protocol server manifest for automated agents.
 
 ## Corporate Contact
-- **Legal Entity:** Apparel Emporium Ltd.
-- **Managing Director & CEO:** Md. Kamal Hossain
+- **Legal Entity:** Apparel Emporium
+- **CEO:** Md. Kamal Hossain
 - **Head Office:** House # 03 (2nd Floor), Road # 12, Sector # 13, Uttara Model Town, Dhaka-1230, Bangladesh
 - **Telephone:** +88 02 4895 5519, +88 096 6691 2038
 - **Email:** info@aelbd.net, kamal@aelbd.net
-- **Website:** https://aelbd.net
+- **Website:** https://www.aelbd.net
 

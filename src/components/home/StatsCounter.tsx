@@ -53,12 +53,12 @@ function sanitizeStats(rawList: any[]): Stat[] {
     return rawList;
 }
 
-// Certifications strip
+// Quality & Manufacturing standards strip
 const CERTS = [
     { label: 'Export Quality', icon: <ShieldCheck size={14} className="text-secondary" /> },
-    { label: 'BSCI Certified', icon: <Award size={14} className="text-secondary" /> },
-    { label: 'OEKO-TEX®', icon: <ShieldCheck size={14} className="text-secondary" /> },
-    { label: 'GOTS Compliant', icon: <Star size={14} className="text-secondary" /> },
+    { label: 'Audited Partner Mills', icon: <Award size={14} className="text-secondary" /> },
+    { label: 'Ethical Production', icon: <ShieldCheck size={14} className="text-secondary" /> },
+    { label: 'Quality Assured', icon: <Star size={14} className="text-secondary" /> },
     { label: 'BGMEA Member', icon: <Award size={14} className="text-secondary" /> },
     { label: 'Fair Trade', icon: <TrendingUp size={14} className="text-secondary" /> },
 ];
