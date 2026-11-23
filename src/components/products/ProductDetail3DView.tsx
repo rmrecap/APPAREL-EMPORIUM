@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import Link from 'next/link';
-import { 
+import {
     Download, MessageSquare, CheckCircle2, X, ZoomIn, ZoomOut, Maximize2, Sparkles, ShieldCheck, MessageCircle, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import RecordProductVisit from './RecordProductVisit';
@@ -383,29 +383,29 @@ export default function ProductDetail3DView({
 
     // ── Universal, buyer-centric specifications matching global demand ──
     const specRows = [
-        { 
-            label: 'Order Volume', 
-            val: 'Flexible (Custom as per Buyer Request)' 
+        {
+            label: 'Order Volume',
+            val: 'Flexible (Custom as per Buyer Request)'
         },
-        { 
-            label: 'Fabric Type', 
-            val: specs['Fabric'] || '100% Combed / Ring-Spun Cotton, CVC, Poly Blends (As Required)' 
+        {
+            label: 'Fabric Type',
+            val: specs['Fabric'] || '100% Combed / Ring-Spun Cotton, CVC, Poly Blends (As Required)'
         },
-        { 
-            label: 'Weight (GSM)', 
-            val: 'Custom GSM (140 - 280+ GSM / Tailored by Region & Season)' 
+        {
+            label: 'Weight (GSM)',
+            val: 'Custom GSM (140 - 280+ GSM / Tailored by Region & Season)'
         },
-        { 
-            label: 'Dyeing & Wash', 
-            val: 'Reactive Eco-Friendly / International Standard / Pantone Matching' 
+        {
+            label: 'Dyeing & Wash',
+            val: 'Reactive Eco-Friendly / International Standard / Pantone Matching'
         },
-        { 
-            label: 'Fit & Sizing', 
-            val: 'US, EU, Asian or Custom Tech Pack Fit' 
+        {
+            label: 'Fit & Sizing',
+            val: 'US, EU, Asian or Custom Tech Pack Fit'
         },
-        { 
-            label: 'Customization', 
-            val: 'Screen Print, Embroidery, DTG, Custom Woven Labels' 
+        {
+            label: 'Customization',
+            val: 'Screen Print, Embroidery, DTG, Custom Woven Labels'
         },
     ];
 
@@ -465,8 +465,8 @@ export default function ProductDetail3DView({
                         <nav aria-label="Breadcrumb" className="flex items-center flex-wrap gap-2 text-[11px] sm:text-xs font-bold tracking-widest uppercase mb-3.5 text-slate-500 dark:text-slate-400">
                             <Link href="/" className="hover:text-primary dark:hover:text-cyan-400 transition-colors">HOME</Link>
                             <span className="text-slate-400 dark:text-slate-600 font-normal">/</span>
-                            <Link 
-                                href={product.category?.slug ? `/products?category=${encodeURIComponent(product.category.slug)}` : '/products'} 
+                            <Link
+                                href={product.category?.slug ? `/products?category=${encodeURIComponent(product.category.slug)}` : '/products'}
                                 className="hover:text-primary dark:hover:text-cyan-400 transition-colors"
                             >
                                 {(product.category?.name || 'GARMENTS').toUpperCase()}
@@ -487,9 +487,9 @@ export default function ProductDetail3DView({
 
                             {/* Main Product Showcase Stage - Open, generous, unrestrained by cramped box */}
                             <div className="prod-stage-bezel rounded-[28px] sm:rounded-[36px] p-3 sm:p-5 relative z-10 flex flex-col items-center justify-center min-h-[380px] sm:min-h-[460px] md:min-h-[500px]">
-                                
+
                                 {/* Amazon-Style Interactive Zoom Container */}
-                                <div 
+                                <div
                                     ref={imgContainerRef}
                                     className="w-full h-full min-h-[350px] sm:min-h-[430px] md:min-h-[470px] flex items-center justify-center overflow-hidden rounded-[20px] sm:rounded-[28px] relative cursor-crosshair select-none p-3 group bg-black/[0.02] dark:bg-white/[0.02]"
                                     onMouseEnter={() => setIsZooming(true)}
@@ -514,7 +514,7 @@ export default function ProductDetail3DView({
 
                                     {/* Optical Crosshair Reticle on Zoom */}
                                     {isZooming && (
-                                        <div 
+                                        <div
                                             className="pointer-events-none absolute w-16 h-16 rounded-full border border-primary/50 dark:border-cyan-400/60 shadow-[0_0_15px_rgba(56,189,248,0.3)] -translate-x-1/2 -translate-y-1/2"
                                             style={{
                                                 left: `${zoomPos.x}%`,
@@ -537,11 +537,10 @@ export default function ProductDetail3DView({
                                     </button>
 
                                     {/* Amazon-Style Tooltip Pill Badge */}
-                                    <div className={`absolute bottom-3 left-1/2 -translate-x-1/2 px-3.5 py-1.5 rounded-full text-[10.5px] font-bold tracking-wider uppercase transition-all duration-300 pointer-events-none flex items-center gap-1.5 shadow-sm ${
-                                        isZooming 
-                                            ? 'bg-slate-900 text-white dark:bg-cyan-500 dark:text-slate-950 opacity-95 scale-95' 
-                                            : 'bg-black/50 text-white/90 backdrop-blur-sm opacity-80 group-hover:opacity-100'
-                                    }`}>
+                                    <div className={`absolute bottom-3 left-1/2 -translate-x-1/2 px-3.5 py-1.5 rounded-full text-[10.5px] font-bold tracking-wider uppercase transition-all duration-300 pointer-events-none flex items-center gap-1.5 shadow-sm ${isZooming
+                                        ? 'bg-slate-900 text-white dark:bg-cyan-500 dark:text-slate-950 opacity-95 scale-95'
+                                        : 'bg-black/50 text-white/90 backdrop-blur-sm opacity-80 group-hover:opacity-100'
+                                        }`}>
                                         <ZoomIn size={12} />
                                         <span>{isZooming ? 'Pan to inspect fabric (2.8x)' : 'Roll over image to zoom'}</span>
                                     </div>
@@ -585,9 +584,8 @@ export default function ProductDetail3DView({
                                                 key={idx}
                                                 type="button"
                                                 onClick={() => setActiveImage(img)}
-                                                className={`thumb-stage-card relative w-20 h-20 sm:w-22 sm:h-22 md:w-24 md:h-24 rounded-2xl overflow-hidden p-2 transition-all duration-300 shrink-0 cursor-pointer ${
-                                                    isSelected ? 'active-thumb-stage' : 'inactive-thumb-stage'
-                                                }`}
+                                                className={`thumb-stage-card relative w-20 h-20 sm:w-22 sm:h-22 md:w-24 md:h-24 rounded-2xl overflow-hidden p-2 transition-all duration-300 shrink-0 cursor-pointer ${isSelected ? 'active-thumb-stage' : 'inactive-thumb-stage'
+                                                    }`}
                                                 title={`View angle ${idx + 1}`}
                                             >
                                                 <img
@@ -873,11 +871,11 @@ export default function ProductDetail3DView({
 
             {/* ═══════════════════════ FULLSCREEN HD FABRIC INSPECTOR MODAL (3D CLAY & DARK SKEUOMORPHIC) ═══════════════════════ */}
             {isFullscreenZoom && (
-                <div 
+                <div
                     className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 bg-black/75 dark:bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
                     onClick={() => setIsFullscreenZoom(false)}
                 >
-                    <div 
+                    <div
                         className="relative max-w-5xl w-full h-[88vh] bg-[#F3EFE8] dark:bg-[#0B1324] border border-white/80 dark:border-cyan-500/40 rounded-[32px] overflow-hidden flex flex-col shadow-[0_30px_90px_rgba(0,0,0,0.35),inset_0_2px_4px_rgba(255,255,255,0.9)] dark:shadow-[0_0_60px_rgba(6,182,212,0.25),0_30px_90px_rgba(0,0,0,0.85)] z-10"
                         onClick={e => e.stopPropagation()}
                     >
@@ -920,7 +918,7 @@ export default function ProductDetail3DView({
                         </div>
 
                         {/* Interactive Centered Pan/Zoom Image Canvas */}
-                        <div 
+                        <div
                             className="flex-1 w-full h-full overflow-hidden flex items-center justify-center p-6 sm:p-10 relative cursor-grab active:cursor-grabbing select-none bg-gradient-to-b from-[#FAF7F2]/50 to-[#EAE4D9]/40 dark:from-[#070D18]/90 dark:to-[#0A1424]/90"
                             onMouseMove={handleMouseMove}
                         >
@@ -967,11 +965,10 @@ export default function ProductDetail3DView({
                                         <button
                                             key={idx}
                                             onClick={() => setActiveImage(img)}
-                                            className={`w-11 h-11 rounded-xl overflow-hidden p-1 transition-all cursor-pointer ${
-                                                activeImage === img 
-                                                    ? 'bg-white dark:bg-[#12223D] border-2 border-primary dark:border-cyan-400 shadow-md scale-105' 
-                                                    : 'bg-[#FAF7F2] dark:bg-white/5 border border-[#DDD6C8] dark:border-white/10 opacity-70 hover:opacity-100 hover:scale-102'
-                                            }`}
+                                            className={`w-11 h-11 rounded-xl overflow-hidden p-1 transition-all cursor-pointer ${activeImage === img
+                                                ? 'bg-white dark:bg-[#12223D] border-2 border-primary dark:border-cyan-400 shadow-md scale-105'
+                                                : 'bg-[#FAF7F2] dark:bg-white/5 border border-[#DDD6C8] dark:border-white/10 opacity-70 hover:opacity-100 hover:scale-102'
+                                                }`}
                                         >
                                             <img src={img} alt={`Angle ${idx + 1}`} className="w-full h-full object-contain pointer-events-none" />
                                         </button>

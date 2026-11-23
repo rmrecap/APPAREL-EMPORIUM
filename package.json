@@ -9,6 +9,9 @@
         "seed": "npx prisma db seed",
         "db:push": "npx prisma db push",
         "db:reset": "npx prisma db push --force-reset && npx prisma db seed",
+        "feed:merchant": "node scripts/generate-google-merchant-feed.js",
+        "upload:merchant": "node scripts/upload-to-merchant-center.js",
+        "upload:sftp": "py scripts/sftp-google-merchant-upload.py",
         "lint": "next lint"
     },
     "dependencies": {
