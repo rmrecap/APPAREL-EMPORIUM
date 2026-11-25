@@ -102,14 +102,41 @@ jobs:
             fi
             git remote set-url origin https://github.com/rmrecap/APPAREL-EMPORIUM.git 2>/dev/null || git remote add origin https://github.com/rmrecap/APPAREL-EMPORIUM.git
             
-            # CRITICAL ZERO-DATA-LOSS BACKUP: Backup live SQLite database before git reset
+            # CRITICAL ZERO-DATA-LOSS BACKUP: Backup live SQLite database & runtime uploads before git reset
             mkdir -p "$HOME/db_backups"
-            if [ -f "prisma/dev.db" ]; then
-              DB_SIZE=$(wc -c < "prisma/dev.db" 2>/dev/null || stat -c%s "prisma/dev.db" 2>/dev/null || echo 0)
-              echo "Preserving live database before git reset (current size: $DB_SIZE bytes)..."
-              cp prisma/dev.db "$HOME/db_backups/live_backup_latest.db"
-              cp prisma/dev.db "$HOME/db_backups/live_backup_$(date +%Y%m%d_%H%M%S).db"
-              cp prisma/dev.db prisma/dev.db.live_backup
+            # Preserve any newly uploaded media from standalone or public_html into repo public/uploads before rebuild
+            mkdir -p public/uploads
+            if [ -d ".next/standalone/public/uploads" ]; then
+              cp -rn .next/standalone/public/uploads/* public/uploads/ 2>/dev/null || true
+            fi
+            if [ -d "/home/$USER/domains/aelbd.net/public_html/public/uploads" ]; then
+              cp -rn /home/$USER/domains/aelbd.net/public_html/public/uploads/* public/uploads/ 2>/dev/null || true
+            fi
+
+            if [ -d "/home/$USER/domains/aelbd.net/hbuilds/current/nodejs/public/uploads" ]; then
+              cp -rn /home/$USER/domains/aelbd.net/hbuilds/current/nodejs/public/uploads/* public/uploads/ 2>/dev/null || true
+            fi
+
+            # Pick the most up-to-date live database (hbuilds runtime vs standalone vs root prisma/dev.db)
+            ACTIVE_DB_SRC=""
+            for DB_CAND in \
+              "/home/$USER/domains/aelbd.net/hbuilds/current/nodejs/prisma/dev.db" \
+              ".next/standalone/prisma/dev.db" \
+              "prisma/dev.db"
+            do
+              if [ -f "$DB_CAND" ]; then
+                if [ -z "$ACTIVE_DB_SRC" ] || [ "$DB_CAND" -nt "$ACTIVE_DB_SRC" ]; then
+                  ACTIVE_DB_SRC="$DB_CAND"
+                fi
+              fi
+            done
+
+            if [ -n "$ACTIVE_DB_SRC" ]; then
+              DB_SIZE=$(wc -c < "$ACTIVE_DB_SRC" 2>/dev/null || stat -c%s "$ACTIVE_DB_SRC" 2>/dev/null || echo 0)
+              echo "Preserving live database ($ACTIVE_DB_SRC, size: $DB_SIZE bytes) before git reset..."
+              cp "$ACTIVE_DB_SRC" "$HOME/db_backups/live_backup_latest.db"
+              cp "$ACTIVE_DB_SRC" "$HOME/db_backups/live_backup_$(date +%Y%m%d_%H%M%S).db"
+              cp "$ACTIVE_DB_SRC" prisma/dev.db.live_backup
             fi
             
             # Fetch safely with fallbacks
@@ -212,6 +239,9 @@ jobs:
             echo "Synchronizing blog posts..."
             node scripts/sync-blog-posts.js || true
 
+            echo "Synchronizing localized product images and Media Library DB..."
+            node scripts/localize-and-sync-media.js --skip-download || true
+
             echo "Running Post-migration Product Integrity Guard..."
             node scripts/guard-product-integrity.js
             
@@ -226,7 +256,8 @@ jobs:
             # Sync standalone static assets and database if standalone build was generated
             if [ -d ".next/standalone" ]; then
               echo "Syncing assets to .next/standalone..."
-              cp -rn public .next/standalone/ 2>/dev/null || true
+              mkdir -p .next/standalone/public
+              cp -rn public/* .next/standalone/public/ 2>/dev/null || true
               mkdir -p .next/standalone/.next
               cp -rn .next/static .next/standalone/.next/ 2>/dev/null || true
               mkdir -p .next/standalone/prisma
@@ -265,8 +296,10 @@ jobs:
                 cp -r .next "$HB/" 2>/dev/null || true
                 cp -rn public/* "$HB/" 2>/dev/null || true
                 cp -rn public "$HB/" 2>/dev/null || true
-                mkdir -p "$HB/prisma"
+                mkdir -p "$HB/prisma" "$HB/.next/standalone/prisma" "$HB/public"
+                cp -rn public/* "$HB/public/" 2>/dev/null || true
                 cp -f prisma/dev.db "$HB/prisma/dev.db" 2>/dev/null || true
+                cp -f prisma/dev.db "$HB/.next/standalone/prisma/dev.db" 2>/dev/null || true
                 cp -f prisma/dev.db "$HB/dev.db" 2>/dev/null || true
                 cp .env "$HB/" 2>/dev/null || true
                 cp package.json "$HB/" 2>/dev/null || true

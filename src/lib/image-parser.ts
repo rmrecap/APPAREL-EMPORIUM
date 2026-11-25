@@ -1,10 +1,11 @@
 import fs from 'fs';
 import path from 'path';
+import { localizeImageUrl, registerMediaFileIfMissing } from '@/lib/media-sync';
 
 /**
  * Normalizes all possible variations of image inputs from external tools, AI models,
  * form submissions, or API requests into a clean array of string URLs.
- * 
+ *
  * Supports:
  * - Direct URLs: ["https://..."]
  * - Object arrays: [{ url: "https://..." }] or [{ src: "..." }]
@@ -77,6 +78,52 @@ export function normalizeIncomingImages(body: any, extraFileUrls: string[] = [])
     }
 
     return filterAndCleanUrls(rawList);
+}
+
+/**
+ * Normalizes incoming images AND localizes any remote URLs (e.g., Google Drive / external hosts)
+ * into /public/uploads/products/ while ensuring every local image is registered in MediaFile.
+ */
+export async function normalizeAndLocalizeIncomingImages(
+    body: any,
+    extraFileUrls: string[] = [],
+    options: { folder?: string; alt?: string; slug?: string } = {}
+): Promise<string[]> {
+    const cleaned = normalizeIncomingImages(body, extraFileUrls);
+    const folder = options.folder || 'products';
+    const localized: string[] = [];
+    const seen = new Set<string>();
+
+    for (let i = 0; i < cleaned.length; i++) {
+        const url = cleaned[i];
+        let finalUrl = url;
+
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+            const extGuess = path.extname(url.split('?')[0]) || '.jpg';
+            const displayName = options.slug ? `${options.slug}-${i + 1}${extGuess}` : undefined;
+            finalUrl = await localizeImageUrl(url, {
+                folder,
+                alt: options.alt,
+                displayName,
+            });
+        } else if (url.startsWith('/uploads/')) {
+            const ext = path.extname(url.split('?')[0]) || '.jpg';
+            const displayName = options.slug ? `${options.slug}-${i + 1}${ext}` : path.basename(url);
+            await registerMediaFileIfMissing({
+                filePath: url,
+                folder: url.split('/')[2] || folder,
+                alt: options.alt || null,
+                originalName: displayName,
+            });
+        }
+
+        if (finalUrl && !seen.has(finalUrl)) {
+            seen.add(finalUrl);
+            localized.push(finalUrl);
+        }
+    }
+
+    return localized;
 }
 
 function filterAndCleanUrls(items: any[]): string[] {

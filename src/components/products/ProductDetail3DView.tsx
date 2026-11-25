@@ -381,27 +381,49 @@ export default function ProductDetail3DView({
         }
     };
 
-    // ── Universal, buyer-centric specifications matching global demand ──
+    // ── Specifications derived from Website Database + universal B2B standards ──
+    const ignoredSpecKeys = new Set(['MOQ', 'MINIMUM ORDER', 'MIN ORDER', 'ORDER VOLUME', 'PRICE', 'FOB', 'FOB PRICE', 'PRICE RANGE']);
+    const dbSpecRows = Object.entries(specs)
+        .filter(([k, v]) => !ignoredSpecKeys.has(k.trim().toUpperCase()) && v !== null && v !== undefined && String(v).trim() !== '')
+        .map(([k, v]) => ({ label: k, val: String(v) }));
+
+    const fallbackSpecRows = [
+        ...(product.sku || product.styleNo ? [{ label: 'Style / SKU', val: product.styleNo || product.sku }] : []),
+        ...(product.department ? [{ label: 'Department', val: product.department }] : []),
+        ...(product.divisionType ? [{ label: 'Division', val: product.divisionType }] : []),
+        ...(product.fabricComposition ? [{ label: 'Fabric Composition', val: product.fabricComposition }] : []),
+        ...(product.fabricConstruction ? [{ label: 'Construction', val: product.fabricConstruction }] : []),
+        ...(product.yarnCount ? [{ label: 'Yarn Count', val: product.yarnCount }] : []),
+        ...(product.gauge ? [{ label: 'Gauge', val: product.gauge }] : []),
+        ...(product.fit ? [{ label: 'Fit', val: product.fit }] : []),
+    ];
+
+    const mergedSpecMap = new Map<string, string>();
+    for (const r of [...dbSpecRows, ...fallbackSpecRows]) {
+        const keyNorm = r.label.trim().toLowerCase();
+        if (!mergedSpecMap.has(keyNorm)) {
+            mergedSpecMap.set(keyNorm, r.val);
+        }
+    }
+
     const specRows = [
         {
             label: 'Order Volume',
-            val: 'Flexible (Custom as per Buyer Request)'
+            val: product.minOrder || 'Flexible (Custom as per Buyer Request)'
         },
-        {
-            label: 'Fabric Type',
-            val: specs['Fabric'] || '100% Combed / Ring-Spun Cotton, CVC, Poly Blends (As Required)'
-        },
-        {
-            label: 'Weight (GSM)',
-            val: 'Custom GSM (140 - 280+ GSM / Tailored by Region & Season)'
-        },
+        ...Array.from(mergedSpecMap.entries()).map(([kNorm, val]) => {
+            const originalRow = [...dbSpecRows, ...fallbackSpecRows].find(r => r.label.trim().toLowerCase() === kNorm);
+            return { label: originalRow?.label || kNorm, val };
+        }),
+        ...(mergedSpecMap.has('fabric') || mergedSpecMap.has('fabric composition')
+            ? []
+            : [{
+                label: 'Fabric Type',
+                val: '100% Combed / Ring-Spun Cotton, CVC, Poly Blends (As Required)'
+            }]),
         {
             label: 'Dyeing & Wash',
-            val: 'Reactive Eco-Friendly / International Standard / Pantone Matching'
-        },
-        {
-            label: 'Fit & Sizing',
-            val: 'US, EU, Asian or Custom Tech Pack Fit'
+            val: product.dyeingFinishing || 'Reactive Eco-Friendly / International Standard / Pantone Matching'
         },
         {
             label: 'Customization',

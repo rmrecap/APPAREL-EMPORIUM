@@ -3,9 +3,9 @@ import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { autoClassifyProductTaxonomy } from '@/lib/product-classifier';
+import { normalizeAndLocalizeIncomingImages } from '@/lib/image-parser';
 
 export const dynamic = 'force-dynamic';
-
 
 export async function POST(request: Request) {
     try {
@@ -23,23 +23,20 @@ export async function POST(request: Request) {
         let failed = 0;
         const errors: string[] = [];
 
-        // Process sequentially or batch insert
         for (const [index, p] of products.entries()) {
             try {
                 if (!p.Name || !p.Category || !p.ShortDescription) {
                     throw new Error('Missing required fields: Name, Category, or ShortDescription');
                 }
 
-                // Try find category
                 let category = await prisma.category.findFirst({
                     where: { name: { equals: String(p.Category) } }
                 });
 
                 if (!category) {
-                    // Create dummy category if not exists
-                    const slug = String(p.Category).toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                    const catSlug = String(p.Category).toLowerCase().replace(/[^a-z0-9]+/g, '-');
                     category = await prisma.category.create({
-                        data: { name: String(p.Category), slug }
+                        data: { name: String(p.Category), slug: catSlug }
                     });
                 }
 
@@ -54,11 +51,12 @@ export async function POST(request: Request) {
                     Price: p.Price || '',
                 };
 
-                const slug = String(p.Name).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.random().toString(36).substring(2, 6);
+                const productName = String(p.Name);
+                const slug = productName.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.random().toString(36).substring(2, 6);
 
                 const classified = autoClassifyProductTaxonomy({
-                    name: String(p.Name),
-                    title: String(p.Name),
+                    name: productName,
+                    title: productName,
                     category: String(p.Category),
                     categoryName: category.name,
                     department: p.Department,
@@ -69,19 +67,41 @@ export async function POST(request: Request) {
                     tags: p.Tags,
                 });
 
+                const localizedImages = await normalizeAndLocalizeIncomingImages(
+                    {
+                        images: p.Images || p.images || p.Image || p.image || p.ImageUrl || p.imageUrl || p.Photo || p.photo,
+                    },
+                    [],
+                    {
+                        folder: 'products',
+                        alt: productName,
+                        slug,
+                    }
+                );
+
+                const finalImages = localizedImages.length > 0 ? localizedImages : ['/images/placeholder-product.svg'];
+                const finalDescription = p.Description ? String(p.Description) : String(p.ShortDescription);
+
                 await prisma.product.create({
                     data: {
-                        name: String(p.Name),
-                        title: String(p.Name),
+                        name: productName,
+                        title: productName,
                         slug,
+                        sku: p.SKU ? String(p.SKU) : undefined,
+                        styleNo: p.SKU ? String(p.SKU) : undefined,
                         shortDescription: String(p.ShortDescription),
-                        description: p.Description ? String(p.Description) : String(p.ShortDescription),
+                        description: finalDescription,
                         categoryId: category.id,
                         divisionType: classified.divisionType,
                         department: classified.department,
                         subCategory: classified.subCategory,
-                        images: '["/images/placeholder-product.svg"]', // Default
+                        fabricComposition: p.Fabric ? String(p.Fabric) : null,
+                        gsm: p.GSM ? String(p.GSM) : null,
+                        images: JSON.stringify(finalImages),
+                        ogImage: finalImages[0] || null,
                         specifications: JSON.stringify(specifications),
+                        seoTitle: productName,
+                        seoDescription: String(p.ShortDescription).substring(0, 160),
                         isActive: true,
                         isFeatured: p.Featured === 'Yes' || p.Featured === 'true' || p.Featured === true
                     }
@@ -100,4 +120,3 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
-

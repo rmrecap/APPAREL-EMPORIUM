@@ -90,7 +90,10 @@ export default function FileUpload({
                     if (response.success) {
                         setQueue([]);
                         setProgress(0);
-                        if (onUploadComplete) onUploadComplete(response.file ? [response.file] : []);
+                        const uploaded = Array.isArray(response.files) && response.files.length > 0
+                            ? response.files
+                            : (response.file ? [response.file] : []);
+                        if (onUploadComplete) onUploadComplete(uploaded);
                     } else {
                         setErrors([response.error || 'Upload failed due to an unknown server error.']);
                     }

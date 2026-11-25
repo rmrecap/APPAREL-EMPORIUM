@@ -4,7 +4,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { extractApiKey, verifyApiKey } from '@/lib/api-auth';
-import { normalizeIncomingImages } from '@/lib/image-parser';
+import { normalizeAndLocalizeIncomingImages } from '@/lib/image-parser';
 import { resolveOrCreateCategory } from '@/lib/category-resolver';
 import { buildCategoryPrismaFilter } from '@/lib/catalog-taxonomy';
 import { autoClassifyProductTaxonomy } from '@/lib/product-classifier';
@@ -254,8 +254,12 @@ export async function POST(req: NextRequest) {
         const finalSlug = `${baseSlug}-${Date.now().toString().slice(-4)}`;
         const finalSku = styleNo || sku || `AEL-${Date.now().toString().slice(-6)}`;
 
-        // ৫. ইমেজ ও স্পেসিফিকেশন সিরিয়ালাইজেশন
-        const finalImageUrls = normalizeIncomingImages(body);
+        // ৫. ইমেজ ও স্পেসিফিকেশন সিরিয়ালাইজেশন (সব রিমোট ইমেজ লোকালাইজ করে মিডিয়া লাইব্রেরিতে যুক্ত করা)
+        const finalImageUrls = await normalizeAndLocalizeIncomingImages(body, [], {
+            folder: 'products',
+            alt: productTitle,
+            slug: baseSlug,
+        });
         const imagesJson = JSON.stringify(finalImageUrls);
 
         let specsJson = '{}';
@@ -328,7 +332,7 @@ export async function POST(req: NextRequest) {
             seoTitle: seoTitle || productTitle,
             seoDescription: seoDescription || shortDescription || description?.slice(0, 150) || '',
             seoKeywords: seoKeywords || null,
-            ogImage: Array.isArray(images) && images.length > 0 ? images[0] : null,
+            ogImage: finalImageUrls.length > 0 ? finalImageUrls[0] : null,
             images: imagesJson,
             variants: typeof variants === 'string' ? variants : JSON.stringify(variants || []),
             tieredPricing: typeof tieredPricing === 'string' ? tieredPricing : JSON.stringify(tieredPricing || []),

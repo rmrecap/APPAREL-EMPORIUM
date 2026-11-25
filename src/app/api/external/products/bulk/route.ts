@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { extractApiKey, verifyApiKey } from '@/lib/api-auth';
 import { handlePreflight, withCors } from '../../cors';
+import { normalizeAndLocalizeIncomingImages } from '@/lib/image-parser';
 
 export const dynamic = 'force-dynamic';
 
@@ -100,6 +101,11 @@ export async function POST(req: NextRequest) {
             }
 
             try {
+                const localizedImages = await normalizeAndLocalizeIncomingImages({ images }, [], {
+                    folder: 'products',
+                    alt: name,
+                    slug: finalSlug,
+                });
                 const product = await prisma.product.create({
                     data: {
                         name,
@@ -107,7 +113,8 @@ export async function POST(req: NextRequest) {
                         description,
                         shortDescription: shortDescription || description.substring(0, 150),
                         categoryId: resolvedCategoryId,
-                        images: Array.isArray(images) ? JSON.stringify(images) : (images || '[]'),
+                        images: JSON.stringify(localizedImages),
+                        ogImage: localizedImages[0] || null,
                         specifications: typeof specifications === 'object' && specifications !== null
                             ? JSON.stringify(specifications)
                             : (specifications || '{}'),

@@ -21,16 +21,33 @@ export async function POST(req: Request) {
         const clonedProduct = await prisma.product.create({
             data: {
                 name: `${sourceProduct.name} (Copy)`,
+                title: `${sourceProduct.name} (Copy)`,
                 slug: newSlug,
                 description: sourceProduct.description,
                 shortDescription: sourceProduct.shortDescription,
                 categoryId: sourceProduct.categoryId,
+                department: sourceProduct.department,
+                subCategory: sourceProduct.subCategory,
+                divisionType: sourceProduct.divisionType,
+                brand: sourceProduct.brand,
+                fabricComposition: sourceProduct.fabricComposition,
+                fabricConstruction: sourceProduct.fabricConstruction,
+                yarnCount: sourceProduct.yarnCount,
+                gsm: sourceProduct.gsm,
+                gauge: sourceProduct.gauge,
+                fit: sourceProduct.fit,
+                dyeingFinishing: sourceProduct.dyeingFinishing,
                 images: sourceProduct.images,
+                ogImage: sourceProduct.ogImage,
                 specifications: sourceProduct.specifications,
                 isFeatured: false,
                 isActive: false, // Clone as inactive by default
                 tags: sourceProduct.tags,
-                variants: sourceProduct.variants
+                variants: sourceProduct.variants,
+                seoTitle: `${sourceProduct.name} (Copy)`,
+                seoDescription: sourceProduct.seoDescription,
+                seoKeywords: sourceProduct.seoKeywords,
+                minOrder: sourceProduct.minOrder,
             }
         });
 

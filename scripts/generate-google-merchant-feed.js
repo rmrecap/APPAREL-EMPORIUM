@@ -6,6 +6,7 @@ const prisma = new PrismaClient();
 const JSON_BACKUP_PATH = path.join(__dirname, '..', 'prisma', 'catalog_backup_257_products.json');
 const XML_OUTPUT_PATH = path.join(__dirname, '..', 'public', 'google-merchant-feed.xml');
 const TSV_OUTPUT_PATH = path.join(__dirname, '..', 'public', 'google-merchant-feed.tsv');
+const TXT_OUTPUT_PATH = path.join(__dirname, '..', 'public', 'google-merchant-products.txt');
 const BASE_URL = 'https://www.aelbd.net';
 
 function parseImages(rawImages) {
@@ -108,24 +109,28 @@ async function main() {
     <description>OEM/ODM apparel manufacturer and exporter catalog from Bangladesh. High quality knitwear, woven garments, denim, and sweaters.</description>
 `;
 
-    // 2. Generate Google Merchant Center TSV Header
+    // 2. Generate Google Merchant Center TSV/TXT Header (matching Merchant SFTP spec)
     const tsvHeaders = [
         'id',
         'title',
         'description',
+        'availability',
         'link',
         'image_link',
         'additional_image_link',
-        'availability',
         'price',
-        'google_product_category',
+        'identifier_exists',
+        'mpn',
         'brand',
         'condition',
+        'channel',
+        'shipping',
+        'included_destination',
+        'excluded_destination',
         'gender',
         'age_group',
         'product_type',
-        'identifier_exists',
-        'mpn',
+        'google_product_category',
         'custom_label_0',
         'custom_label_1',
         'custom_label_2',
@@ -146,7 +151,7 @@ async function main() {
         const link = `${BASE_URL}/products/${p.slug || p.id}`;
         const images = parseImages(p.images);
         const primaryImage = images.length > 0 ? images[0] : `${BASE_URL}/logo.jpg`;
-        const additionalImages = images.slice(1, 10);
+        const additionalImages = images.slice(1, 11);
 
         const basePrice = parseBasePrice(p.priceRange);
         const priceStr = `${basePrice} USD`;
@@ -199,19 +204,23 @@ async function main() {
             cleanText(id),
             cleanText(title),
             cleanText(desc),
+            'in_stock',
             cleanText(link),
             cleanText(primaryImage),
             cleanText(additionalImages.join(',')),
-            'in stock',
             priceStr,
-            googleCategory,
+            'no',
+            cleanText(id),
             brand,
             condition,
+            'online',
+            'US:Standard Shipping:0.00 USD',
+            'Free_listings',
+            'Free_local_listings,Local_inventory_ads',
             gender,
             ageGroup,
             cleanText(productType),
-            'no',
-            cleanText(id),
+            googleCategory,
             cleanText(p.department || 'Apparel'),
             cleanText(p.divisionType || 'Manufacturing'),
             cleanText(p.minOrder || 'Flexible MOQ'),
@@ -228,6 +237,9 @@ async function main() {
 
     fs.writeFileSync(TSV_OUTPUT_PATH, tsvRows.join('\n'), 'utf8');
     console.log(`✅ Saved TSV Feed: ${TSV_OUTPUT_PATH} (${fs.statSync(TSV_OUTPUT_PATH).size} bytes)`);
+
+    fs.writeFileSync(TXT_OUTPUT_PATH, tsvRows.join('\n'), 'utf8');
+    console.log(`✅ Saved TXT Feed: ${TXT_OUTPUT_PATH} (${fs.statSync(TXT_OUTPUT_PATH).size} bytes)`);
 
     console.log('================================================================');
     console.log('🎉 GOOGLE MERCHANT FEEDS GENERATED SUCCESSFULLY');

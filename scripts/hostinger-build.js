@@ -245,6 +245,10 @@ async function main() {
             run('node scripts/sync-blog-posts.js', 'Synchronize Blog Posts');
         }
 
+        if (fs.existsSync(path.join(cwd, 'scripts', 'localize-and-sync-media.js'))) {
+            run('node scripts/localize-and-sync-media.js --skip-download', 'Synchronize Media Library & Localized Product Paths');
+        }
+
         // 7. POST-MIGRATION PRODUCT INTEGRITY GUARD
         if (fs.existsSync(path.join(cwd, 'scripts', 'guard-product-integrity.js'))) {
             run('node scripts/guard-product-integrity.js', 'Post-migration Product Integrity Guard');

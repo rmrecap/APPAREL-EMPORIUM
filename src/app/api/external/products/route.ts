@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { extractApiKey, verifyApiKey } from '@/lib/api-auth';
 import { corsHeaders, handlePreflight, withCors } from '../cors';
-import { normalizeIncomingImages } from '@/lib/image-parser';
+import { normalizeAndLocalizeIncomingImages } from '@/lib/image-parser';
 import { resolveOrCreateCategory } from '@/lib/category-resolver';
 import { autoClassifyProductTaxonomy } from '@/lib/product-classifier';
 import fs from 'fs';
@@ -114,8 +114,13 @@ export async function POST(req: NextRequest) {
         });
         const resolvedCategoryId = resolvedCategory.id;
 
-        // 5. Image Extraction (handles images, imageUrl, photo, gallery, coverImage, base64, etc.)
-        const finalImageUrls = normalizeIncomingImages(body, uploadedFiles);
+        // 5. Image Extraction & Localization (downloads remote URLs to /uploads/products and registers in MediaFile)
+        const baseProdSlug = (body.slug || productName).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'product';
+        const finalImageUrls = await normalizeAndLocalizeIncomingImages(body, uploadedFiles, {
+            folder: 'products',
+            alt: productName,
+            slug: baseProdSlug,
+        });
         const imagesJson = JSON.stringify(finalImageUrls);
 
         // 6. Auto-publish status check
@@ -195,6 +200,7 @@ export async function POST(req: NextRequest) {
             samplingLeadTime: body.samplingLeadTime || null,
             productionLeadTime: body.productionLeadTime || null,
             images: imagesJson,
+            ogImage: finalImageUrls.length > 0 ? finalImageUrls[0] : null,
             specifications: specsJson,
             isFeatured: body.isFeatured ?? false,
             isActive: finalIsActive,
@@ -213,7 +219,7 @@ export async function POST(req: NextRequest) {
         // 7. Safe Upsert Product (Prevent duplicate styleNo or slug failure)
         let product: any;
         const existingByStyle = finalStyleNo ? await prisma.product.findUnique({ where: { styleNo: finalStyleNo } }) : null;
-        
+
         // Base slug
         const rawSlug = body.slug || productName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'product';
         const existingBySlug = (!existingByStyle) ? await prisma.product.findUnique({ where: { slug: rawSlug } }) : null;

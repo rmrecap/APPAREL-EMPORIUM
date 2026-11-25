@@ -5,6 +5,7 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { extractApiKey, verifyApiKey } from '@/lib/api-auth';
 import { autoClassifyProductTaxonomy } from '@/lib/product-classifier';
+import { normalizeAndLocalizeIncomingImages } from '@/lib/image-parser';
 
 export const dynamic = 'force-dynamic';
 
@@ -96,6 +97,30 @@ export async function PUT(
             tags: body.tags,
         });
 
+        let localizedImagesJson: string | undefined;
+        let firstLocalizedImage: string | null | undefined;
+        if (body.images !== undefined) {
+            const rawImgs = typeof body.images === 'string' ? (() => { try { return JSON.parse(body.images); } catch { return [body.images]; } })() : body.images;
+            const localizedUrls = await normalizeAndLocalizeIncomingImages({ images: rawImgs }, [], {
+                folder: 'products',
+                alt: name,
+                slug: body.slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+            });
+            // Preserve { url, alt } objects if provided
+            if (Array.isArray(rawImgs) && rawImgs.some((it: any) => typeof it === 'object' && it !== null)) {
+                const mappedObjs = rawImgs.map((it: any, idx: number) => {
+                    if (typeof it === 'object' && it !== null) {
+                        return { ...it, url: localizedUrls[idx] || it.url };
+                    }
+                    return localizedUrls[idx] || it;
+                });
+                localizedImagesJson = JSON.stringify(mappedObjs);
+            } else {
+                localizedImagesJson = JSON.stringify(localizedUrls);
+            }
+            firstLocalizedImage = localizedUrls[0] || null;
+        }
+
         const updateData: any = {
             ...(name && { name, title: name }),
             ...(body.slug && { slug: body.slug }),
@@ -124,7 +149,8 @@ export async function PUT(
             ...(body.packaging !== undefined && { packaging: body.packaging }),
             ...(body.exportMarkets !== undefined && { exportMarkets: typeof body.exportMarkets === 'string' ? body.exportMarkets : JSON.stringify(body.exportMarkets || []) }),
             ...(body.features !== undefined && { features: typeof body.features === 'string' ? body.features : JSON.stringify(body.features || []) }),
-            ...(body.images !== undefined && { images: typeof body.images === 'string' ? body.images : JSON.stringify(body.images || []) }),
+            ...(localizedImagesJson !== undefined && { images: localizedImagesJson }),
+            ...(firstLocalizedImage !== undefined && { ogImage: firstLocalizedImage }),
             ...(body.specifications !== undefined && { specifications: typeof body.specifications === 'string' ? body.specifications : JSON.stringify(body.specifications || {}) }),
             ...(body.variants !== undefined && { variants: typeof body.variants === 'string' ? body.variants : JSON.stringify(body.variants || []) }),
             ...(body.tieredPricing !== undefined && { tieredPricing: typeof body.tieredPricing === 'string' ? body.tieredPricing : JSON.stringify(body.tieredPricing || []) }),
@@ -134,6 +160,7 @@ export async function PUT(
             ...(body.tags !== undefined && { tags: typeof body.tags === 'string' ? body.tags : JSON.stringify(body.tags || []) }),
             ...(body.seoTitle !== undefined && { seoTitle: body.seoTitle }),
             ...(body.seoDescription !== undefined && { seoDescription: body.seoDescription }),
+            ...(body.seoKeywords !== undefined && { seoKeywords: body.seoKeywords }),
         };
 
         const product = await prisma.product.update({

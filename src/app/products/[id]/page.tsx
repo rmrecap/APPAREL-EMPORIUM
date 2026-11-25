@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
                 { id: params.id }
             ]
         },
-        select: { name: true, shortDescription: true, slug: true, images: true }
+        select: { name: true, shortDescription: true, slug: true, images: true, ogImage: true, seoTitle: true, seoDescription: true, seoKeywords: true }
     });
 
     if (!product) {
@@ -35,13 +35,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.aelbd.net';
-    const firstImgRel = extractFeaturedImage(product.images, '/images/3d/white_tshirt.jpg');
+    const firstImgRel = product.ogImage || extractFeaturedImage(product.images, '/images/3d/white_tshirt.jpg');
     const firstImg = firstImgRel.startsWith('http') ? firstImgRel : `${baseUrl}${firstImgRel.startsWith('/') ? '' : '/'}${firstImgRel}`;
     const productSlug = product.slug || params.id;
 
     return {
-        title: `${product.name} Wholesale Manufacturing & Sourcing | AELBD`,
-        description: product.shortDescription || `Explore specifications, MOQ, and wholesale production details for ${product.name}.`,
+        title: product.seoTitle || `${product.name} Wholesale Manufacturing & Sourcing | AELBD`,
+        description: product.seoDescription || product.shortDescription || `Explore specifications, MOQ, and wholesale production details for ${product.name}.`,
+        keywords: product.seoKeywords || undefined,
         alternates: {
             canonical: `https://www.aelbd.net/products/${encodeURIComponent(productSlug)}`,
         },
@@ -127,9 +128,26 @@ export default async function ProductDetailPage({ params }: PageProps) {
         include: { category: true }
     });
 
-    // ── Schema.org B2B Garment Manufacturing Service & BreadcrumbList JSON-LD ──
+    // ── Schema.org B2B Garment Manufacturing Service, Product & BreadcrumbList JSON-LD ──
     const productImages = extractProductImages(product.images, '/images/3d/white_tshirt.jpg');
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.aelbd.net';
+    const absoluteImages = productImages.map(img => img.startsWith('http') ? img : `${baseUrl}${img.startsWith('/') ? '' : '/'}${img}`);
+
+    let parsedSpecs: Record<string, string> = {};
+    try {
+        if (typeof product.specifications === 'string') {
+            const p = JSON.parse(product.specifications);
+            if (p && typeof p === 'object' && !Array.isArray(p)) parsedSpecs = p;
+        }
+    } catch { }
+
+    const additionalProperties = Object.entries(parsedSpecs)
+        .filter(([, v]) => v !== null && v !== undefined && String(v).trim() !== '')
+        .map(([k, v]) => ({
+            '@type': 'PropertyValue',
+            'name': k,
+            'value': String(v),
+        }));
 
     const b2bServiceSchema = {
         '@context': 'https://schema.org',
@@ -139,13 +157,30 @@ export default async function ProductDetailPage({ params }: PageProps) {
         'provider': {
             '@type': 'Organization',
             '@id': `${baseUrl}/#organization`,
-            'name': 'Apparel Emporium',
+            'name': product.brand || 'Apparel Emporium',
             'url': baseUrl,
         },
-        'description': product.shortDescription || product.description,
-        'image': productImages.map(img => img.startsWith('http') ? img : `${baseUrl}${img.startsWith('/') ? '' : '/'}${img}`),
+        'description': product.description || product.shortDescription,
+        'image': absoluteImages,
         'areaServed': 'Worldwide',
-        'category': product.category?.name || 'Garments',
+        'category': product.category?.name || product.subCategory || 'Garments',
+    };
+
+    const productSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        'name': product.name,
+        'sku': product.sku || product.styleNo || product.id,
+        'mpn': product.styleNo || product.sku || product.id,
+        'description': product.description || product.shortDescription,
+        'image': absoluteImages,
+        'category': [product.department, product.divisionType, product.category?.name].filter(Boolean).join(' > ') || 'Apparel',
+        'material': product.fabricComposition || parsedSpecs['Fabric'] || undefined,
+        'brand': {
+            '@type': 'Brand',
+            'name': product.brand || 'Apparel Emporium',
+        },
+        ...(additionalProperties.length > 0 ? { 'additionalProperty': additionalProperties } : {}),
     };
 
     const breadcrumbSchema = {
@@ -164,6 +199,10 @@ export default async function ProductDetailPage({ params }: PageProps) {
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(b2bServiceSchema) }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
             />
             <script
                 type="application/ld+json"
